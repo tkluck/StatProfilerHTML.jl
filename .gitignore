@@ -1,0 +1,13 @@
+/Build
+/Build.bat
+/dev_Build.PL
+/Devel-StatProfiler*
+/META.*
+/MYMETA.*
+/_build
+/.build
+/blib
+/buildtmp
+/pod2htm?.tmp
+*.o
+*.obj
