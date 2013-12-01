@@ -4,6 +4,8 @@
 #include <time.h>
 #include <pthread.h>
 
+#include "tracecollector.h"
+
 using namespace devel::statprofiler;
 // TODO handle Perl threads/multiplicity
 static unsigned int counter = 0;
@@ -59,6 +61,7 @@ devel::statprofiler::runloop(pTHX)
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (counter != pred_counter) {
+            collect_trace(aTHX_ 20);
             pred_counter = counter;
         }
         OP_ENTRY_PROBE(OP_NAME(op));
