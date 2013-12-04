@@ -6,7 +6,9 @@
 
 namespace devel {
     namespace statprofiler {
-        void collect_trace(pTHX_ int depth);
+        class TraceFileWriter;
+
+        void collect_trace(pTHX_ TraceFileWriter &trace, int depth);
     }
 }
 

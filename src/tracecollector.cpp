@@ -1,38 +1,7 @@
 #include "tracecollector.h"
+#include "tracefile.h"
 
-
-static void
-collect_caller_info(pTHX_ int depth, const PERL_CONTEXT *caller, const PERL_CONTEXT *sub)
-{
-    COP *callsite = caller->blk_oldcop;
-    HV *callpackage = CopSTASH(callsite);
-    const char *name, *package = "__ANON__";
-
-    // from Perl_pp_caller
-    if (CxTYPE(sub) == CXt_SUB || CxTYPE(sub) == CXt_FORMAT) {
-	GV * const cvgv = CvGV(sub->blk_sub.cv);
-	if (cvgv && isGV(cvgv)) {
-            GV *egv = GvEGVx(cvgv) ? GvEGVx(cvgv) : cvgv;
-            HV *stash = GvSTASH(egv);
-
-            if (stash)
-                package = HvNAME(stash);
-            name = GvNAME(egv);
-	}
-	else {
-            name = "(unknown)";
-	}
-    } else {
-        package = "(eval)";
-        name = "(eval)";
-    }
-#if 0
-    // XXX
-    printf("%s::%s at %s %s:%d ",
-           package, name,
-           HvNAME_get(callpackage), OutCopFILE(callsite), CopLINE(callsite));
-#endif
-}
+using namespace devel::statprofiler;
 
 
 // needs to be kept in sync with S_dopoptosub in op.c
@@ -66,12 +35,13 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 
 // needs to be kept in sync with Perl_caller_cx in op.c
 void
-devel::statprofiler::collect_trace(pTHX_ int depth)
+devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
 {
     I32 cxix = S_dopoptosub_at(aTHX_ cxstack, cxstack_ix);
     const PERL_CONTEXT *ccstack = cxstack;
     const PERL_SI *top_si = PL_curstackinfo;
     CV *db_sub = PL_DBsub ? GvCV(PL_DBsub) : NULL;
+    COP *line = PL_curcop;
 
     for (;;) {
         // skip over auxiliary stacks pushed by PUSHSTACKi
@@ -85,26 +55,39 @@ devel::statprofiler::collect_trace(pTHX_ int depth)
         // do not report the automatic calls to &DB::sub
         if (!(db_sub && cxix >= 0 &&
               ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub))) {
+            const PERL_CONTEXT *sub = &ccstack[cxix];
+            const PERL_CONTEXT *caller = sub;
+
             if (db_sub) {
                 // when there is a &DB::sub, we need its call site to get
                 // the correct file/line information
                 I32 dbcxix = S_dopoptosub_at(aTHX_ ccstack, cxix - 1);
 
                 if (dbcxix >= 0 && ccstack[dbcxix].blk_sub.cv == db_sub) {
-                    collect_caller_info(aTHX_ depth, &ccstack[dbcxix], &ccstack[cxix]);
+                    caller = &ccstack[dbcxix];
                     cxix = dbcxix;
                 }
-                else
-                    collect_caller_info(aTHX_ depth, &ccstack[cxix], &ccstack[cxix]);
-            } else {
-                collect_caller_info(aTHX_ depth, &ccstack[cxix], &ccstack[cxix]);
             }
+
+            // when called between an entersub and the following nextstate,
+            // ignore the set-up but-not-entered-yet stack frame
+            if (line != caller->blk_oldcop) {
+                if (CxTYPE(sub) != CXt_EVAL)
+                    trace.add_frame(CxTYPE(sub), sub->blk_sub.cv, line);
+                else
+                    trace.add_frame(CxTYPE(sub), NULL, line);
+            }
+            else
+                ++depth;
+            line = caller->blk_oldcop;
+
             if (!--depth)
                 break;
         }
         cxix = S_dopoptosub_at(aTHX_ ccstack, cxix - 1);
     }
-#if 0
-    printf("\n"); // XXX
-#endif
+
+    // report main
+    if (depth)
+        trace.add_frame(CXt_NULL, NULL, line);
 }

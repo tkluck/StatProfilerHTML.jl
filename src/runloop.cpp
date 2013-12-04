@@ -5,10 +5,12 @@
 #include <pthread.h>
 
 #include "tracecollector.h"
+#include "tracefile.h"
 
 using namespace devel::statprofiler;
 // TODO handle Perl threads/multiplicity
 static unsigned int counter = 0;
+static TraceFileWriter trace("statprof.out");
 
 
 static void *
@@ -56,12 +58,16 @@ devel::statprofiler::runloop(pTHX)
     OP *op = PL_op;
     unsigned int pred_counter = counter;
     bool *terminate = new bool;
+    if (!trace.is_valid())
+        croak("Failed to open trace file");
     if (!start_counter_thread(terminate))
         croak("Failed to start counter thread");
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (counter != pred_counter) {
-            collect_trace(aTHX_ 20);
+            trace.start_sample(counter - pred_counter);
+            collect_trace(aTHX_ trace, 20);
+            trace.end_sample();
             pred_counter = counter;
         }
         OP_ENTRY_PROBE(OP_NAME(op));
