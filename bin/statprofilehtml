@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use autodie qw(open mkdir);
+
+use Devel::StatProfiler::Reader;
+use File::Spec::Functions qw(catfile);
+
+my $profile = Devel::StatProfiler::Reader->new('statprof.out');
+my $outdir = 'statprof';
+my $calls_data = catfile($outdir, 'all_stacks_by_time.calls');
+my $calls_svg = catfile($outdir, 'all_stacks_by_time.svg');
+
+mkdir $outdir unless -d $outdir;
+open my $calls_fh, '>', $calls_data;
+
+my $total_samples = 0;
+
+while (my $trace = $profile->read_trace) {
+    my $subs = join ';', map { $_->subroutine || 'MAIN' } reverse @{$trace->frames};
+    print $calls_fh $subs, " ", $trace->weight, "\n";
+    $total_samples += $trace->weight;
+}
+
+# factor to scale the values to microseconds
+my $factor = 1000000 / 1000;
+# total (width) for flamegraph is profiler_active in ticks
+my $run_us = $total_samples;
+my $extension = $^O eq "MSWin32" ? "" : ".pl";
+my $fg_cmd = "flamegraph$extension --nametype=sub --countname=microseconds";
+
+# TODO links --nameattr=$subattr
+system("$fg_cmd --factor=$factor --total=$run_us $calls_data > $calls_svg") == 0
+    or die "Generating $calls_svg failed\n";
