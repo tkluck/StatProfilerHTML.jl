@@ -11,3 +11,4 @@
 - generate annotated source file listings
   - link source file listings from flame graph
 - command line options for analysis script
+- multiplicty/threads/fork
