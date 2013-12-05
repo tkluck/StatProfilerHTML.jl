@@ -1,0 +1,13 @@
+- allow merging/analyzing multiple profiles
+- randomize initial tick, for better sampling over multiple runs
+- test BEGIN/use/eval/require/do ""/sort block/map block
+- test under debugger
+- differentiate BEGIN blocks/evals
+- output pseudo-subroutine for opcode (package::CORE:op)
+- configurable sampling
+  - sample frequency
+  - output file
+- runtime runloop switch
+- generate annotated source file listings
+  - link source file listings from flame graph
+- command line options for analysis script
