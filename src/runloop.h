@@ -12,4 +12,8 @@ namespace devel {
     }
 }
 
+#ifdef _DEVEL_STATPROFILER_XSP
+using namespace devel::statprofiler;
+#endif
+
 #endif

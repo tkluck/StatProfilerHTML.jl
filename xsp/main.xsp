@@ -1,3 +1,5 @@
+#define _DEVEL_STATPROFILER_XSP
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "ppport.h"
@@ -10,12 +12,12 @@
 %{
 
 BOOT:
-    PL_runops = devel::statprofiler::runloop;
-    devel::statprofiler::init_runloop(aTHX);
+    PL_runops = runloop;
+    init_runloop(aTHX);
 
 void
 CLONE(...)
   CODE:
-    devel::statprofiler::clone_runloop(aTHX);
+    clone_runloop(aTHX);
 
 %}
