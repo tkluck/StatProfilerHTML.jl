@@ -5,11 +5,17 @@
 #include "runloop.h"
 
 %module{Devel::StatProfiler};
+%package{Devel::StatProfiler};
 
 %{
 
 BOOT:
     PL_runops = devel::statprofiler::runloop;
     devel::statprofiler::init_runloop(aTHX);
+
+void
+CLONE(...)
+  CODE:
+    devel::statprofiler::clone_runloop(aTHX);
 
 %}

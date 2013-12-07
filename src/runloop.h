@@ -7,6 +7,7 @@
 namespace devel {
     namespace statprofiler {
         void init_runloop(pTHX);
+        void clone_runloop(pTHX);
         int runloop(pTHX);
     }
 }
