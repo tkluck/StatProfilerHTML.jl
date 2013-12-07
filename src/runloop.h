@@ -8,7 +8,11 @@ namespace devel {
     namespace statprofiler {
         void init_runloop(pTHX);
         void clone_runloop(pTHX);
-        int runloop(pTHX);
+        void install_runloop();
+
+        void set_enabled(bool enabled);
+        void set_output_file(const char *path);
+        void set_sampling_interval(unsigned int interval);
     }
 }
 

@@ -5,5 +5,5 @@ use warnings;
 
 use Test::More tests => 2;
 
-use_ok('Devel::StatProfiler');
+use_ok('Devel::StatProfiler', '-nostart');
 use_ok('Devel::StatProfiler::Reader');

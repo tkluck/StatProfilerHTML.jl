@@ -9,10 +9,14 @@
 %module{Devel::StatProfiler};
 %package{Devel::StatProfiler};
 
+%name{_install} void install_runloop();
+void set_enabled(bool enabled);
+void set_output_file(const char *path);
+void set_sampling_interval(unsigned int interval);
+
 %{
 
 BOOT:
-    PL_runops = runloop;
     init_runloop(aTHX);
 
 void

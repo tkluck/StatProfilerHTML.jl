@@ -27,6 +27,7 @@ namespace {
 
     struct Cxt {
         string filename;
+        bool enabled;
         int runloop_level;
         TraceFileWriter *trace;
 
@@ -59,6 +60,8 @@ namespace {
     PerlMutex refcount_mutex;
     // global counter, written by increment_counter(), read by the runloops
     unsigned int counter = 0;
+    // sampling interval, in microseconds
+    unsigned int sampling_interval = 10000;
 }
 
 static bool
@@ -67,6 +70,7 @@ start_counter_thread(bool **terminate);
 
 Cxt::Cxt() :
     filename("statprof.out"),
+    enabled(true),
     runloop_level(0),
     trace(NULL)
 {
@@ -74,6 +78,7 @@ Cxt::Cxt() :
 
 Cxt::Cxt(const Cxt &cxt) :
     filename(cxt.filename),
+    enabled(cxt.enabled),
     runloop_level(0),
     trace(NULL)
 {
@@ -132,9 +137,10 @@ static void *
 increment_counter(void *arg)
 {
     bool *terminate = static_cast<bool *>(arg);
+    unsigned int delay = sampling_interval * 1000;
 
     while (!*terminate) {
-        timespec sleep = {0, 1000000}; // 1 msec
+        timespec sleep = {0, delay};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
         if (*terminate)
@@ -171,8 +177,8 @@ start_counter_thread(bool **terminate)
 }
 
 
-int
-devel::statprofiler::runloop(pTHX)
+static int
+runloop(pTHX)
 {
     dVAR;
     dMY_CXT;
@@ -231,4 +237,40 @@ devel::statprofiler::clone_runloop(pTHX)
 
     MY_CXT_CLONE;
     new(&MY_CXT) Cxt(*original_cxt);
+}
+
+
+void
+devel::statprofiler::install_runloop()
+{
+    dTHX;
+    dMY_CXT;
+
+    if (MY_CXT.enabled)
+        PL_runops = runloop;
+}
+
+
+void
+devel::statprofiler::set_enabled(bool enabled)
+{
+    dTHX;
+    dMY_CXT;
+
+    MY_CXT.enabled = enabled;
+}
+
+void
+devel::statprofiler::set_output_file(const char *path)
+{
+    dTHX;
+    dMY_CXT;
+
+    MY_CXT.filename = path;
+}
+
+void
+devel::statprofiler::set_sampling_interval(unsigned int interval)
+{
+    sampling_interval = interval;
 }
