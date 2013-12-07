@@ -10,5 +10,6 @@
 
 BOOT:
     PL_runops = devel::statprofiler::runloop;
+    devel::statprofiler::init_runloop(aTHX);
 
 %}
