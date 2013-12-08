@@ -4,14 +4,28 @@ using namespace devel::statprofiler;
 using namespace std;
 
 
-TraceFileWriter::TraceFileWriter(const string &path)
+TraceFileWriter::TraceFileWriter(const string &path) :
+    out(NULL)
 {
-    out = fopen(path.c_str(), "w");
+    open(path);
 }
 
 TraceFileWriter::~TraceFileWriter()
 {
-    fclose(out);
+    close();
+}
+
+void TraceFileWriter::open(const std::string &path)
+{
+    close();
+    out = fopen(path.c_str(), "w");
+}
+
+void TraceFileWriter::close()
+{
+    if (out)
+        fclose(out);
+    out = NULL;
 }
 
 void TraceFileWriter::start_sample(unsigned int weight)

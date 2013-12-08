@@ -47,6 +47,8 @@ namespace devel {
             TraceFileWriter(const std::string &path);
             ~TraceFileWriter();
 
+            void open(const std::string &path);
+            void close();
             bool is_valid() const { return out; }
 
             void start_sample(unsigned int weight);
