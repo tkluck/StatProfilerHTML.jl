@@ -55,4 +55,13 @@ sub import {
     _install();
 }
 
+sub _set_profiler_state {
+    srand $_[0]; # the srand is replaced with runloop.c:switch_runloop
+}
+
+sub disable_profile { _set_profiler_state(0) }
+sub enable_profile  { _set_profiler_state(1) }
+sub restart_profile { _set_profiler_state(2) }
+sub stop_profile    { _set_profiler_state(3) }
+
 1;

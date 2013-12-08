@@ -27,8 +27,10 @@ namespace {
 
     struct Cxt {
         string filename;
-        bool enabled;
+        bool enabled, using_trampoline, resuming;
         int runloop_level;
+        runops_proc_t original_runloop;
+        OP *switch_op;
         TraceFileWriter *trace;
 
         Cxt();
@@ -71,7 +73,11 @@ start_counter_thread(bool **terminate);
 Cxt::Cxt() :
     filename("statprof.out"),
     enabled(true),
+    using_trampoline(false),
+    resuming(false),
     runloop_level(0),
+    original_runloop(NULL),
+    switch_op(NULL),
     trace(NULL)
 {
 }
@@ -79,7 +85,11 @@ Cxt::Cxt() :
 Cxt::Cxt(const Cxt &cxt) :
     filename(cxt.filename),
     enabled(cxt.enabled),
+    using_trampoline(false),
+    resuming(false),
     runloop_level(0),
+    original_runloop(NULL),
+    switch_op(cxt.switch_op),
     trace(NULL)
 {
 }
@@ -207,6 +217,102 @@ runloop(pTHX)
 }
 
 
+static int
+trampoline(pTHX)
+{
+    dMY_CXT;
+    int res;
+
+    MY_CXT.using_trampoline = true;
+    SAVEVPTR(PL_runops);
+
+    do {
+        MY_CXT.resuming = false;
+
+        if (MY_CXT.enabled)
+            PL_runops = runloop;
+        else
+            PL_runops = MY_CXT.original_runloop;
+
+        res = CALLRUNOPS(aTHX);
+        PL_op = MY_CXT.resuming ? MY_CXT.switch_op->op_next : NULL;
+    } while (PL_op);
+
+    return res;
+}
+
+
+static bool
+switch_runloop(pTHX_ pMY_CXT_ bool enable)
+{
+    if (MY_CXT.runloop_level > 1) {
+        warn("Trying to change profiling state from a nested runloop");
+        return false;
+    }
+
+    if (enable == MY_CXT.enabled)
+        return false;
+    MY_CXT.enabled = enable;
+
+    // the easy case, just let the trampoline handle the switch
+    if (MY_CXT.using_trampoline)
+        return true;
+
+    if (!enable) {
+        // this will exit the currently-running profiling runloop, and
+        // continue at the line marked >>HERE<< below
+        PL_runops = MY_CXT.original_runloop;
+        return true;
+    } else {
+        PL_runops = runloop;
+        PL_op = NORMAL;
+        CALLRUNOPS(aTHX); // execution resumes >>HERE<<
+
+        // if not resuming, the program ended for real, othwerwise restore
+        // PL_op so the outer runloop keeps executing
+        if (MY_CXT.resuming)
+            PL_op = MY_CXT.switch_op;
+
+        return false;
+    }
+}
+
+
+static OP *
+set_profiler_state(pTHX)
+{
+    dSP;
+    dMY_CXT;
+    int state = POPi;
+
+    switch (state) {
+    case 0: // disable
+    case 1: // enable
+        MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ state == 1);
+        break;
+    case 2: // restart
+        if (MY_CXT.trace) {
+            MY_CXT.trace->close();
+            MY_CXT.trace->open(MY_CXT.filename);
+            // XXX check, write metadata
+        }
+        break;
+    case 3: // stop
+        if (MY_CXT.enabled) {
+            MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ false);
+            if (MY_CXT.trace)
+                MY_CXT.trace->close();
+        }
+        break;
+    }
+
+    if (MY_CXT.resuming)
+        RETURNOP((OP *) NULL);
+    else
+        RETURN;
+}
+
+
 static void
 cleanup_runloop(pTHX_ void *ptr)
 {
@@ -222,6 +328,16 @@ devel::statprofiler::init_runloop(pTHX)
     new(&MY_CXT) Cxt();
 
     Perl_call_atexit(aTHX_ cleanup_runloop, NULL);
+
+    CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
+
+    for (OP *o = CvSTART(enable_profiler); o; o = o->op_next) {
+        if (o->op_type == OP_SRAND) {
+            o->op_ppaddr = set_profiler_state;
+            MY_CXT.switch_op = o;
+            break;
+        }
+    }
 }
 
 
@@ -246,8 +362,9 @@ devel::statprofiler::install_runloop()
     dTHX;
     dMY_CXT;
 
+    MY_CXT.original_runloop = PL_runops;
     if (MY_CXT.enabled)
-        PL_runops = runloop;
+        PL_runops = trampoline;
 }
 
 
