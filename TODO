@@ -12,3 +12,6 @@
   - link source file listings from flame graph
 - command line options for analysis script
 - multiplicty/threads/fork
+- profile metadata (tick duration, custom metadata)
+- changes of file name, metadata take effect when profiling is (re)enabled
+- calling stop -> enable DTRT
