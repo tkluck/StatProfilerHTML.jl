@@ -9,6 +9,10 @@
 
 #include <string>
 
+#ifndef OP_ENTRY_PROBE
+# define OP_ENTRY_PROBE
+#endif
+
 using namespace devel::statprofiler;
 using namespace std;
 
