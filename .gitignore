@@ -11,3 +11,4 @@
 /pod2htm?.tmp
 *.o
 *.obj
+.*.sw*
