@@ -205,7 +205,7 @@ runloop(pTHX)
     MY_CXT.enter_runloop();
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
-        if (counter != pred_counter) {
+        if (UNLIKELY( counter != pred_counter )) {
             trace->start_sample(counter - pred_counter);
             collect_trace(aTHX_ *trace, 20);
             trace->end_sample();
