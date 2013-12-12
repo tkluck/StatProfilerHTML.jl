@@ -1,17 +1,80 @@
 - allow merging/analyzing multiple profiles
+  - check they have the same sample frequency, stack depth, Perl version
+- use a different format for the file
+  - needs to store different kinds of information
+    - normal stack frames
+    - eval stack frames (need to store the source code for the eval)
+    - custom metadata
+    - tick duration, Perl version, sampling stack depth
+  - write to temporary file and rename after close
+  - decide whether to use compression
+  - decide whether to store the full sub/file name every time or
+    cache recently-used ones to save on file size (and maybe I/O speed)
+  - use async I/O to reduce delays? (probably not)
 - randomize initial tick, for better sampling over multiple runs
-- test BEGIN/use/eval/require/do ""/sort block/map block
+- test various interesting cases
+  - eval {}
+  - eval ""
+  - do ""
+  - sort {}/map {}
+  - tie and overload
+  - XS
 - test under debugger
-- differentiate BEGIN blocks/evals
-- output pseudo-subroutine for opcode (package::CORE:op)
+- differentiate BEGIN blocks/evals in profile visualization
+- handle subroutines defined in an eval
+- save currently-executing opcode as part of the stacktrace
+  - take into account that different Perl versions have different op numbers
+  - display pseudo-subroutine (package::CORE:op) in the profile visualization
 - configurable sampling
   - sample frequency
   - output file
-- runtime runloop switch
+  - stack depth
+- add option to set $^P to
+  - 0x200 descriptive names for anonymous subroutines
+  - 0x100 descriptive names for eval ""
+  - 0x10  keep information about the definition line for a subroutine
 - generate annotated source file listings
   - link source file listings from flame graph
 - command line options for analysis script
 - multiplicty/threads/fork
-- profile metadata (tick duration, custom metadata)
 - changes of file name, metadata take effect when profiling is (re)enabled
 - calling stop -> enable DTRT
+- generated code containing #line directives
+  - it might be useful to have both the original and generated code
+    in the report, with some way to toggle between the two
+- metadata/segmenting
+  - for separate requests, needs to store per-request metadata
+  - might store separate requests in separate files, or in separate
+    segments of the same file
+  - each request needs its own metadata
+  - might be useful to have multiple different, potentially overlapping
+    sub-segments (es. to mark a setup/teardown phase)
+  - don't assume the metadata is available at the beginning of the request
+- some serious benchmarking
+  - if possible, include benchmarks in the distribution
+  - make them easy to run
+  - add a fast benchmark to be used during development and a slow more
+    realistic one for release
+
+- report similar to NYTProf
+  - flame graph
+  - exclusive/inclusive sample count
+  - total per sub and per-line
+  - for each line, compute % relative to sub
+  - for each sub, compute % relative to total
+  - for subs, % of samples aggregated by call site
+  - aggregate slow opcodes per sub and display them at the end
+- flexible stack frame -> source code mapping
+  - for eval, use the embedded source code
+  - for Git repositories, fetch it from Git
+  - for non-Git, fetch it from disk
+  - for generated code, allow some custom mapping
+- eval aggregation
+- closure aggregation
+- recursive sub aggregation
+- would be nice to support arbitrary aggregation (es. by URL)
+  - add post-process step that computes a per-segment summary, so
+    aggregating different segments is hopefully faster
+  - maybe do the aggregation directly in the browser, to reduce CPU
+    usage on the storage server
+- make aggregation code reusable both as a script and in a web application
