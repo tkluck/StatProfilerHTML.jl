@@ -73,7 +73,8 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
 
             // when called between an entersub and the following nextstate,
             // ignore the set-up but-not-entered-yet stack frame
-            if (line != caller->blk_oldcop) {
+            // also ignore the call frame set up for BEGIN blocks
+            if (line != caller->blk_oldcop && line != &PL_compiling) {
                 if (CxTYPE(sub) != CXt_EVAL)
                     trace.add_frame(CxTYPE(sub), sub->blk_sub.cv, line);
                 else
@@ -89,7 +90,7 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
         cxix = S_dopoptosub_at(aTHX_ ccstack, cxix - 1);
     }
 
-    // report main
-    if (depth)
+    // report main, but ignore the stack frame set up for BEGIN blocks
+    if (depth && line != &PL_compiling)
         trace.add_frame(CXt_NULL, NULL, line);
 }
