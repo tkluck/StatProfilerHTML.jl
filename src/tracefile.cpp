@@ -63,7 +63,7 @@ void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, COP *line)
 
 void TraceFileWriter::add_topmost_op(pTHX_ OP *o)
 {
-    topmost_op_name = OP_NAME(o);
+    topmost_op_name = o ? OP_NAME(o) : NULL;
 }
 
 void TraceFileWriter::end_sample()

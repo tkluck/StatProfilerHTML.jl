@@ -197,7 +197,7 @@ runloop(pTHX)
     dVAR;
     dMY_CXT;
     OP *op = PL_op;
-    OP *prev_op; // Could use PL_op for this, but PL_op might have indirection slowdown
+    OP *prev_op = NULL; // Could use PL_op for this, but PL_op might have indirection slowdown
     unsigned int pred_counter = counter;
     TraceFileWriter *trace = MY_CXT.create_trace();
 
