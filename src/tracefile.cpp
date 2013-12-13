@@ -5,7 +5,7 @@ using namespace std;
 
 
 TraceFileWriter::TraceFileWriter(const string &path) :
-    out(NULL)
+    out(NULL), topmost_op_name(NULL)
 {
     open(path);
 }
@@ -61,7 +61,12 @@ void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, COP *line)
     fprintf(out, "%s,%d", OutCopFILE(line), CopLINE(line));
 }
 
+void TraceFileWriter::add_topmost_op(pTHX_ OP *o)
+{
+    topmost_op_name = OP_NAME(o);
+}
+
 void TraceFileWriter::end_sample()
 {
-    fputs("\n", out);
+    fprintf(out, ";%s\n", topmost_op_name ? topmost_op_name : "");
 }

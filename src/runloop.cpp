@@ -197,6 +197,7 @@ runloop(pTHX)
     dVAR;
     dMY_CXT;
     OP *op = PL_op;
+    OP *prev_op; // Could use PL_op for this, but PL_op might have indirection slowdown
     unsigned int pred_counter = counter;
     TraceFileWriter *trace = MY_CXT.create_trace();
 
@@ -208,9 +209,11 @@ runloop(pTHX)
         if (UNLIKELY( counter != pred_counter )) {
             trace->start_sample(counter - pred_counter);
             collect_trace(aTHX_ *trace, 20);
+            trace->add_topmost_op(aTHX_ prev_op);
             trace->end_sample();
             pred_counter = counter;
         }
+        prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
     }
     MY_CXT.leave_runloop();

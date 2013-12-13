@@ -19,6 +19,8 @@ sub read_trace {
 
     chomp $line;
     my ($weight, @frames) = split /;/, $line;
+    my $topmost_op = pop @frames;
+
     my $frames = [map {
         my ($type, $sub, $file, $line) = split /,/, $_;
 
@@ -32,6 +34,7 @@ sub read_trace {
     return bless {
         weight => $weight,
         frames => $frames,
+        op_name => $topmost_op,
     }, 'Devel::StatProfiler::StackTrace';
 }
 

@@ -18,6 +18,7 @@ namespace devel {
             const char *subroutine;
             const char *file;
             unsigned int line;
+            const char *op_name;
         };
 
         struct StackTrace
@@ -53,10 +54,12 @@ namespace devel {
 
             void start_sample(unsigned int weight);
             void add_frame(unsigned int cxt_type, CV *sub, COP *line);
+            void add_topmost_op(pTHX_ OP *o);
             void end_sample();
 
         private:
             std::FILE *out;
+            const char *topmost_op_name;
         };
     }
 }
