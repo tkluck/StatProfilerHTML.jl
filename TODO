@@ -56,13 +56,15 @@
     realistic one for release
 
 - report similar to NYTProf
-  - flame graph
   - exclusive/inclusive sample count
   - total per sub and per-line
   - for each line, compute % relative to sub
   - for each sub, compute % relative to total
   - for subs, % of samples aggregated by call site
   - aggregate slow opcodes per sub and display them at the end
+  - aggregate XSUBs and display them at the end
+- add heuristic to detect the real start of the sub (and default to
+  first sampled line)
 - flexible stack frame -> source code mapping
   - for eval, use the embedded source code
   - for Git repositories, fetch it from Git
@@ -77,3 +79,5 @@
   - maybe do the aggregation directly in the browser, to reduce CPU
     usage on the storage server
 - make aggregation code reusable both as a script and in a web application
+- remove file text after __DATA__/__END__ but check it's not removing
+  source code (use sampled lines)

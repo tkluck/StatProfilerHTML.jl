@@ -9,6 +9,7 @@ sub new {
 
     return $class->SUPER::new(
         %args,
+        share_dir          => 'share',
         extra_linker_flags => [qw(-lrt)],
     );
 }

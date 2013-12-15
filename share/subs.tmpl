@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+  </head>
+  <body>
+    <table>
+      <caption>Subroutines, sorted by exclusive sample count</caption>
+      <tr>
+        <th>Exclusive samples</td>
+        <th>Inclusive samples</td>
+        <th>Subroutine</th>
+      </tr>
+[% my $sub_link = $variables{sub_link};
+   for my $sub (@{$variables{subs}}) { %]
+      <tr>
+        <td>[%= $sub->{exclusive} %]</td>
+        <td>[%= $sub->{inclusive} %]</td>
+        <td><a href="[%= $sub_link->($sub) %]">[%= $sub->{name} %]</a></td>
+      </tr>
+[% } %]
+    </table>
+  </body>
+</html>

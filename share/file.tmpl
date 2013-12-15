@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+  </head>
+  <body>
+    <table>
+      <caption>File source code</caption>
+      <tr>
+        <th>Line</td>
+        <th>Exclusive samples</th>
+        <th>Inclusive samples</th>
+        <th>Code</th>
+      </tr>
+[% my ($lines, $exclusive, $inclusive) = @variables{qw(lines exclusive inclusive)};
+   for my $line (1 .. $#$lines) { %]
+      <tr>
+        <td><a name="L[%= $line %]" />[%= $line %]</td>
+        <td>[%= $exclusive->[$line] || '' %]</td>
+        <td>[%= $inclusive->[$line] || '' %]</td>
+        <td class="code">[%= $lines->[$line] %]</td>
+      </tr>
+[% } %]
+    </table>
+  </body>
+</html>

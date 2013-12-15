@@ -1,0 +1,17 @@
+table {
+    border-collapse: collapse;
+    /* border-spacing: 0px; */
+}
+
+th {
+    border: solid 1px #000000;
+}
+
+td {
+    border: solid 1px #000000;
+}
+
+td.code {
+    font-family: monospace;
+    white-space: pre;
+}

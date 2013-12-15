@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+  </head>
+  <body>
+[% if ($variables{flamegraph}) { %]
+    <object data="all_stacks_by_time.svg" width="1200" type="image/svg+xml">
+        SVG not supported
+    </object>
+[% } %]
+    <br /><br />
+    <table>
+      <caption>Subroutines, sorted by exclusive sample count</caption>
+      <tr>
+        <th>Exclusive samples</td>
+        <th>Inclusive samples</td>
+        <th>Subroutine</th>
+      </tr>
+[% my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
+   my $sub_link = $variables{sub_link};
+   for my $sub (@{$variables{subs}}[0..$max]) { %]
+      <tr>
+        <td>[%= $sub->{exclusive} %]</td>
+        <td>[%= $sub->{inclusive} %]</td>
+        <td><a href="[%= $sub_link->($sub) %]">[%= $sub->{name} %]</a></td>
+      </tr>
+[% } %]
+    </table>
+    <a href="subs.html">All subs</a>
+    <br /><br />
+    <table>
+      <caption>Files, sorted by exclusive sample count</caption>
+      <tr>
+        <th>Exclusive samples</td>
+        <th>Report</th>
+      </tr>
+[% for my $file (@{$variables{files}}) { %]
+      <tr>
+        <td>[%= $file->{exclusive} %]</td>
+        <td><a href="[%= $file->{report} %]">[%= $file->{basename} %]</a></td>
+      </tr>
+[% } %]
+    </table>
+  </body>
+</html>
