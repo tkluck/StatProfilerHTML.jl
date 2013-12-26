@@ -160,10 +160,18 @@ sub _finalize {
 
 sub _fetch_source {
     my ($self, $path) = @_;
+    my @lines;
 
     open my $fh, '<', $path;
+    while (defined (my $line = <$fh>)) {
+        # this might match a token inside a string, and does not match
+        # the token on a non-empty line; probably it should double-check
+        # using the range of lines with samples
+        last if $line =~ /^__(?:DATA|END)__\s+$/;
+        push @lines, $line;
+    }
 
-    return ['I hope you never see this...', <$fh>];
+    return ['I hope you never see this...', @lines];
 }
 
 sub output {
