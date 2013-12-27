@@ -11,13 +11,33 @@
         <th>Inclusive samples</th>
         <th>Code</th>
       </tr>
-[% my ($lines, $exclusive, $inclusive) = @variables{qw(lines exclusive inclusive)};
+[% my ($lines, $exclusive, $inclusive, $subs, $callees) = @variables{qw(lines exclusive inclusive subs callees)};
+   my ($sub_link, $file_link) = @variables{qw(sub_link file_link)};
    for my $line (1 .. $#$lines) { %]
       <tr>
         <td><a name="L[%= $line %]" />[%= $line %]</td>
         <td>[%= $exclusive->[$line] || '' %]</td>
         <td>[%= $inclusive->[$line] || '' %]</td>
-        <td class="code">[%= $lines->[$line] %]</td>
+        <td>
+[%   if (my $starting_subs = $subs->{$line}) { %]
+          <span class="call-sites">
+[%     for my $sub (@$starting_subs) { %]
+            [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
+[%       for my $site (values %{$sub->{call_sites}}) { %]
+            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $site->{caller}{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
+[%       } %]
+[%     } %]
+          </span>
+[%   } %]
+[%   if (my $calls = $callees->{$line}) { %]
+          <span class="callees">
+[%     for my $call (@$calls) { %]
+            [%= $call->{inclusive} %] samples in <a href="[%= $sub_link->($call->{callee}) %]">[%= $call->{callee}{name} %]</a><br />
+[%     } %]
+          </span>
+[%   } %]
+          <span class="code">[%= $lines->[$line] %]</span>
+        </td>
       </tr>
 [% } %]
     </table>

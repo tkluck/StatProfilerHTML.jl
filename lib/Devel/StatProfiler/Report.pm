@@ -10,6 +10,7 @@ use File::Basename ();
 use File::Spec::Functions ();
 use File::Which;
 use File::Copy ();
+use Scalar::Util ();
 use Template::Perlish;
 
 sub new {
@@ -68,6 +69,33 @@ sub _write_template {
     close $fh;
 }
 
+sub _call_site_id {
+    my ($frame) = @_;
+
+    return sprintf '%s:%d', $frame->file, $frame->line;
+}
+
+sub _sub_id {
+    my ($sub) = @_;
+
+    return sprintf '%s:%s', $sub->{name}, $sub->{file};
+}
+
+sub _sub {
+    my ($self, $frame) = @_;
+    my $name = $frame->subroutine || $frame->file . ':main';
+
+    return $self->{aggregate}{subs}{$name} ||= {
+        name       => $name,
+        file       => $frame->file,
+        inclusive  => 0,
+        exclusive  => 0,
+        lines      => {},
+        call_sites => {},
+        start_line => $frame->line,
+    };
+}
+
 sub add_trace_file {
     my ($self, $file) = @_;
     my $r = Devel::StatProfiler::Reader->new($file);
@@ -85,20 +113,36 @@ sub add_trace_file {
 
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
-            my $name = $frame->subroutine || $frame->file . ':main';
             my $line = $frame->line;
-            my $sub = $subs->{$name} ||= {
-                name       => $name,
-                file       => $frame->file,
-                inclusive  => 0,
-                exclusive  => 0,
-                lines      => {},
-                start_line => $line,
-            };
+            my $sub = $self->_sub($frame);
 
             $sub->{start_line} = $line if $sub->{start_line} > $line;
             $sub->{inclusive} += $weight;
             $sub->{lines}{inclusive}{$line} += $weight;
+
+            if ($i != $#$frames) {
+                my $call_site = $frames->[$i + 1];
+                my $caller = $self->_sub($call_site);
+                my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
+                    caller    => $caller,
+                    exclusive => 0,
+                    inclusive => 0,
+                    file      => $call_site->file,
+                    line      => $call_site->line,
+                };
+                Scalar::Util::weaken($site->{caller}) unless $site->{inclusive};
+
+                $site->{inclusive} += $weight;
+                $site->{exclusive} += $weight if !$i;
+
+                my $callee = $caller->{lines}{callees}{$call_site->line}{_sub_id($caller)} ||= {
+                    callee    => $sub,
+                    inclusive => 0,
+                };
+                Scalar::Util::weaken($callee->{callee}) unless $callee->{inclusive};
+
+                $callee->{inclusive} += $weight;
+            }
 
             if (!$i) {
                 $sub->{exclusive} += $weight;
@@ -131,7 +175,7 @@ sub _finalize {
     my $ordinal = 0;
     for my $sub (sort { $a->{file} cmp $b->{file} }
                       values %{$self->{aggregate}{subs}}) {
-        my ($exclusive, $inclusive) = @{$sub->{lines}}{qw(exclusive inclusive)};
+        my ($exclusive, $inclusive, $callees) = @{$sub->{lines}}{qw(exclusive inclusive callees)};
         my $entry = $files{$sub->{file}} ||= {
             name      => $sub->{file},
             basename  => File::Basename::basename($sub->{file}),
@@ -139,12 +183,14 @@ sub _finalize {
             lines     => {
                 exclusive       => [],
                 inclusive       => [],
+                callees         => {},
             },
             exclusive => 0,
+            subs      => {},
         };
 
         $entry->{exclusive} += $sub->{exclusive};
-        push @{$entry->{subs}}, $sub;
+        push @{$entry->{subs}{$sub->{start_line}}}, $sub;
 
         for my $line (keys %$exclusive) {
             $entry->{lines}{exclusive}[$line] += $exclusive->{$line};
@@ -152,6 +198,10 @@ sub _finalize {
 
         for my $line (keys %$inclusive) {
             $entry->{lines}{inclusive}[$line] += $inclusive->{$line};
+        }
+
+        for my $line (keys %$callees) {
+            push @{$entry->{lines}{callees}{$line}}, values %{$callees->{$line}};
         }
     }
 
@@ -192,6 +242,14 @@ sub output {
             $sub->{start_line};
     };
 
+    my $file_link = sub {
+        my ($file, $line) = @_;
+
+        return sprintf '%s#L%d',
+            $self->{aggregate}{files}{$file}{report},
+            $line;
+    };
+
     # format files
     for my $file (keys %$files) {
         my $entry = $files->{$file};
@@ -200,8 +258,12 @@ sub output {
         my %file_data = (
             name        => $entry->{name},
             lines       => $code,
+            subs        => $entry->{subs},
             exclusive   => $entry->{lines}{exclusive},
             inclusive   => $entry->{lines}{inclusive},
+            callees     => $entry->{lines}{callees},
+            sub_link    => $sub_link,
+            file_link   => $file_link,
         );
 
         $self->_write_template($self->{templates}{file}, \%file_data,
