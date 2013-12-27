@@ -11,7 +11,6 @@
   - decide whether to store the full sub/file name every time or
     cache recently-used ones to save on file size (and maybe I/O speed)
   - use async I/O to reduce delays? (probably not)
-- randomize initial tick, for better sampling over multiple runs
 - test various interesting cases
   - eval {}
   - eval ""

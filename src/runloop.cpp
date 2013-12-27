@@ -6,6 +6,7 @@
 
 #include "tracecollector.h"
 #include "tracefile.h"
+#include "rand.h"
 
 #include <string>
 
@@ -51,6 +52,14 @@ namespace {
         void enter_runloop();
         void leave_runloop();
     };
+
+    struct CounterCxt {
+        bool terminate;
+        unsigned int start_delay;
+
+        CounterCxt(unsigned int delay) :
+            terminate(false), start_delay(delay) { }
+    };
 }
 
 typedef struct Cxt my_cxt_t;
@@ -68,6 +77,9 @@ namespace {
     unsigned int counter = 0;
     // sampling interval, in microseconds
     unsigned int sampling_interval = 10000;
+    // random start delay, to improve distribution
+    unsigned int random_start = 0;
+    bool seeded = false;
 }
 
 static bool
@@ -150,8 +162,9 @@ Cxt::leave_runloop()
 static void *
 increment_counter(void *arg)
 {
-    bool *terminate = static_cast<bool *>(arg);
-    unsigned int delay = sampling_interval * 1000;
+    CounterCxt *cxt = static_cast<CounterCxt *>(arg);
+    bool *terminate = &cxt->terminate;
+    unsigned int delay = cxt->start_delay * 1000;
 
     while (!*terminate) {
         timespec sleep = {0, delay};
@@ -159,9 +172,10 @@ increment_counter(void *arg)
             ;
         if (*terminate)
             break;
+        delay = sampling_interval * 1000;
         ++counter;
     }
-    delete terminate;
+    delete cxt;
 
     return NULL;
 }
@@ -174,16 +188,27 @@ start_counter_thread(bool **terminate)
     pthread_t thread;
     bool ok = true;
 
+    // init random seed
+    if (!seeded) {
+        seeded = true;
+        random_start = rand_seed();
+    }
+
+    rand(&random_start);
+
     if (pthread_attr_init(&attr))
         return false;
 
-    *terminate = new bool(false);
+    // discard low-order bits (they tend to be less random and we
+    // don't need them anyway)
+    CounterCxt *cxt = new CounterCxt((random_start >> 8) % sampling_interval);
+    *terminate = &cxt->terminate;
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
-    ok = ok && !pthread_create(&thread, &attr, &increment_counter, *terminate);
+    ok = ok && !pthread_create(&thread, &attr, &increment_counter, cxt);
     pthread_attr_destroy(&attr);
 
     if (!ok) {
-        delete *terminate;
+        delete cxt;
         *terminate = NULL;
     }
 
