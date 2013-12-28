@@ -1,13 +1,29 @@
 #include "tracefile.h"
 
+#include "rand.h"
+
+#include <ctime>
+
 using namespace devel::statprofiler;
 using namespace std;
 
+namespace {
+    void append_hex(string &str, unsigned int value)
+    {
+        static const char digits[] = "0123456789abcdef";
 
-TraceFileWriter::TraceFileWriter(const string &path) :
+        for (int i = 0; i < 8; ++i) {
+            str += digits[value & 0xf];
+            value >>= 4;
+        }
+    }
+}
+
+TraceFileWriter::TraceFileWriter(const string &path, bool is_template) :
     out(NULL), topmost_op_name(NULL)
 {
-    open(path);
+    seed = rand_seed();
+    open(path, is_template);
 }
 
 TraceFileWriter::~TraceFileWriter()
@@ -15,16 +31,34 @@ TraceFileWriter::~TraceFileWriter()
     close();
 }
 
-void TraceFileWriter::open(const std::string &path)
+void TraceFileWriter::open(const std::string &path, bool is_template)
 {
     close();
-    out = fopen(path.c_str(), "w");
+    output_file = path;
+
+    if (is_template) {
+        output_file += '.';
+        append_hex(output_file, getpid());
+        append_hex(output_file, time(NULL));
+        for (int i = 0; i < 4; ++i) {
+            rand(&seed);
+            append_hex(output_file, seed);
+        }
+    }
+
+    out = fopen(output_file.c_str(), "w");
 }
 
 void TraceFileWriter::close()
 {
-    if (out)
+    if (out) {
+        string temp = output_file + "_";
+
         fclose(out);
+        if (!rename(temp.c_str(), output_file.c_str()))
+            unlink(temp.c_str());
+    }
+
     out = NULL;
 }
 

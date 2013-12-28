@@ -45,10 +45,10 @@ namespace devel {
         class TraceFileWriter
         {
         public:
-            TraceFileWriter(const std::string &path);
+            TraceFileWriter(const std::string &path, bool is_template);
             ~TraceFileWriter();
 
-            void open(const std::string &path);
+            void open(const std::string &path, bool is_template);
             void close();
             bool is_valid() const { return out; }
 
@@ -59,6 +59,8 @@ namespace devel {
 
         private:
             std::FILE *out;
+            std::string output_file;
+            unsigned int seed;
             const char *topmost_op_name;
         };
     }

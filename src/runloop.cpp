@@ -32,6 +32,7 @@ namespace {
 
     struct Cxt {
         string filename;
+        bool is_template;
         bool enabled, using_trampoline, resuming;
         int runloop_level;
         runops_proc_t original_runloop;
@@ -88,6 +89,7 @@ start_counter_thread(bool **terminate);
 
 Cxt::Cxt() :
     filename("statprof.out"),
+    is_template(true),
     enabled(true),
     using_trampoline(false),
     resuming(false),
@@ -100,6 +102,7 @@ Cxt::Cxt() :
 
 Cxt::Cxt(const Cxt &cxt) :
     filename(cxt.filename),
+    is_template(cxt.is_template),
     enabled(cxt.enabled),
     using_trampoline(false),
     resuming(false),
@@ -114,7 +117,7 @@ TraceFileWriter *
 Cxt::create_trace()
 {
     if (!trace)
-        trace = new TraceFileWriter(filename);
+        trace = new TraceFileWriter(filename, is_template);
 
     return trace;
 }
@@ -325,7 +328,7 @@ set_profiler_state(pTHX)
     case 2: // restart
         if (MY_CXT.trace) {
             MY_CXT.trace->close();
-            MY_CXT.trace->open(MY_CXT.filename);
+            MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template);
             // XXX check, write metadata
         }
         break;
@@ -410,12 +413,13 @@ devel::statprofiler::set_enabled(bool enabled)
 }
 
 void
-devel::statprofiler::set_output_file(const char *path)
+devel::statprofiler::set_output_file(const char *path, bool is_template)
 {
     dTHX;
     dMY_CXT;
 
     MY_CXT.filename = path;
+    MY_CXT.is_template = is_template;
 }
 
 void

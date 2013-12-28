@@ -6,7 +6,7 @@
     - eval stack frames (need to store the source code for the eval)
     - custom metadata
     - tick duration, Perl version, sampling stack depth
-  - write to temporary file and rename after close
+  - use atomic create-or-fail open when opening the file
   - decide whether to use compression
   - decide whether to store the full sub/file name every time or
     cache recently-used ones to save on file size (and maybe I/O speed)

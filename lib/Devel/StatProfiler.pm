@@ -13,6 +13,7 @@ XSLoader::load(__PACKAGE__);
 my %args = (
     -interval => 1,
     -file     => 1,
+    -template => 1,
     -nostart  => 0,
 );
 
@@ -41,7 +42,9 @@ sub import {
         if ($arg eq '-interval') {
             set_sampling_interval($value);
         } elsif ($arg eq '-file') {
-            set_output_file($value);
+            set_output_file($value, 0);
+        } elsif ($arg eq '-template') {
+            set_output_file($value, 1);
         } elsif ($arg eq '-nostart') {
             set_enabled(0);
         }
