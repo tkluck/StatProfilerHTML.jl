@@ -212,6 +212,12 @@ sub _fetch_source {
     my ($self, $path) = @_;
     my @lines;
 
+    # temporary
+    if (!-f $path) {
+        warn "Can't find source for '$path'";
+        return ['Eval source not available...'];
+    }
+
     open my $fh, '<', $path;
     while (defined (my $line = <$fh>)) {
         # this might match a token inside a string, and does not match
