@@ -1,0 +1,3 @@
+%loadplugin{feature::default_xs_typemap};
+
+%typemap{SV *}{simple};

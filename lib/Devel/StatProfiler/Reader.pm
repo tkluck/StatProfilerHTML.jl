@@ -3,41 +3,8 @@ package Devel::StatProfiler::Reader;
 
 use strict;
 use warnings;
-use autodie qw(open);
 
-sub new {
-    my ($class, $path) = @_;
-    open my $fh, '<', $path;
-
-    return bless { fh => $fh }, $class;
-}
-
-sub read_trace {
-    my ($self) = @_;
-    my $line = readline $self->{fh};
-
-    return unless defined $line;
-
-    chomp $line;
-    my ($weight, @frames) = split /;/, $line;
-    my $topmost_op = pop @frames;
-
-    my $frames = [map {
-        my ($type, $sub, $file, $line) = split /,/, $_;
-
-        bless {
-            subroutine => $sub,
-            file       => $file,
-            line       => $line,
-        }, 'Devel::StatProfiler::StackFrame';
-    } @frames];
-
-    return bless {
-        weight => $weight,
-        frames => $frames,
-        op_name => $topmost_op,
-    }, 'Devel::StatProfiler::StackTrace';
-}
+require Devel::StatProfiler; # load XS but don't start profiling
 
 package Devel::StatProfiler::StackFrame;
 

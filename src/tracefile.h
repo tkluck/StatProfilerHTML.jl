@@ -11,36 +11,20 @@
 
 namespace devel {
     namespace statprofiler {
-#if 0 // tentative reader interface
-        struct StackFrame
-        {
-            const char *package;
-            const char *subroutine;
-            const char *file;
-            unsigned int line;
-            const char *op_name;
-        };
-
-        struct StackTrace
-        {
-            unsigned int weight;
-            std::vector<StackFrame> frames;
-        };
-
         class TraceFileReader
         {
         public:
             TraceFileReader(const std::string &path);
             ~TraceFileReader();
 
-            bool is_valid() const { return in; }
+            void open(const std::string &path);
             void close();
+            bool is_valid() const { return in; }
 
-            StackTrace read_trace();
+            SV *read_trace();
         private:
             std::FILE *in;
         };
-#endif
 
         class TraceFileWriter
         {
@@ -52,18 +36,20 @@ namespace devel {
             void close();
             bool is_valid() const { return out; }
 
-            void start_sample(unsigned int weight);
+            void start_sample(pTHX_ unsigned int weight, OP *current_op);
             void add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
-            void add_topmost_op(pTHX_ OP *o);
             void end_sample();
 
         private:
             std::FILE *out;
             std::string output_file;
             unsigned int seed;
-            const char *topmost_op_name;
         };
     }
 }
+
+#ifdef _DEVEL_STATPROFILER_XSP
+using namespace devel::statprofiler;
+#endif
 
 #endif

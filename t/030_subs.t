@@ -11,16 +11,16 @@ my ($foo, $l1, $l2, $l3);
     package X;
 
     $foo = sub {
-        main::take_sample(); BEGIN { $l1 = __LINE__ }
+        main::take_sample(); BEGIN { $l1 = __LINE__ + 0 }
     };
 }
 
 sub Moo::bar {
-    take_sample(); BEGIN { $l2 = __LINE__ }
+    take_sample(); BEGIN { $l2 = __LINE__ + 0 }
 }
 
 sub foo {
-    take_sample(); BEGIN { $l3 = __LINE__ }
+    take_sample(); BEGIN { $l3 = __LINE__ + 0 }
 }
 
 foo();

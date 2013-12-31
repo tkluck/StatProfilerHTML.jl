@@ -27,8 +27,7 @@ Future:
   below.
 - A record has the structure:
   <tag byte> <varint-encoded length> <payload string of previously encoded length>
-  Or if the tag does not have a payload, then a record may just consist of the
-  tag byte.
+  The length is always present, even when the tag does not have a payload.
 - The document body consists of a chain of records.
 - The set of valid tags are:
   0: unused

@@ -54,7 +54,7 @@ Devel::StatProfiler::stop_profile();
 my @samples = get_samples('tprof.out');
 
 my $xsub = bless {
-    line       => '-1',
+    line       => -1,
     file       => '',
     subroutine => 'Time::HiRes::usleep',
 }, 'Devel::StatProfiler::StackFrame';

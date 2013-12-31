@@ -12,16 +12,16 @@ sub foo {
 }
 
 sub bar {
-    foo(); BEGIN { $l4 = __LINE__ }
+    foo(); BEGIN { $l4 = __LINE__ + 0 }
 }
 
 sub baz {
     goto &foo;
 }
 
-foo(); BEGIN { $l1 = __LINE__ }
-bar(); BEGIN { $l2 = __LINE__ }
-baz(); BEGIN { $l3 = __LINE__ }
+foo(); BEGIN { $l1 = __LINE__ + 0 }
+bar(); BEGIN { $l2 = __LINE__ + 0 }
+baz(); BEGIN { $l3 = __LINE__ + 0 }
 
 Devel::StatProfiler::stop_profile();
 

@@ -5,6 +5,7 @@
 #include "ppport.h"
 
 #include "runloop.h"
+#include "tracefile.h"
 
 %module{Devel::StatProfiler};
 %package{Devel::StatProfiler};
@@ -13,6 +14,13 @@
 void set_enabled(bool enabled);
 void set_output_file(const char *path, bool is_template);
 void set_sampling_interval(unsigned int interval);
+
+%name{Devel::StatProfiler::Reader} class TraceFileReader
+{
+    TraceFileReader(const char *name);
+
+    SV *read_trace();
+};
 
 %{
 
