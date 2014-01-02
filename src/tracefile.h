@@ -21,9 +21,12 @@ namespace devel {
             void close();
             bool is_valid() const { return in; }
 
+            unsigned int version() const { return file_version; }
+
             SV *read_trace();
         private:
             std::FILE *in;
+            unsigned int file_version;
         };
 
         class TraceFileWriter

@@ -146,6 +146,7 @@ namespace {
 
 
 TraceFileReader::TraceFileReader(const std::string &path)
+  : file_version(0)
 {
     open(path);
 }
@@ -164,7 +165,15 @@ void TraceFileReader::open(const std::string &path)
         croak("Unexpected end-of-file while reading file magic");
     if (strncmp(magic, MAGIC, sizeof(magic)))
         croak("Invalid file magic");
-    read_varint(in);
+
+    int version_from_file = read_varint(in);
+    // In future, will check that the version is at least not newer
+    // than this library's file format version. That's necessary even
+    // if there's a backcompat layer.
+    if (version_from_file < 1 || version_from_file > VERSION)
+        croak("Incompatible file format version %i", version_from_file);
+
+    file_version = (unsigned int)version_from_file;
 }
 
 void TraceFileReader::close()
