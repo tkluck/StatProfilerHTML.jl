@@ -17,9 +17,9 @@ using namespace std;
 #endif
 
 enum {
-    SAMPLE_START = 1,
-    SAMPLE_END   = 2,
-    SUB_FRAME    = 3,
+    TAG_SAMPLE_START     = 1,
+    TAG_SAMPLE_END       = 2,
+    TAG_SUB_FRAME        = 3,
 };
 
 namespace {
@@ -200,7 +200,7 @@ SV *TraceFileReader::read_trace()
         int size = read_varint(in);
 
         switch (type) {
-        case SAMPLE_START: {
+        case TAG_SAMPLE_START: {
             int weight = read_varint(in);
             SV *op_name = read_string(aTHX_ in);
 
@@ -215,7 +215,7 @@ SV *TraceFileReader::read_trace()
         default:
             skip_bytes(in, size);
             break;
-        case SUB_FRAME: {
+        case TAG_SUB_FRAME: {
             SV *package = read_string(aTHX_ in);
             SV *name = read_string(aTHX_ in);
             SV *file = read_string(aTHX_ in);
@@ -241,7 +241,7 @@ SV *TraceFileReader::read_trace()
 
             break;
         }
-        case SAMPLE_END:
+        case TAG_SAMPLE_END:
             skip_bytes(in, size);
             return sv_bless(newRV_inc((SV *) sample), st_stash);
         }
@@ -298,7 +298,7 @@ void TraceFileWriter::start_sample(pTHX_ unsigned int weight, OP *current_op)
 {
     const char *op_name = current_op ? OP_NAME(current_op) : NULL;
 
-    write_byte(out, SAMPLE_START);
+    write_byte(out, TAG_SAMPLE_START);
     write_varint(out, varint_size(weight) + string_size(op_name));
     write_varint(out, weight);
     write_string(out, op_name, false);
@@ -306,7 +306,7 @@ void TraceFileWriter::start_sample(pTHX_ unsigned int weight, OP *current_op)
 
 void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line)
 {
-    write_byte(out, SUB_FRAME);
+    write_byte(out, TAG_SUB_FRAME);
     const char *file;
     size_t file_size;
     int lineno;
@@ -373,6 +373,6 @@ void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, CO
 
 void TraceFileWriter::end_sample()
 {
-    write_byte(out, SAMPLE_END);
+    write_byte(out, TAG_SAMPLE_END);
     write_varint(out, 0);
 }
