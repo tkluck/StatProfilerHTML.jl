@@ -20,6 +20,7 @@ enum {
     TAG_SAMPLE_START     = 1,
     TAG_SAMPLE_END       = 2,
     TAG_SUB_FRAME        = 3,
+    TAG_HEADER_SEPARATOR = 254,
 };
 
 namespace {
@@ -174,6 +175,11 @@ void TraceFileReader::open(const std::string &path)
         croak("Incompatible file format version %i", version_from_file);
 
     file_version = (unsigned int)version_from_file;
+
+    // TODO this becomes a loop reading header records
+    int separator = fgetc(in);
+    if (separator != TAG_HEADER_SEPARATOR)
+        croak("Invalid file: Header does not end with header separator byte");
 }
 
 void TraceFileReader::close()
@@ -186,6 +192,8 @@ void TraceFileReader::close()
 SV *TraceFileReader::read_trace()
 {
     dTHX;
+    // This could possibly be cached across read_trace calls and may
+    // be worthwhile if there's lots.
     HV *st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
     HV *sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     HV *sample;
@@ -279,6 +287,7 @@ void TraceFileWriter::open(const std::string &path, bool is_template)
     out = fopen(output_file.c_str(), "w");
     write_bytes(out, MAGIC, sizeof(MAGIC) - 1);
     write_varint(out, VERSION);
+    write_byte(out, TAG_HEADER_SEPARATOR);
 }
 
 void TraceFileWriter::close()
