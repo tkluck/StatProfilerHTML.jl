@@ -38,9 +38,8 @@ sub get_samples {
 
     while (my $trace = $r->read_trace) {
         my $frames = $trace->frames;
-
-        next unless $frames->[0]->subroutine eq 't::lib::Test::take_sample';
-        die "Incorrect source file" unless $frames->[0]->file, 't/lib/Test.pm';
+        next unless @$frames;
+        next unless $frames->[0]->subroutine eq 'Time::HiRes::usleep';
 
         push @samples, $frames;
     }

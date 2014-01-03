@@ -114,3 +114,11 @@ With a sampling profiler there is no reliable way to track the C<goto
 will report that the code at F<foo.pl> line 10 has spent approximately
 the same time in calling C<foo> and C<bar>, and will report C<foo> as
 being called from the main program rather than from C<bar>.
+
+=head2 XSUBs with callbacks
+
+Since XSUBs don't have a Perl-level stack frame, Perl code called from
+XSUBs is reported as if called from the source line calling the XSUB.
+
+Additionally, the exclusive time for the XSUB incorrectly includes the
+time spent in callbacks.

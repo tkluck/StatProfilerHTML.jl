@@ -17,7 +17,6 @@
   - do ""
   - sort {}/map {}
   - tie and overload
-  - XS
 - test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
 - handle subroutines defined in an eval
@@ -54,6 +53,8 @@
   - make them easy to run
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
+- find a solution to correctly report exclusive/inclusive time for XSUBs
+  with callbacks (might not be possible)
 
 - report similar to NYTProf
   - exclusive/inclusive sample count

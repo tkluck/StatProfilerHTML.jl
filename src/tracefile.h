@@ -53,7 +53,7 @@ namespace devel {
             bool is_valid() const { return out; }
 
             void start_sample(unsigned int weight);
-            void add_frame(unsigned int cxt_type, CV *sub, COP *line);
+            void add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
             void add_topmost_op(pTHX_ OP *o);
             void end_sample();
 

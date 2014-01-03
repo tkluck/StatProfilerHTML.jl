@@ -76,9 +76,9 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
             // also ignore the call frame set up for BEGIN blocks
             if (line != caller->blk_oldcop && line != &PL_compiling) {
                 if (CxTYPE(sub) != CXt_EVAL)
-                    trace.add_frame(CxTYPE(sub), sub->blk_sub.cv, line);
+                    trace.add_frame(CxTYPE(sub), sub->blk_sub.cv, NULL, line);
                 else
-                    trace.add_frame(CxTYPE(sub), NULL, line);
+                    trace.add_frame(CxTYPE(sub), NULL, NULL, line);
             }
             else
                 ++depth;
@@ -92,5 +92,5 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
 
     // report main, but ignore the stack frame set up for BEGIN blocks
     if (depth && line != &PL_compiling)
-        trace.add_frame(CXt_NULL, NULL, line);
+        trace.add_frame(CXt_NULL, NULL, NULL, line);
 }

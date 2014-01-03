@@ -219,6 +219,73 @@ start_counter_thread(bool **terminate)
 }
 
 
+// taken from pp_entersub in pp_hot.c, modified to return NULL rather
+// than croak()ing or trying autoload
+//
+// since this runs after the call, some branches can likely be
+// simplified (for example the SvGETMAGIC(), and the checks for
+// SvOK()/strict refs)
+static CV *
+get_cv_from_sv(pTHX_ OP* op, SV *sv, GV **name)
+{
+    CV *cv = NULL;
+    GV *gv = *name = NULL;
+
+    switch (SvTYPE(sv)) {
+        /* This is overwhelming the most common case:  */
+    case SVt_PVGV:
+      we_have_a_glob:
+        if (!(cv = GvCVu((const GV *)sv))) {
+            HV *stash;
+            cv = sv_2cv(sv, &stash, &gv, 0);
+        }
+        if (!cv)
+            return NULL;
+        break;
+    case SVt_PVLV:
+        if(isGV_with_GP(sv)) goto we_have_a_glob;
+        /*FALLTHROUGH*/
+    default:
+        if (sv == &PL_sv_yes)           /* unfound import, ignore */
+            return NULL;
+        SvGETMAGIC(sv);
+        if (SvROK(sv)) {
+            if (SvAMAGIC(sv)) {
+                sv = amagic_deref_call(sv, to_cv_amg);
+                /* Don't SPAGAIN here.  */
+            }
+        }
+        else {
+            const char *sym;
+            STRLEN len;
+            if (!SvOK(sv))
+                return NULL;
+            sym = SvPV_nomg_const(sv, len);
+            if (op->op_private & HINT_STRICT_REFS)
+                return NULL;
+            cv = get_cvn_flags(sym, len, GV_ADD|SvUTF8(sv));
+            break;
+        }
+        cv = MUTABLE_CV(SvRV(sv));
+        if (SvTYPE(cv) == SVt_PVCV)
+            break;
+        /* FALL THROUGH */
+    case SVt_PVHV:
+    case SVt_PVAV:
+        return NULL;
+        /* This is the second most common case:  */
+    case SVt_PVCV:
+        cv = MUTABLE_CV(sv);
+        break;
+    }
+
+    if (cv && !gv && CvGV(cv) && isGV_with_GP(CvGV(cv)))
+        gv = CvGV(cv);
+
+    *name = gv;
+    return cv;
+}
+
 static int
 runloop(pTHX)
 {
@@ -226,6 +293,7 @@ runloop(pTHX)
     dMY_CXT;
     OP *op = PL_op;
     OP *prev_op = NULL; // Could use PL_op for this, but PL_op might have indirection slowdown
+    SV *called_sv = NULL;
     unsigned int pred_counter = counter;
     TraceFileWriter *trace = MY_CXT.create_trace();
 
@@ -236,11 +304,43 @@ runloop(pTHX)
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (UNLIKELY( counter != pred_counter )) {
             trace->start_sample(counter - pred_counter);
+            if (prev_op &&
+                (prev_op->op_type == OP_ENTERSUB ||
+                 prev_op->op_type == OP_GOTO) &&
+                (op == prev_op->op_next)) {
+                // if the sub call is a normal Perl sub, op should be
+                // pointing to CvSTART(), the fact is points to
+                // op_next implies the call was to an XSUB
+                GV *cv_name;
+                CV *cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &cv_name);
+
+                if (cv && CvISXSUB(cv))
+                    trace->add_frame(CXt_SUB, cv, cv_name, NULL);
+#if 0 // DEBUG
+                else {
+                    const char *package = "__ANON__", *name = "(unknown)";
+
+                    if (cv_name) {
+                        package = HvNAME(GvSTASH(cv_name));
+                        name = GvNAME(cv_name);
+                    }
+
+                    warn("Called sub %s::%s is not an XSUB", package, name);
+                }
+#endif
+            }
             collect_trace(aTHX_ *trace, 20);
             trace->add_topmost_op(aTHX_ prev_op);
             trace->end_sample();
             pred_counter = counter;
         }
+        // here we save the argument to entersub/goto so, if it ends
+        // up calling an XSUB, we can retrieve sub call information
+        // later (there is the possibility of the called sub modifying
+        // called_sv through an alias, but is such a corner case that
+        // is not worth the trouble)
+        if (op->op_type == OP_ENTERSUB || op->op_type == OP_GOTO)
+            called_sv = *PL_stack_sp;
         prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
     }

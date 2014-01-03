@@ -67,7 +67,7 @@ void TraceFileWriter::start_sample(unsigned int weight)
     fprintf(out, "%d", weight);
 }
 
-void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, COP *line)
+void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line)
 {
     fprintf(out, ";%d,", cxt_type);
 
@@ -78,7 +78,7 @@ void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, COP *line)
         const char *package = "__ANON__", *name = "(unknown)";
 
         // from Perl_pp_caller
-	GV * const cvgv = CvGV(sub);
+	GV * const cvgv = sub_name ? sub_name : CvGV(sub);
 	if (cvgv && isGV(cvgv)) {
             GV *egv = GvEGVx(cvgv) ? GvEGVx(cvgv) : cvgv;
             HV *stash = GvSTASH(egv);
@@ -92,7 +92,10 @@ void TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, COP *line)
     } else
         fputs(",", out);
 
-    fprintf(out, "%s,%d", OutCopFILE(line), CopLINE(line));
+    if (line)
+        fprintf(out, "%s,%d", OutCopFILE(line), CopLINE(line));
+    else
+        fprintf(out, ",-1");
 }
 
 void TraceFileWriter::add_topmost_op(pTHX_ OP *o)
