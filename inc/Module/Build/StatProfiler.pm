@@ -22,8 +22,8 @@ sub _run_benchmark {
     my @results;
     for my $params (['prof', $prof], ['base', $base]) {
         my $bench = Dumbbench->new(
-            initial_runs         => 25,
-            target_rel_precision => 0.1,
+            initial_runs         => 35,
+            target_rel_precision => 0.002,
             verbosity            => 0,
         );
 
