@@ -17,10 +17,19 @@ using namespace std;
 #endif
 
 enum {
-    TAG_SAMPLE_START     = 1,
-    TAG_SAMPLE_END       = 2,
-    TAG_SUB_FRAME        = 3,
-    TAG_HEADER_SEPARATOR = 254,
+    TAG_SAMPLE_START            = 1,
+    TAG_SAMPLE_END              = 2,
+    TAG_SUB_FRAME               = 3,
+    TAG_EVAL_FRAME              = 4, // TODO implement
+    TAG_SECTION_START           = 198, // TODO implement
+    TAG_SECTION_END             = 199, // TODO implement
+    TAG_CUSTOM_META             = 200, // TODO implement
+    TAG_META_PERL_VERSION       = 201, // TODO implement
+    TAG_META_TICK_DURATION      = 202, // TODO implement
+    TAG_META_STACK_SAMPLE_DEPTH = 203, // TODO implement
+    TAG_META_LIBRARY_VERSION    = 204, // TODO implement
+    TAG_HEADER_SEPARATOR        = 254,
+    TAG_TAG_CONTINUATION        = 255 // just reserved for now
 };
 
 namespace {
