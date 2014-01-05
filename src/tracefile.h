@@ -40,16 +40,16 @@ namespace devel {
             TraceFileWriter(pTHX_ const std::string &path, bool is_template);
             ~TraceFileWriter();
 
-            void open(const std::string &path, bool is_template);
+            int open(const std::string &path, bool is_template);
             void close();
             bool is_valid() const { return out; }
 
-            void start_sample(unsigned int weight, OP *current_op);
-            void add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
-            void end_sample();
+            int start_sample(unsigned int weight, OP *current_op);
+            int add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
+            int end_sample();
 
         private:
-            void write_header();
+            int write_header();
 
             std::FILE *out;
             std::string output_file;
