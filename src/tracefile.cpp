@@ -192,7 +192,6 @@ void TraceFileReader::close()
 
 SV *TraceFileReader::read_trace()
 {
-    dTHX;
     // This could possibly be cached across read_trace calls and may
     // be worthwhile if there's lots.
     HV *st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
