@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+# PODNAME: statprofilehtml
+# ABSTRACT: generate Devel::StatProfiler HTML report
 
 use 5.12.0;
 use warnings;

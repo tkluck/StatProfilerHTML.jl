@@ -1,4 +1,5 @@
 package Devel::StatProfiler::Report;
+# ABSTRACT: process profiler output to generate a report
 
 use strict;
 use warnings;

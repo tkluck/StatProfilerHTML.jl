@@ -1,5 +1,5 @@
 package Devel::StatProfiler;
-# ABSTRACT: fill me in...
+# ABSTRACT: low-overhead sampling code profiler
 
 use strict;
 use warnings;
@@ -68,3 +68,27 @@ sub restart_profile { _set_profiler_state(2) }
 sub stop_profile    { _set_profiler_state(3) }
 
 1;
+
+__END__
+
+=head1 SYNOPSIS
+
+  # profile (needs multiple runs, with representative data/distribution!)
+  perl -MDevel::StatProfiler foo.pl input1.txt
+  perl -MDevel::StatProfiler foo.pl input2.txt
+  perl -MDevel::StatProfiler foo.pl input3.txt
+  perl -MDevel::StatProfiler foo.pl input1.txt
+
+  # prepare a report from profile data
+  statprofilehtml
+
+=head1 DESCRIPTION
+
+Devel::StatProfiler is a sampling (or statistical) code profiler.
+
+Rather than measuring the exact time spent in a statement (or
+subroutine), the profiler interrupts the program at fixed intervals
+(10 milliseconds by default) and takes a stack trace.  Given a
+sufficient number of samples this provides a good indication of where
+the program is spending time and has a relatively low overhead (around
+3-5% increased runtime).

@@ -1,4 +1,5 @@
 package Devel::StatProfiler::Reader;
+# ABSTRACT: read profiler output
 
 use strict;
 use warnings;
