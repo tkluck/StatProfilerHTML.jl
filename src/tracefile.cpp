@@ -146,9 +146,10 @@ namespace {
 }
 
 
-TraceFileReader::TraceFileReader(const std::string &path)
+TraceFileReader::TraceFileReader(pTHX_ const std::string &path)
   : file_version(0)
 {
+    SET_THX_MEMBER
     open(path);
 }
 
@@ -257,9 +258,10 @@ SV *TraceFileReader::read_trace()
 }
 
 
-TraceFileWriter::TraceFileWriter(const string &path, bool is_template) :
+TraceFileWriter::TraceFileWriter(pTHX_ const string &path, bool is_template) :
     out(NULL)
 {
+    SET_THX_MEMBER
     seed = rand_seed();
     open(path, is_template);
 }
@@ -303,7 +305,7 @@ void TraceFileWriter::close()
     out = NULL;
 }
 
-void TraceFileWriter::start_sample(pTHX_ unsigned int weight, OP *current_op)
+void TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
 {
     const char *op_name = current_op ? OP_NAME(current_op) : NULL;
 

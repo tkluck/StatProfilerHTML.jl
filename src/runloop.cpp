@@ -48,7 +48,7 @@ namespace {
             delete trace;
         }
 
-        TraceFileWriter *create_trace();
+        TraceFileWriter *create_trace(pTHX);
 
         void enter_runloop();
         void leave_runloop();
@@ -114,10 +114,10 @@ Cxt::Cxt(const Cxt &cxt) :
 }
 
 TraceFileWriter *
-Cxt::create_trace()
+Cxt::create_trace(pTHX)
 {
     if (!trace)
-        trace = new TraceFileWriter(filename, is_template);
+        trace = new TraceFileWriter(aTHX_ filename, is_template);
 
     return trace;
 }
@@ -295,7 +295,7 @@ runloop(pTHX)
     OP *prev_op = NULL; // Could use PL_op for this, but PL_op might have indirection slowdown
     SV *called_sv = NULL;
     unsigned int pred_counter = counter;
-    TraceFileWriter *trace = MY_CXT.create_trace();
+    TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
 
     if (!trace->is_valid())
         croak("Failed to open trace file");
@@ -303,7 +303,7 @@ runloop(pTHX)
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (UNLIKELY( counter != pred_counter )) {
-            trace->start_sample(aTHX_ counter - pred_counter, prev_op);
+            trace->start_sample(counter - pred_counter, prev_op);
             if (prev_op &&
                 (prev_op->op_type == OP_ENTERSUB ||
                  prev_op->op_type == OP_GOTO) &&

@@ -17,7 +17,8 @@ void set_sampling_interval(unsigned int interval);
 
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {
-    TraceFileReader(const char *name);
+    TraceFileReader(const char *name)
+      %code{% RETVAL = new TraceFileReader(aTHX_ name); %};
 
     SV *read_trace();
 };
