@@ -26,6 +26,8 @@ namespace devel {
 
             SV *read_trace();
         private:
+            void read_header();
+
             std::FILE *in;
             unsigned int file_version;
             DECL_THX_MEMBER
@@ -46,6 +48,8 @@ namespace devel {
             void end_sample();
 
         private:
+            void write_header();
+
             std::FILE *out;
             std::string output_file;
             unsigned int seed;

@@ -160,9 +160,14 @@ TraceFileReader::~TraceFileReader()
 
 void TraceFileReader::open(const std::string &path)
 {
+    in = fopen(path.c_str(), "r");
+    read_header();
+}
+
+void TraceFileReader::read_header()
+{
     char magic[sizeof(MAGIC) - 1];
 
-    in = fopen(path.c_str(), "r");
     if (fread(magic, 1, sizeof(magic), in) != sizeof(magic))
         croak("Unexpected end-of-file while reading file magic");
     if (strncmp(magic, MAGIC, sizeof(magic)))
@@ -286,6 +291,12 @@ void TraceFileWriter::open(const std::string &path, bool is_template)
     }
 
     out = fopen(output_file.c_str(), "w");
+
+    write_header();
+}
+
+void TraceFileWriter::write_header()
+{
     write_bytes(out, MAGIC, sizeof(MAGIC) - 1);
     write_varint(out, VERSION);
     write_byte(out, TAG_HEADER_SEPARATOR);
