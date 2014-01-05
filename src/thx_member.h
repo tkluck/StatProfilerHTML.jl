@@ -20,7 +20,7 @@
 #include <EXTERN.h>
 #include <perl.h>
 
-#ifdef USE_ITHREADS
+#ifdef MULTIPLICITY
 #   define DECL_THX_MEMBER tTHX my_perl;
 #   define SET_THX_MEMBER this->my_perl = aTHX;
 #else
