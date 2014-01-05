@@ -92,3 +92,25 @@ subroutine), the profiler interrupts the program at fixed intervals
 sufficient number of samples this provides a good indication of where
 the program is spending time and has a relatively low overhead (around
 3-5% increased runtime).
+
+=head1 CAVEATS
+
+=head2 goto &subroutine
+
+With a sampling profiler there is no reliable way to track the C<goto
+&foo> construct, hence the profile data for this code
+
+    sub foo {
+        # 100 milliseconds of computation
+    }
+
+    sub bar {
+        # 100 milliseconds of computation, then
+        goto &foo;
+    }
+
+    bar() for 1..100000; # foo.pl, line 10
+
+will report that the code at F<foo.pl> line 10 has spent approximately
+the same time in calling C<foo> and C<bar>, and will report C<foo> as
+being called from the main program rather than from C<bar>.
