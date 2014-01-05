@@ -146,11 +146,10 @@ namespace {
 }
 
 
-TraceFileReader::TraceFileReader(pTHX_ const std::string &path)
-  : file_version(0)
+TraceFileReader::TraceFileReader(pTHX)
+  : in(NULL), file_version(0)
 {
     SET_THX_MEMBER
-    open(path);
 }
 
 TraceFileReader::~TraceFileReader()
@@ -160,6 +159,7 @@ TraceFileReader::~TraceFileReader()
 
 void TraceFileReader::open(const std::string &path)
 {
+    close();
     in = fopen(path.c_str(), "r");
     read_header();
 }

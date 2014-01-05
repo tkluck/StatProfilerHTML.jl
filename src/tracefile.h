@@ -15,7 +15,8 @@ namespace devel {
         class TraceFileReader
         {
         public:
-            TraceFileReader(pTHX_ const std::string &path);
+            // Note: Constructor does not open the file!
+            TraceFileReader(pTHX);
             ~TraceFileReader();
 
             void open(const std::string &path);
