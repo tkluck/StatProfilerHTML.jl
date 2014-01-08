@@ -184,19 +184,47 @@ void TraceFileReader::read_header()
     if (strncmp(magic, MAGIC, sizeof(magic)))
         croak("Invalid file magic");
 
-    int version_from_file = read_varint(in);
     // In future, will check that the version is at least not newer
     // than this library's file format version. That's necessary even
     // if there's a backcompat layer.
+    int version_from_file = read_varint(in);
     if (version_from_file < 1 || version_from_file > VERSION)
         croak("Incompatible file format version %i", version_from_file);
 
     file_version = (unsigned int)version_from_file;
 
     // TODO this becomes a loop reading header records
-    int separator = fgetc(in);
-    if (separator != TAG_HEADER_SEPARATOR)
-        croak("Invalid file: Header does not end with header separator byte");
+    bool cont = 1;
+    while (cont) {
+        const int tag = fgetc(in);
+
+        switch (tag) {
+        case EOF:
+            croak("Invalid input file: File ends before end of file header");
+        case TAG_HEADER_SEPARATOR:
+            cont = 0;
+            break;
+
+        // TODO use the actual header data!
+        case TAG_META_PERL_VERSION: {
+            const int perl_revision   = read_varint(in);
+            const int perl_version    = read_varint(in);
+            const int perl_subversion = read_varint(in);
+            break;
+        }
+        case TAG_META_TICK_DURATION: {
+            const int tick_duration = read_varint(in);
+            break;
+        }
+        case TAG_META_STACK_SAMPLE_DEPTH: {
+            const int stack_sample_depth = read_varint(in);
+            break;
+        }
+
+        default:
+            croak("Invalid input file: Invalid header record tag (%i)", tag);
+        }
+    }
 }
 
 void TraceFileReader::close()
@@ -305,14 +333,35 @@ int TraceFileWriter::open(const std::string &path, bool is_template)
     if (!out)
         return 1;
 
-    return write_header();
+    return 0;
 }
 
-int TraceFileWriter::write_header()
+int TraceFileWriter::write_perl_version()
+{
+    int status = 0;
+    status += write_byte(out, TAG_META_PERL_VERSION);
+    status += write_varint(out, PERL_REVISION);
+    status += write_varint(out, PERL_VERSION);
+    status += write_varint(out, PERL_SUBVERSION);
+    return status;
+}
+
+int TraceFileWriter::write_header(unsigned int sampling_interval,
+                                  unsigned int stack_collect_depth)
 {
     int status = 0;
     status += write_bytes(out, MAGIC, sizeof(MAGIC) - 1);
     status += write_varint(out, VERSION);
+
+    // Write meta data: Perl version, tick duration, stack sample depth
+    status += write_perl_version();
+
+    status += write_byte(out, TAG_META_TICK_DURATION);
+    status += write_varint(out, sampling_interval);
+
+    status += write_byte(out, TAG_META_STACK_SAMPLE_DEPTH);
+    status += write_varint(out, stack_collect_depth);
+
     status += write_byte(out, TAG_HEADER_SEPARATOR);
     return status;
 }

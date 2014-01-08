@@ -37,6 +37,7 @@ namespace devel {
         class TraceFileWriter
         {
         public:
+            // Usage in this order: Construct object, open, write_header, write samples
             TraceFileWriter(pTHX_ const std::string &path, bool is_template);
             ~TraceFileWriter();
 
@@ -44,12 +45,15 @@ namespace devel {
             void close();
             bool is_valid() const { return out; }
 
+            int write_header(unsigned int sampling_interval,
+                             unsigned int stack_collect_depth);
+
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
             int end_sample();
 
         private:
-            int write_header();
+            int write_perl_version();
 
             std::FILE *out;
             std::string output_file;

@@ -80,6 +80,8 @@ namespace {
     unsigned int sampling_interval = 10000;
     // random start delay, to improve distribution
     unsigned int random_start = 0;
+    // number of stack frames to collect
+    unsigned int stack_collect_depth = 20;
     bool seeded = false;
 }
 
@@ -116,8 +118,10 @@ Cxt::Cxt(const Cxt &cxt) :
 TraceFileWriter *
 Cxt::create_trace(pTHX)
 {
-    if (!trace)
+    if (!trace) {
         trace = new TraceFileWriter(aTHX_ filename, is_template);
+        trace->write_header(sampling_interval, stack_collect_depth);
+    }
 
     return trace;
 }
@@ -329,7 +333,7 @@ runloop(pTHX)
                 }
 #endif
             }
-            collect_trace(aTHX_ *trace, 20);
+            collect_trace(aTHX_ *trace, stack_collect_depth);
             trace->end_sample();
             pred_counter = counter;
         }
@@ -428,6 +432,7 @@ set_profiler_state(pTHX)
         if (MY_CXT.trace) {
             MY_CXT.trace->close();
             MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template);
+            MY_CXT.trace->write_header(sampling_interval, stack_collect_depth);
             // XXX check, write metadata
         }
         break;
