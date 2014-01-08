@@ -16,7 +16,6 @@
   - eval ""
   - do ""
   - sort {}/map {}
-  - tie and overload
 - test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
 - handle subroutines defined in an eval
@@ -24,15 +23,12 @@
   - take into account that different Perl versions have different op numbers
   - display pseudo-subroutine (package::CORE:op) in the profile visualization
 - configurable sampling
-  - sample frequency
-  - output file
   - stack depth
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
   - 0x10  keep information about the definition line for a subroutine
-- generate annotated source file listings
-  - link source file listings from flame graph
+- link source file listings from flame graph
 - command line options for analysis script
 - multiplicty/threads/fork
 - changes of file name, metadata take effect when profiling is (re)enabled
@@ -49,8 +45,6 @@
     sub-segments (es. to mark a setup/teardown phase)
   - don't assume the metadata is available at the beginning of the request
 - some serious benchmarking
-  - if possible, include benchmarks in the distribution
-  - make them easy to run
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
 - find a solution to correctly report exclusive/inclusive time for XSUBs
