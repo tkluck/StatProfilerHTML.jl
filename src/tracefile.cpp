@@ -208,7 +208,6 @@ void TraceFileReader::read_header()
             cont = 0;
             break;
 
-        // TODO use the actual header data!
         case TAG_META_PERL_VERSION: {
             source_perl_version.revision   = read_varint(in);
             source_perl_version.version    = read_varint(in);
@@ -216,11 +215,11 @@ void TraceFileReader::read_header()
             break;
         }
         case TAG_META_TICK_DURATION: {
-            const int tick_duration = read_varint(in);
+            source_tick_duration = read_varint(in);
             break;
         }
         case TAG_META_STACK_SAMPLE_DEPTH: {
-            const int stack_sample_depth = read_varint(in);
+            source_stack_sample_depth = read_varint(in);
             break;
         }
 

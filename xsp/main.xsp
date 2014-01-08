@@ -30,6 +30,8 @@ void set_sampling_interval(unsigned int interval);
     SV *read_trace();
 
     int get_format_version();
+    int get_source_tick_duration();
+    int get_source_stack_sample_depth();
 
     SV *get_source_perl_version()
       %code{%

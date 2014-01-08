@@ -31,14 +31,20 @@ namespace devel {
 
             unsigned int get_format_version() const { return file_format_version; }
             const PerlVersion_t& get_source_perl_version() const { return source_perl_version; }
+            int get_source_tick_duration() const { return source_tick_duration; }
+            int get_source_stack_sample_depth() const { return source_stack_sample_depth; }
 
             SV *read_trace();
         private:
             void read_header();
 
             std::FILE *in;
+            // TODO maybe introduce a header struct or class for cleanliness?
             unsigned int file_format_version;
             PerlVersion_t source_perl_version;
+            int source_tick_duration;
+            int source_stack_sample_depth;
+
             DECL_THX_MEMBER
         };
 
