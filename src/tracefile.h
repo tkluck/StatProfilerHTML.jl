@@ -12,6 +12,12 @@
 
 namespace devel {
     namespace statprofiler {
+        typedef struct {
+            int revision;
+            int version;
+            int subversion;
+        } PerlVersion_t;
+
         class TraceFileReader
         {
         public:
@@ -23,14 +29,16 @@ namespace devel {
             void close();
             bool is_valid() const { return in; }
 
-            unsigned int version() const { return file_version; }
+            unsigned int get_format_version() const { return file_format_version; }
+            const PerlVersion_t& get_source_perl_version() const { return source_perl_version; }
 
             SV *read_trace();
         private:
             void read_header();
 
             std::FILE *in;
-            unsigned int file_version;
+            unsigned int file_format_version;
+            PerlVersion_t source_perl_version;
             DECL_THX_MEMBER
         };
 

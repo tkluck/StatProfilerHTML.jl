@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use t::lib::Test tests => 6;
+use t::lib::Test tests => 7;
 
 use Devel::StatProfiler::Reader;
 use Time::HiRes qw(usleep);
@@ -21,6 +21,8 @@ for (1..3000) {
 Devel::StatProfiler::stop_profile();
 
 my $r = Devel::StatProfiler::Reader->new('tprof.out');
+ok($r->get_format_version() >= 1);
+
 my ($total, %sleep_pattern);
 
 while (my $trace = $r->read_trace) {

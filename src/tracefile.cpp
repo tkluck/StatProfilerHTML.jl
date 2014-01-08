@@ -8,7 +8,7 @@ using namespace devel::statprofiler;
 using namespace std;
 
 #define MAGIC   "=statprofiler"
-#define VERSION 1
+#define FORMAT_VERSION 1
 
 #if PERL_SUBVERSION < 16
 # ifndef GvNAMEUTF8
@@ -158,9 +158,12 @@ namespace {
 
 
 TraceFileReader::TraceFileReader(pTHX)
-  : in(NULL), file_version(0)
+  : in(NULL), file_format_version(0)
 {
     SET_THX_MEMBER
+    source_perl_version.revision = 0;
+    source_perl_version.version = 0;
+    source_perl_version.subversion = 0;
 }
 
 TraceFileReader::~TraceFileReader()
@@ -188,10 +191,10 @@ void TraceFileReader::read_header()
     // than this library's file format version. That's necessary even
     // if there's a backcompat layer.
     int version_from_file = read_varint(in);
-    if (version_from_file < 1 || version_from_file > VERSION)
+    if (version_from_file < 1 || version_from_file > FORMAT_VERSION)
         croak("Incompatible file format version %i", version_from_file);
 
-    file_version = (unsigned int)version_from_file;
+    file_format_version = (unsigned int)version_from_file;
 
     // TODO this becomes a loop reading header records
     bool cont = 1;
@@ -207,9 +210,9 @@ void TraceFileReader::read_header()
 
         // TODO use the actual header data!
         case TAG_META_PERL_VERSION: {
-            const int perl_revision   = read_varint(in);
-            const int perl_version    = read_varint(in);
-            const int perl_subversion = read_varint(in);
+            source_perl_version.revision   = read_varint(in);
+            source_perl_version.version    = read_varint(in);
+            source_perl_version.subversion = read_varint(in);
             break;
         }
         case TAG_META_TICK_DURATION: {
@@ -351,7 +354,7 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
 {
     int status = 0;
     status += write_bytes(out, MAGIC, sizeof(MAGIC) - 1);
-    status += write_varint(out, VERSION);
+    status += write_varint(out, FORMAT_VERSION);
 
     // Write meta data: Perl version, tick duration, stack sample depth
     status += write_perl_version();
