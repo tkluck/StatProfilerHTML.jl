@@ -4,7 +4,10 @@ use t::lib::Test;
 
 use Devel::StatProfiler::Reader;
 
-use Devel::StatProfiler -file => 'tprof.out', -interval => 1000;
+my $profile_file;
+BEGIN { $profile_file = temp_profile_file(); }
+
+use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 my ($foo, $l1, $l2, $l3);
 
 {
@@ -29,7 +32,7 @@ $foo->();
 
 Devel::StatProfiler::stop_profile();
 
-my @samples = get_samples('tprof.out');
+my @samples = get_samples($profile_file);
 
 eq_or_diff($samples[0][2], bless {
     line       => $l3,

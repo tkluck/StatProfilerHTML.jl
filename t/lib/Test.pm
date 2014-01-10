@@ -1,19 +1,20 @@
 package t::lib::Test;
-
-use strict;
+use 5.12.0;
 use warnings;
 use parent 'Test::Builder::Module';
 
 use Test::More;
 use Test::Differences;
 use Time::HiRes qw(usleep);
+use File::Temp ();
+use File::Spec;
 
 require feature;
 
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples)
+  qw(take_sample get_samples temp_profile_file)
 );
 
 sub import {
@@ -24,6 +25,16 @@ sub import {
     feature->import(':5.12');
 
     goto &Test::Builder::Module::import;
+}
+
+sub temp_profile_file {
+    state $debugging = $ENV{DEBUG};
+    state $tmpdir = File::Temp::tempdir(CLEANUP => !$debugging);
+    my $file = File::Temp::mktemp(File::Spec->catfile($tmpdir, "tprof.outXXXXXXXX"));
+    if ($debugging) {
+        say "# Temporary profiling output file: '$file'";
+    }
+    return $file;
 }
 
 sub take_sample {

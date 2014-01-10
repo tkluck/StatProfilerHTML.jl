@@ -4,7 +4,10 @@ use t::lib::Test;
 
 use Devel::StatProfiler::Reader;
 
-use Devel::StatProfiler -file => 'tprof.out', -interval => 1000;
+my $profile_file;
+BEGIN { $profile_file = temp_profile_file(); }
+
+use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 my ($foo, $l1, $l2, $l3);
 
 BEGIN {
@@ -15,7 +18,7 @@ use Test::Begin;
 
 Devel::StatProfiler::stop_profile();
 
-my ($begin, $use_begin, $use_init, $use_import) = my @samples = get_samples('tprof.out');
+my ($begin, $use_begin, $use_init, $use_import) = my @samples = get_samples($profile_file);
 
 is(@$begin, 3);
 is($begin->[2]->subroutine, 'main::BEGIN');

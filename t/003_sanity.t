@@ -5,7 +5,10 @@ use t::lib::Test tests => 6;
 use Devel::StatProfiler::Reader;
 use Time::HiRes qw(usleep);
 
-use Devel::StatProfiler -file => 'tprof.out', -interval => 1000;
+my $profile_file;
+BEGIN { $profile_file = temp_profile_file(); }
+
+use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 my ($sleepy, $s_100, $s_500, $s_200);
 
 sub sleepy {
@@ -20,7 +23,7 @@ for (1..3000) {
 
 Devel::StatProfiler::stop_profile();
 
-my $r = Devel::StatProfiler::Reader->new('tprof.out');
+my $r = Devel::StatProfiler::Reader->new($profile_file);
 
 my ($total, %sleep_pattern);
 
