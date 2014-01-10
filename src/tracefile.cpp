@@ -61,6 +61,11 @@ namespace {
         return string_size(value ? strlen(value) : 0);
     }
 
+    size_t string_size(pTHX_ SV *value)
+    {
+        return string_size(SvCUR(value));
+    }
+
     void skip_bytes(FILE *in, size_t size)
     {
         char buffer[128];
@@ -158,6 +163,14 @@ namespace {
     int write_string(FILE *out, const std::string &value, bool utf8)
     {
         return write_string(out, value.c_str(), value.length(), utf8);
+    }
+
+    int write_string(pTHX_ FILE *out, SV *value)
+    {
+        U32 utf8 = SvUTF8(value);
+        STRLEN len;
+        char *str = SvPV(value, len);
+        return write_string(out, str, len, utf8);
     }
 }
 
