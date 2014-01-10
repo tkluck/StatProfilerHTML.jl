@@ -29,23 +29,25 @@ Future:
   <tag byte> <varint-encoded length> <payload string of previously encoded length>
   The length is always present, even when the tag does not have a payload.
 - The document body consists of a chain of records.
+- All record types that are valid in the document BODY are followed by
+  a varint indicating the total record size.
 - The set of valid tags are:
   0: unused
   1: a sample-start record (payload: - sample weight as varint,
                                      - # of stack frames in sample as varint
                                      - name of topmost OP as string)
-  2: a sample-end record (no payload)
+  2: a sample-end record (followed by just a 0-varint)
   3: a regular stack-frame record (payload: - package/sub name as string
                                             - file name as string
                                             - line number as varint)
   4: an eval stack-frame record (TODO!)
   198: section start marker (payload: section name string)
   199: section end marker (payload: section name string)
-  200: custom meta data (payload: meta data key string, meta data value string)
-  201: meta data: Perl version (payload: three varints for the three parts of the Perl version)
-  202: meta data: tick duration in ns (as varint)
-  203: meta data: sampling stack depth (as varint)
-  204: meta data: Devel::StatProfiler version (as major version varint, minor version varint)
+  200: custom meta data (header or body) (payload: meta data key string, meta data value string)
+  201: header meta data: Perl version (payload: three varints for the three parts of the Perl version)
+  202: header meta data: tick duration in ns (as varint)
+  203: header meta data: sampling stack depth (as varint)
+  204: header meta data: Devel::StatProfiler version (as major version varint, minor version varint)
   254: separation marker between header and body. Also document-end marker. (has no payload)
   255: Continuation marker (unused)
 
