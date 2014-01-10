@@ -290,9 +290,9 @@ SV *TraceFileReader::read_trace()
             sample = (HV *) sv_2mortal((SV *) newHV());
             frames = newAV();
 
-            hv_store(sample, "frames", 6, newRV_noinc((SV *) frames), 0);
-            hv_store(sample, "weight", 6, newSViv(weight), 0);
-            hv_store(sample, "op_name", 7, SvREFCNT_inc(op_name), 0);
+            hv_stores(sample, "frames", newRV_noinc((SV *) frames));
+            hv_stores(sample, "weight", newSViv(weight));
+            hv_stores(sample, "op_name", SvREFCNT_inc(op_name));
             break;
         }
         default:
@@ -316,13 +316,13 @@ SV *TraceFileReader::read_trace()
                 sv_catpvn(fullname, "::", 2);
                 sv_catsv(fullname, name);
 
-                hv_store(frame, "subroutine", 10, fullname, 0);
+                hv_stores(frame, "subroutine", fullname);
             }
             else
-                hv_store(frame, "subroutine", 10, newSVpvn("", 0), 0);
+                hv_stores(frame, "subroutine", newSVpvn("", 0));
 
-            hv_store(frame, "file", 4, SvREFCNT_inc(file), 0);
-            hv_store(frame, "line", 4, newSViv(line), 0);
+            hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
 
             break;
