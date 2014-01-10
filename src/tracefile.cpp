@@ -260,7 +260,7 @@ SV *TraceFileReader::read_trace()
     // be worthwhile if there's lots.
     HV *st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
     HV *sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
-    HV *sample;
+    HV *sample = NULL;
     AV *frames;
 
     for (;;) {
@@ -288,6 +288,8 @@ SV *TraceFileReader::read_trace()
             skip_bytes(in, size);
             break;
         case TAG_SUB_FRAME: {
+            if (!sample)
+                croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
             SV *package = read_string(aTHX_ in);
             SV *name = read_string(aTHX_ in);
             SV *file = read_string(aTHX_ in);
@@ -314,6 +316,8 @@ SV *TraceFileReader::read_trace()
             break;
         }
         case TAG_SAMPLE_END:
+            if (!sample)
+                croak("Invalid input file: Found stray sample-end tag without sample-start tag");
             skip_bytes(in, size);
             return sv_bless(newRV_inc((SV *) sample), st_stash);
         case TAG_CUSTOM_META:
