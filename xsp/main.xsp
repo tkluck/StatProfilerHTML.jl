@@ -16,6 +16,8 @@ void set_enabled(bool enabled);
 void set_output_file(const char *path, bool is_template);
 void set_sampling_interval(unsigned int interval);
 
+void write_custom_metadata(SV *key, SV *value);
+
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {
     TraceFileReader(SV *path)
@@ -32,6 +34,7 @@ void set_sampling_interval(unsigned int interval);
     int get_format_version();
     int get_source_tick_duration();
     int get_source_stack_sample_depth();
+    HV *get_custom_metadata();
 
     SV *get_source_perl_version()
       %code{%

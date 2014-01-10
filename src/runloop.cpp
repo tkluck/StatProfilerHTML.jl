@@ -531,3 +531,18 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
 {
     sampling_interval = interval;
 }
+
+void
+devel::statprofiler::write_custom_metadata(SV *key, SV *value)
+{
+    dTHX;
+    dMY_CXT;
+
+    STRLEN key_len;
+    char *key_str = SvPV(key, key_len);
+    STRLEN val_len;
+    char *val_str = SvPV(value, val_len);
+
+    MY_CXT.trace->write_custom_metadata(string(key_str, key_len),
+                                        string(val_str, val_len));
+}

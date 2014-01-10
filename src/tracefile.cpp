@@ -154,6 +154,11 @@ namespace {
     {
         return write_string(out, value, value ? strlen(value) : 0, utf8);
     }
+
+    int write_string(FILE *out, const std::string &value, bool utf8)
+    {
+        return write_string(out, value.c_str(), value.length(), utf8);
+    }
 }
 
 
@@ -164,10 +169,12 @@ TraceFileReader::TraceFileReader(pTHX)
     source_perl_version.revision = 0;
     source_perl_version.version = 0;
     source_perl_version.subversion = 0;
+    custom_metadata = newHV();
 }
 
 TraceFileReader::~TraceFileReader()
 {
+    SvREFCNT_dec(custom_metadata);
     close();
 }
 
@@ -222,11 +229,22 @@ void TraceFileReader::read_header()
             source_stack_sample_depth = read_varint(in);
             break;
         }
+        case TAG_CUSTOM_META:
+            read_custom_meta_record(read_varint(in));
+            break;
 
         default:
             croak("Invalid input file: Invalid header record tag (%i)", tag);
         }
     }
+}
+
+void TraceFileReader::read_custom_meta_record(const int size)
+{
+    SV *key = read_string(aTHX_ in);
+    SV *value = read_string(aTHX_ in);
+    SvREFCNT_inc(value);
+    hv_store_ent(custom_metadata, key, value, 0);
 }
 
 void TraceFileReader::close()
@@ -252,7 +270,6 @@ SV *TraceFileReader::read_trace()
             return newSV(0);
 
         int size = read_varint(in);
-
         switch (type) {
         case TAG_SAMPLE_START: {
             int weight = read_varint(in);
@@ -267,6 +284,7 @@ SV *TraceFileReader::read_trace()
             break;
         }
         default:
+            warn("Unknown record type in trace file. Attempting to skip this record");
             skip_bytes(in, size);
             break;
         case TAG_SUB_FRAME: {
@@ -298,8 +316,16 @@ SV *TraceFileReader::read_trace()
         case TAG_SAMPLE_END:
             skip_bytes(in, size);
             return sv_bless(newRV_inc((SV *) sample), st_stash);
+        case TAG_CUSTOM_META:
+            read_custom_meta_record(size);
+            break;
         }
     }
+}
+
+HV *TraceFileReader::get_custom_metadata()
+{
+    return custom_metadata;
 }
 
 
@@ -471,3 +497,15 @@ int TraceFileWriter::end_sample()
     status += write_varint(out, 0);
     return status;
 }
+
+int TraceFileWriter::write_custom_metadata(const std::string &key,
+                                           const std::string &value)
+{
+    int status = 0;
+    status += write_byte(out, TAG_CUSTOM_META);
+    status += write_varint(out, string_size(key.length())+string_size(value.length()));
+    status += write_string(out, key, 0); // all assumed binary for now
+    status += write_string(out, value, 0);
+    return status;
+}
+

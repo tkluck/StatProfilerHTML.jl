@@ -35,8 +35,12 @@ namespace devel {
             int get_source_stack_sample_depth() const { return source_stack_sample_depth; }
 
             SV *read_trace();
+            // Returns the hash of custom meta data records that have been encountered
+            // thus far.
+            HV *get_custom_metadata();
         private:
             void read_header();
+            void read_custom_meta_record(const int size);
 
             std::FILE *in;
             // TODO maybe introduce a header struct or class for cleanliness?
@@ -44,6 +48,7 @@ namespace devel {
             PerlVersion_t source_perl_version;
             int source_tick_duration;
             int source_stack_sample_depth;
+            HV *custom_metadata;
 
             DECL_THX_MEMBER
         };
@@ -65,6 +70,8 @@ namespace devel {
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
             int end_sample();
+
+            int write_custom_metadata(const std::string &key, const std::string &value);
 
         private:
             int write_perl_version();
