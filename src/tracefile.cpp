@@ -239,12 +239,17 @@ void TraceFileReader::read_header()
     }
 }
 
-void TraceFileReader::read_custom_meta_record(const int size)
+void TraceFileReader::read_custom_meta_record(const int size, HV *extra_output_hash)
 {
     SV *key = read_string(aTHX_ in);
     SV *value = read_string(aTHX_ in);
     SvREFCNT_inc(value);
     hv_store_ent(custom_metadata, key, value, 0);
+
+    if (extra_output_hash) {
+        SvREFCNT_inc(value);
+        hv_store_ent(extra_output_hash, key, value, 0);
+    }
 }
 
 void TraceFileReader::close()
@@ -262,6 +267,13 @@ SV *TraceFileReader::read_trace()
     HV *sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     HV *sample = NULL;
     AV *frames;
+
+    // As we read more meta data, we'll build up this hash (which is
+    // created lazily below). If there's any, that hash will be returned
+    // with the trace as a hash element of the trace ("metadata").
+    // We also insert any metadata found into the TraceFileReader global
+    // metadata hash.
+    HV *new_metadata = NULL;
 
     for (;;) {
         int type = fgetc(in);
@@ -319,11 +331,16 @@ SV *TraceFileReader::read_trace()
             if (!sample)
                 croak("Invalid input file: Found stray sample-end tag without sample-start tag");
             skip_bytes(in, size);
+
+            if (new_metadata)
+                hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));
             return sv_bless(newRV_inc((SV *) sample), st_stash);
         case TAG_CUSTOM_META:
-            read_custom_meta_record(size);
+            if (!new_metadata)
+                new_metadata = (HV *)sv_2mortal((SV *)newHV());
+            read_custom_meta_record(size, new_metadata);
             break;
-        }
+        } // end switch
     }
 }
 

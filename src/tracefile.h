@@ -40,7 +40,7 @@ namespace devel {
             HV *get_custom_metadata();
         private:
             void read_header();
-            void read_custom_meta_record(const int size);
+            void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
 
             std::FILE *in;
             // TODO maybe introduce a header struct or class for cleanliness?
