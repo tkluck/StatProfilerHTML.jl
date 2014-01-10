@@ -18,7 +18,7 @@
       </tr>
 [% my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
    my $sub_link = $variables{sub_link};
-   for my $sub (@{$variables{subs}}[0..$max]) { %]
+   for my $sub (@{$variables{subs}}[0..$max - 1]) { %]
       <tr>
         <td>[%= $sub->{exclusive} %]</td>
         <td>[%= $sub->{inclusive} %]</td>
