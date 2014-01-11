@@ -122,3 +122,9 @@ XSUBs is reported as if called from the source line calling the XSUB.
 
 Additionally, the exclusive time for the XSUB incorrectly includes the
 time spent in callbacks.
+
+=head2 XSUBs and overload
+
+If an object has an overloaded C<&{}> operator (code dereference)
+returning an XSUB as the code reference, the overload might be called
+twice in some situations.

@@ -248,7 +248,7 @@ get_cv_from_sv(pTHX_ OP* op, SV *sv, GV **name)
     default:
         if (sv == &PL_sv_yes)           /* unfound import, ignore */
             return NULL;
-        SvGETMAGIC(sv);
+        /* SvGETMAGIC(sv) already called by pp_entersub/pp_goto */
         if (SvROK(sv)) {
             if (SvAMAGIC(sv)) {
                 sv = amagic_deref_call(sv, to_cv_amg);
