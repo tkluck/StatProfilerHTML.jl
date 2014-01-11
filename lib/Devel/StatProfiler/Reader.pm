@@ -46,6 +46,7 @@ sub subroutine { $_[0]->{subroutine} }
 sub file { $_[0]->{file} }
 sub line { $_[0]->{line} }
 sub kind { $_[0]->{line} == -2 ? 2 :
+           $_[0]->{line} == -1 ? 1 :
                                  0 }
 
 package Devel::StatProfiler::StackTrace;

@@ -19,6 +19,8 @@
           <a href="[%= $sub_link->($sub) %]">[%= $sub->{name} %]</a>
 [%   if ($sub->{kind} == 2) { %]
             (opcode)
+[%   } elsif ($sub->{kind} == 1) { %]
+            (xsub)
 [%   } %]
         </td>
       </tr>

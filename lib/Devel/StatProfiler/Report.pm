@@ -22,6 +22,7 @@ sub new {
             subs      => {},
             flames    => {},
             files     => {},
+            file_map  => {},
         },
         templates     => {
             file      => _get_template('file.tmpl'),
@@ -88,6 +89,15 @@ sub _sub {
     my ($sub, $file) = ($frame->subroutine, $frame->file);
     my $name = $sub || $file . ':main';
     my $id = $frame->id || $name;
+
+    # count the number of subroutines of a certain package defined per
+    # file, used as an heuristic for where to display xsub time
+    if ($sub && $file) {
+        # TODO in the binary format there should be a 'package' accessor
+        my ($package) = $sub =~ m{^(.*)::[^:]+};
+
+        $self->{aggregate}{file_map}{$package}{$file}++;
+    }
 
     return $self->{aggregate}{subs}{$id} ||= {
         name       => $name,
@@ -178,6 +188,7 @@ sub add_trace_file {
 sub _fileify {
     my ($name) = @_;
 
+    return 'no-file' unless $name;
     (my $base = File::Basename::basename($name)) =~ s/\W+/-/g;
 
     return $base;
@@ -185,15 +196,38 @@ sub _fileify {
 
 sub _finalize {
     my ($self) = @_;
-    my %files;
+    my (%files, %package_map);
+
+    # use the file defining the maximum number of subs of a certain
+    # package as the main file for that package (for xsubs)
+    for my $package (keys %{$self->{aggregate}{file_map}}) {
+        my $max = 0;
+
+        for my $file (keys %{$self->{aggregate}{file_map}{$package}}) {
+            my $count = $self->{aggregate}{file_map}{$package}{$file};
+
+            if ($count > $max) {
+                $package_map{$package} = $file;
+                $max = $count;
+            }
+        }
+    }
 
     my $ordinal = 0;
     for my $sub (sort { $a->{file} cmp $b->{file} }
                       values %{$self->{aggregate}{subs}}) {
+        # set the file for the xsub
+        if ($sub->{kind} == 1) {
+            # TODO in the binary format there should be a 'package' accessor
+            my ($package) = $sub->{name} =~ m{^(.*)::[^:]+};
+
+            $sub->{file} = $package_map{$package} // '';
+        }
+
         my ($exclusive, $inclusive, $callees) = @{$sub->{lines}}{qw(exclusive inclusive callees)};
         my $entry = $files{$sub->{file}} ||= {
             name      => $sub->{file},
-            basename  => File::Basename::basename($sub->{file}),
+            basename  => $sub->{file} eq '' ? '' : File::Basename::basename($sub->{file}),
             report    => sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal),
             lines     => {
                 exclusive       => [],
@@ -226,6 +260,10 @@ sub _finalize {
 sub _fetch_source {
     my ($self, $path) = @_;
     my @lines;
+
+    if ($path eq '') {
+        return ['Dummy file to stick orphan XSUBs in...'];
+    }
 
     # temporary
     if (!-f $path) {

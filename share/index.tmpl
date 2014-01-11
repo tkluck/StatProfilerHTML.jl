@@ -26,6 +26,8 @@
           <a href="[%= $sub_link->($sub) %]">[%= $sub->{name} %]</a>
 [%   if ($sub->{kind} == 2) { %]
             (opcode)
+[%   } elsif ($sub->{kind} == 1) { %]
+            (xsub)
 [%   } %]
         </td>
       </tr>
@@ -42,7 +44,7 @@
 [% for my $file (@{$variables{files}}) { %]
       <tr>
         <td>[%= $file->{exclusive} %]</td>
-        <td><a href="[%= $file->{report} %]">[%= $file->{basename} %]</a></td>
+        <td><a href="[%= $file->{report} %]">[%= $file->{basename} eq '' ? '(unknown)' : $file->{basename} %]</a></td>
       </tr>
 [% } %]
     </table>

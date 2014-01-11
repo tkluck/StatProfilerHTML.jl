@@ -41,7 +41,8 @@
       </tr>
 [% } %]
 [% my @opcodes = sort { $b->{name} cmp $a->{name} } @{$subs->{'-2'} || []};
-   my @special = @opcodes;
+   my @xsubs = sort { $b->{name} cmp $a->{name} } @{$subs->{'-1'} || []};
+   my @special = (@opcodes, @xsubs);
    for my $line (0 .. $#special) {
      my $sub = $special[$line];
      (my $anchor = $sub->{name}) =~ s/\W+/-/g; %]
@@ -58,6 +59,8 @@
           </span>
 [%   if ($sub->{kind} == 2) { %]
           <span class="code">sub [%= $sub->{name} %] # opcode</span>
+[%   } else { %]
+          <span class="code">sub [%= $sub->{name} %] # xsub</span>
 [%   } %]
         </td>
       </tr>
