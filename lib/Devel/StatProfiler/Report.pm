@@ -136,7 +136,7 @@ sub add_trace_file {
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{lines}{callees}{$call_site->line}{_sub_id($caller)} ||= {
+                my $callee = $caller->{lines}{callees}{$call_site->line}{_sub_id($sub)} ||= {
                     callee    => $sub,
                     inclusive => 0,
                 };
