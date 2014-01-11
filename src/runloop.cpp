@@ -586,9 +586,6 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
 void
 devel::statprofiler::set_max_output_file_size(size_t max_size)
 {
-    dTHX;
-    dMY_CXT;
-
     // Changing this at run time should be safe.
     max_output_file_size = max_size;
 }
@@ -608,10 +605,8 @@ devel::statprofiler::set_stack_collection_depth(unsigned int num_stack_frames)
 }
 
 void
-devel::statprofiler::write_custom_metadata(SV *key, SV *value)
+devel::statprofiler::write_custom_metadata(pTHX_ SV *key, SV *value)
 {
-    dTHX;
     dMY_CXT;
-
     MY_CXT.trace->write_custom_metadata(key, value);
 }

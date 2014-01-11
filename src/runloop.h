@@ -16,7 +16,7 @@ namespace devel {
         void set_stack_collection_depth(unsigned int num_stack_frames);
         void set_max_output_file_size(size_t max_size);
 
-        void write_custom_metadata(SV *key, SV *value);
+        void write_custom_metadata(pTHX_ SV *key, SV *value);
     }
 }
 
