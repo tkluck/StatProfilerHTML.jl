@@ -49,6 +49,7 @@ namespace devel {
             int source_tick_duration;
             int source_stack_sample_depth;
             HV *custom_metadata;
+            HV *sections;
             // various stashes used by the reader
             HV *st_stash, *sf_stash;
 
@@ -76,6 +77,8 @@ namespace devel {
             int end_sample();
 
             int write_custom_metadata(SV *key, SV *value);
+            int start_section(SV *section_name);
+            int end_section(SV *section_name);
 
         private:
             int write_perl_version();
@@ -83,6 +86,7 @@ namespace devel {
             std::FILE *out;
             std::string output_file;
             unsigned int seed;
+
             DECL_THX_MEMBER
         };
     }

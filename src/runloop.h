@@ -17,6 +17,8 @@ namespace devel {
         void set_max_output_file_size(size_t max_size);
 
         void write_custom_metadata(pTHX_ SV *key, SV *value);
+        void start_section(pTHX_ SV *section_name);
+        void end_section(pTHX_ SV *section_name);
     }
 }
 

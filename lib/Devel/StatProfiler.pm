@@ -70,6 +70,12 @@ sub enable_profile  { _set_profiler_state(1) }
 sub restart_profile { _set_profiler_state(2) }
 sub stop_profile    { _set_profiler_state(3) }
 
+sub guarded_section {
+  my ($section_name) = @_;
+  require Devel::StatProfiler::SectionGuard;
+  return Devel::StatProfiler::SectionGuard->new(section_name => $section_name);
+}
+
 1;
 
 __END__

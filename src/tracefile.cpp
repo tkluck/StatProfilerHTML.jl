@@ -176,7 +176,7 @@ namespace {
 
 
 TraceFileReader::TraceFileReader(pTHX)
-  : in(NULL), file_format_version(0)
+  : in(NULL), file_format_version(0), sections(NULL)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -190,11 +190,14 @@ TraceFileReader::TraceFileReader(pTHX)
 TraceFileReader::~TraceFileReader()
 {
     SvREFCNT_dec(custom_metadata);
+    SvREFCNT_dec(sections);
     close();
 }
 
 void TraceFileReader::open(const std::string &path)
 {
+    SvREFCNT_dec(sections);
+    sections = newHV();
     close();
     in = fopen(path.c_str(), "r");
     read_header();
@@ -350,6 +353,7 @@ SV *TraceFileReader::read_trace()
                 croak("Invalid input file: Found stray sample-end tag without sample-start tag");
             skip_bytes(in, size);
 
+            hv_stores(sample, "active_sections", newRV_inc((SV *)sections));
             if (new_metadata)
                 hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));
             return sv_bless(newRV_inc((SV *) sample), st_stash);
@@ -358,6 +362,31 @@ SV *TraceFileReader::read_trace()
                 new_metadata = (HV *)sv_2mortal((SV *)newHV());
             read_custom_meta_record(size, new_metadata);
             break;
+        case TAG_SECTION_START: {
+            SV *section_name = read_string(aTHX_ in);
+            HE *depth = hv_fetch_ent(sections, section_name, 1, 0);
+            if (!depth || !SvOK(HeVAL(depth)))
+                sv_setuv(HeVAL(depth), 1);
+            else
+                sv_setuv(HeVAL(depth), 1 + SvUV(HeVAL(depth)));
+            break;
+        }
+        case TAG_SECTION_END: {
+            SV *section_name = read_string(aTHX_ in);
+            HE *depth= hv_fetch_ent(sections, section_name, 0, 0);
+            if (!depth || !SvOK(HeVAL(depth)) || SvUV(HeVAL(depth)) == 0) {
+                STRLEN len;
+                char *str = SvPV(section_name, len);
+                croak("Invalid input file: Unmatched section end for '%.*s'", len, str);
+            }
+
+            const UV depth_num = SvUV(HeVAL(depth));
+            if (depth_num == 1)
+                hv_delete_ent(sections, section_name, G_DISCARD, 0);
+            else
+                sv_setuv(HeVAL(depth), depth_num - 1);
+            break;
+        }
         } // end switch
     }
 }
@@ -453,6 +482,9 @@ void TraceFileWriter::close()
 
 int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
 {
+    // TODO maybe track whether we're already in a sample so we can barf if we
+    // generate nested samples in error? This would also allow for forbidding
+    // adding section info within a sample, which makes no sense.
     const char *op_name = current_op ? OP_NAME(current_op) : NULL;
     int status = 0;
 
@@ -460,6 +492,30 @@ int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
     status += write_varint(out, varint_size(weight) + string_size(op_name));
     status += write_varint(out, weight);
     status += write_string(out, op_name, false);
+
+    return status;
+}
+
+int TraceFileWriter::start_section(SV *section_name)
+{
+    // TODO possibly track sections fully to forbid generating invalid sections
+    int status = 0;
+
+    status += write_byte(out, TAG_SECTION_START);
+    status += write_varint(out, string_size(aTHX_ section_name));
+    status += write_string(aTHX_ out, section_name);
+
+    return status;
+}
+
+int TraceFileWriter::end_section(SV *section_name)
+{
+    // TODO possibly track sections fully to forbid generating invalid sections
+    int status = 0;
+
+    status += write_byte(out, TAG_SECTION_END);
+    status += write_varint(out, string_size(aTHX_ section_name));
+    status += write_string(aTHX_ out, section_name);
 
     return status;
 }

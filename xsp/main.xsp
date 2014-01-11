@@ -20,6 +20,10 @@ void set_max_output_file_size(size_t max_size);
 
 void write_custom_metadata(SV *key, SV *value)
   %code{% write_custom_metadata(aTHX_ key, value); %};
+void start_section(SV *section_name)
+  %code{% start_section(aTHX_ section_name); %};
+void end_section(SV *section_name)
+  %code{% end_section(aTHX_ section_name); %};
 
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {
