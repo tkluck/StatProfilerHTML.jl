@@ -29,6 +29,7 @@ sub new {
             index     => _get_template('index.tmpl'),
         },
         flamegraph    => $opts{flamegraph} || 0,
+        slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
         tick          => 1000, # TODO get from profile files
     }, $class;
 
@@ -84,24 +85,27 @@ sub _sub_id {
 
 sub _sub {
     my ($self, $frame) = @_;
-    my $name = $frame->subroutine || $frame->file . ':main';
+    my ($sub, $file) = ($frame->subroutine, $frame->file);
+    my $name = $sub || $file . ':main';
+    my $id = $frame->id || $name;
 
-    return $self->{aggregate}{subs}{$name} ||= {
+    return $self->{aggregate}{subs}{$id} ||= {
         name       => $name,
-        file       => $frame->file,
+        file       => $file,
         inclusive  => 0,
         exclusive  => 0,
         lines      => {},
         call_sites => {},
         start_line => $frame->line,
+        kind       => $frame->kind,
     };
 }
 
 sub add_trace_file {
     my ($self, $file) = @_;
     my $r = Devel::StatProfiler::Reader->new($file);
-    my $subs = $self->{aggregate}{subs};
     my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
+    my $slowops = $self->{slowops};
 
     # TODO handle metadata, die if inconsistent
 
@@ -112,6 +116,16 @@ sub add_trace_file {
 
         my $frames = $trace->frames;
 
+        # TODO move it to Reader.pm?
+        if ($slowops->{my $op_name = $trace->op_name}) {
+            unshift @$frames, bless {
+                id         => $frames->[0]->file . ":CORE::$op_name",
+                subroutine => "CORE::$op_name",
+                file       => $frames->[0]->file,
+                line       => -2,
+            }, 'Devel::StatProfiler::StackFrame';
+        }
+
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
             my $line = $frame->line;
@@ -119,7 +133,7 @@ sub add_trace_file {
 
             $sub->{start_line} = $line if $sub->{start_line} > $line;
             $sub->{inclusive} += $weight;
-            $sub->{lines}{inclusive}{$line} += $weight;
+            $sub->{lines}{inclusive}{$line} += $weight if $line > 0;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -147,7 +161,7 @@ sub add_trace_file {
 
             if (!$i) {
                 $sub->{exclusive} += $weight;
-                $sub->{lines}{exclusive}{$line} += $weight;
+                $sub->{lines}{exclusive}{$line} += $weight if $line > 0;
             }
 
             # TODO aggregate opcodes
@@ -244,9 +258,16 @@ sub output {
     my $sub_link = sub {
         my ($sub) = @_;
 
-        return sprintf '%s#L%d',
-            $self->{aggregate}{files}{$sub->{file}}{report},
-            $sub->{start_line};
+        if ($sub->{kind} == 0) {
+            return sprintf '%s#L%d',
+                $self->{aggregate}{files}{$sub->{file}}{report},
+                $sub->{start_line};
+        } else {
+            (my $anchor = $sub->{name}) =~ s/\W+/-/g;
+            return sprintf '%s#LX%s',
+                $self->{aggregate}{files}{$sub->{file}}{report},
+                $anchor;
+        }
     };
 
     my $file_link = sub {

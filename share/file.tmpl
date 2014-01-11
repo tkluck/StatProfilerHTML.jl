@@ -23,7 +23,7 @@
           <span class="call-sites">
 [%     for my $sub (@$starting_subs) { %]
             [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
-[%       for my $site (values %{$sub->{call_sites}}) { %]
+[%       for my $site (sort values %{$sub->{call_sites}}) { %]
             [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $site->{caller}{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
 [%       } %]
 [%     } %]
@@ -37,6 +37,28 @@
           </span>
 [%   } %]
           <span class="code">[%= $lines->[$line] %]</span>
+        </td>
+      </tr>
+[% } %]
+[% my @opcodes = sort { $b->{name} cmp $a->{name} } @{$subs->{'-2'} || []};
+   my @special = @opcodes;
+   for my $line (0 .. $#special) {
+     my $sub = $special[$line];
+     (my $anchor = $sub->{name}) =~ s/\W+/-/g; %]
+      <tr>
+        <td><a name="LX[%= $anchor %]" /></td>
+        <td></td>
+        <td></td>
+        <td>
+          <span class="call-sites">
+            [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
+[%   for my $site (sort values %{$sub->{call_sites}}) { %]
+            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $site->{caller}{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
+[%   } %]
+          </span>
+[%   if ($sub->{kind} == 2) { %]
+          <span class="code">sub [%= $sub->{name} %] # opcode</span>
+[%   } %]
         </td>
       </tr>
 [% } %]

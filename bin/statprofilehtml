@@ -9,7 +9,10 @@ use Devel::StatProfiler::Report;
 
 my $outdir = 'statprof';
 
-my $report = Devel::StatProfiler::Report->new(flamegraph => 1);
+my $report = Devel::StatProfiler::Report->new(
+    flamegraph => 1,
+    slowops    => [],
+);
 for my $f (glob('statprof.out.*')) {
     $report->add_trace_file($f);
 }
