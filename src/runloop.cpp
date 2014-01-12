@@ -533,6 +533,12 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
 }
 
 void
+devel::statprofiler::set_stack_collection_depth(unsigned int num_stack_frames)
+{
+    stack_collect_depth = num_stack_frames;
+}
+
+void
 devel::statprofiler::write_custom_metadata(SV *key, SV *value)
 {
     dTHX;

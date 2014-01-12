@@ -13,6 +13,7 @@ namespace devel {
         void set_enabled(bool enabled);
         void set_output_file(const char *path, bool is_template);
         void set_sampling_interval(unsigned int interval);
+        void set_stack_collection_depth(unsigned int num_stack_frames);
 
         void write_custom_metadata(SV *key, SV *value);
     }
