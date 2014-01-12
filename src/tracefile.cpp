@@ -21,6 +21,8 @@ enum {
     TAG_SAMPLE_END              = 2,
     TAG_SUB_FRAME               = 3,
     TAG_EVAL_FRAME              = 4, // TODO implement
+    TAG_XSUB_FRAME              = 5,
+    TAG_MAIN_FRAME              = 6,
     TAG_SECTION_START           = 198, // TODO implement
     TAG_SECTION_END             = 199, // TODO implement
     TAG_CUSTOM_META             = 200, // TODO implement
@@ -172,6 +174,17 @@ namespace {
         char *str = SvPV(value, len);
         return write_string(out, str, len, utf8);
     }
+
+    SV *make_fullname(pTHX_ SV *package, SV *name) {
+        SV *fullname = newSV(SvCUR(package) + 2 + SvCUR(name));
+
+        SvPOK_on(fullname);
+        sv_catsv(fullname, package);
+        sv_catpvn(fullname, "::", 2);
+        sv_catsv(fullname, name);
+
+        return fullname;
+    }
 }
 
 
@@ -322,26 +335,41 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             HV *frame = newHV();
 
-            if (SvCUR(package) || SvCUR(name)) {
-                SV *fullname = newSV(SvCUR(package) + 2 + SvCUR(name));
+            hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
+            hv_stores(frame, "package", SvREFCNT_inc(package));
+            hv_stores(frame, "sub_name", SvREFCNT_inc(name));
+            hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "line", newSViv(line));
+            av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
 
-                SvPOK_on(fullname);
-                sv_catsv(fullname, package);
-                sv_catpvn(fullname, "::", 2);
-                sv_catsv(fullname, name);
+            break;
+        }
+        case TAG_XSUB_FRAME: {
+            if (!sample)
+                croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
+            SV *package = read_string(aTHX_ in);
+            SV *name = read_string(aTHX_ in);
+            HV *frame = newHV();
 
-                SvREFCNT_inc(package);
-                SvREFCNT_inc(name);
-                hv_stores(frame, "package", package);
-                hv_stores(frame, "sub_name", name);
-                hv_stores(frame, "fq_sub_name", fullname);
-            }
-            else {
-                hv_stores(frame, "package", newSVpvn("", 0));
-                hv_stores(frame, "sub_name", newSVpvn("", 0));
-                hv_stores(frame, "fq_sub_name", newSVpvn("", 0));
-            }
+            hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
+            hv_stores(frame, "package", SvREFCNT_inc(package));
+            hv_stores(frame, "sub_name", SvREFCNT_inc(name));
+            hv_stores(frame, "file", newSVpvn("", 0));
+            hv_stores(frame, "line", newSViv(-1));
+            av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
 
+            break;
+        }
+        case TAG_MAIN_FRAME: {
+            if (!sample)
+                croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
+            SV *file = read_string(aTHX_ in);
+            int line = read_varint(in);
+            HV *frame = newHV();
+
+            hv_stores(frame, "fq_sub_name", newSVpvn("", 0));
+            hv_stores(frame, "package", newSVpvn("", 0));
+            hv_stores(frame, "sub_name", newSVpvn("", 0));
             hv_stores(frame, "file", SvREFCNT_inc(file));
             hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
@@ -520,29 +548,22 @@ int TraceFileWriter::end_section(SV *section_name)
     return status;
 }
 
-int TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line)
+int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line)
 {
     const char *file;
     size_t file_size;
     int lineno, status = 0;
 
-    // Perl sub vs XSUB
-    if (line) {
+    if (frame_type != FRAME_XSUB) {
         file = OutCopFILE(line);
         file_size = strlen(file);
         lineno = CopLINE(line);
-    } else {
-        file = "";
-        file_size = 0;
-        lineno = -1;
     }
-
-    status += write_byte(out, TAG_SUB_FRAME);
 
     // require: cx->blk_eval.old_namesv
     // mPUSHs(newSVsv(cx->blk_eval.old_namesv));
 
-    if (cxt_type != CXt_EVAL && cxt_type != CXt_NULL) {
+    if (frame_type != FRAME_MAIN) {
         const char *package = "__ANON__", *name = "(unknown)";
         bool package_utf8 = false, name_utf8 = false;
         size_t package_size = 8, name_size = 9;
@@ -568,21 +589,27 @@ int TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP
             name_size = GvNAMELEN(egv);
 	}
 
-        status += write_varint(out, string_size(package_size) +
-                                    string_size(name_size) +
-                                    string_size(file_size) +
-                                    varint_size(lineno));
-        status += write_string(out, package, package_size, package_utf8);
-        status += write_string(out, name, name_size, name_utf8);
-        status += write_string(out, file, file_size, false);
-        status += write_varint(out, lineno);
+        if (frame_type == FRAME_SUB) {
+            status += write_byte(out, TAG_SUB_FRAME);
+            status += write_varint(out, string_size(package_size) +
+                                        string_size(name_size) +
+                                        string_size(file_size) +
+                                        varint_size(lineno));
+            status += write_string(out, package, package_size, package_utf8);
+            status += write_string(out, name, name_size, name_utf8);
+            status += write_string(out, file, file_size, false);
+            status += write_varint(out, lineno);
+        } else {
+            status += write_byte(out, TAG_XSUB_FRAME);
+            status += write_varint(out, string_size(package_size) +
+                                        string_size(name_size));
+            status += write_string(out, package, package_size, package_utf8);
+            status += write_string(out, name, name_size, name_utf8);
+        }
     } else {
-        status += write_varint(out, string_size(0) +
-                                    string_size(0) +
-                                    string_size(file_size) +
+        status += write_byte(out, TAG_MAIN_FRAME);
+        status += write_varint(out, string_size(file_size) +
                                     varint_size(lineno));
-        status += write_string(out, "", 0, false);
-        status += write_string(out, "", 0, false);
         status += write_string(out, file, file_size, false);
         status += write_varint(out, lineno);
     }

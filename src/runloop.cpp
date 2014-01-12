@@ -364,7 +364,7 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
         CV *cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &cv_name);
 
         if (cv && CvISXSUB(cv))
-            trace->add_frame(CXt_SUB, cv, cv_name, NULL);
+            trace->add_frame(FRAME_XSUB, cv, cv_name, NULL);
 #if 0 // DEBUG
         else {
             const char *package = "__ANON__", *name = "(unknown)";

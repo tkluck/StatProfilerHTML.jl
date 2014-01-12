@@ -18,6 +18,13 @@ namespace devel {
             int subversion;
         } PerlVersion_t;
 
+        enum FrameType
+        {
+            FRAME_SUB,
+            FRAME_XSUB,
+            FRAME_MAIN,
+        };
+
         class TraceFileReader
         {
         public:
@@ -73,7 +80,7 @@ namespace devel {
                              unsigned int stack_collect_depth);
 
             int start_sample(unsigned int weight, OP *current_op);
-            int add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
+            int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
             int end_sample();
 
             int write_custom_metadata(SV *key, SV *value);
