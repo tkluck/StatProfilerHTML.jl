@@ -1,13 +1,6 @@
 - allow merging/analyzing multiple profiles
   - check they have the same sample frequency, stack depth, Perl version
-- use a different format for the file
-  - needs to store different kinds of information
-    - normal stack frames
-    - eval stack frames (need to store the source code for the eval)
-    - custom metadata
-    - tick duration, Perl version, sampling stack depth
-  - use atomic create-or-fail open when opening the file
-  - decide whether to use compression
+- file output
   - decide whether to store the full sub/file name every time or
     cache recently-used ones to save on file size (and maybe I/O speed)
   - use async I/O to reduce delays? (probably not)
@@ -19,15 +12,12 @@
 - test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
 - handle subroutines defined in an eval
-- display pseudo-subroutine for slow opcodes (package::CORE:op) in the profile visualization
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
   - 0x10  keep information about the definition line for a subroutine
-- link source file listings from flame graph
 - command line options for analysis script
 - multiplicty/threads/fork
-- changes of file name, metadata take effect when profiling is (re)enabled
 - calling stop -> enable DTRT
 - generated code containing #line directives
   - it might be useful to have both the original and generated code
@@ -49,13 +39,9 @@
   with callbacks (might not be possible)
 
 - report similar to NYTProf
-  - exclusive/inclusive sample count
-  - total per sub and per-line
   - for each line, compute % relative to sub
   - for each sub, compute % relative to total
   - for subs, % of samples aggregated by call site
-  - aggregate slow opcodes per sub and display them at the end
-  - aggregate XSUBs and display them at the end
 - add heuristic to detect the real start of the sub (and default to
   first sampled line)
 - flexible stack frame -> source code mapping
@@ -74,3 +60,5 @@
 - make aggregation code reusable both as a script and in a web application
 - remove file text after __DATA__/__END__ but check it's not removing
   source code (use sampled lines)
+- link source file listings from flame graph
+- set default list of slow opcodes in bin/statprofilehtml
