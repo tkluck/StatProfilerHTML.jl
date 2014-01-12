@@ -96,6 +96,43 @@ sufficient number of samples this provides a good indication of where
 the program is spending time and has a relatively low overhead (around
 3-5% increased runtime).
 
+=head2 Options
+
+Options can be passed either on the command line:
+
+    perl -MDevel::StatProfiler=-interval,1000,-template,/tmp/profile/statprof.out
+
+or by loading the profiler directly from the profiled program
+
+   use Devel::StatProfiler -interval => 1000, -template => '/tmp/profile/statprof.out';
+
+=head3 -template <path> (default: statprof.out)
+
+Sets the base name used for the output file.  The full filename is
+obtained by appending a dot followed by a random string to the
+template path.  This ensures that subsequent profiler runs don't
+overwrite the same output file.
+
+=head3 -nostart
+
+Don't start profiling when the module is loaded.  To start the profile
+call C<enable_profile()>.
+
+=head3 -interval <microsecs> (default 10000)
+
+Sets the sampling interval, in microseconds.
+
+=head3 -depth <stack depth> (default 20)
+
+Sets the maximum number of stack frames saved for each sample.
+
+=head3 -file <path>
+
+In general, using C<-template> above is the preferred option.
+
+Sets the exact file path used for profile output file; if the file is
+already present, it's overwritten.
+
 =head1 CAVEATS
 
 =head2 goto &subroutine
