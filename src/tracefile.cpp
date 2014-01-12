@@ -43,7 +43,7 @@ namespace {
         }
     }
 
-    size_t varint_size(int value)
+    size_t varint_size(unsigned int value)
     {
         return value < (1 << 7)  ? 1 :
                value < (1 << 14) ? 2 :
@@ -81,7 +81,7 @@ namespace {
         }
     }
 
-    int read_varint(FILE *in)
+    unsigned int read_varint(FILE *in)
     {
         int res = 0;
         int v;
@@ -101,7 +101,7 @@ namespace {
     SV *read_string(pTHX_ FILE *in)
     {
         int flags = fgetc(in);
-        int size = read_varint(in);
+        unsigned int size = read_varint(in);
 
         if (flags == EOF)
             croak("Unexpected end-of-file while reading a string");
@@ -210,7 +210,7 @@ void TraceFileReader::read_header()
     // In future, will check that the version is at least not newer
     // than this library's file format version. That's necessary even
     // if there's a backcompat layer.
-    int version_from_file = read_varint(in);
+    unsigned int version_from_file = read_varint(in);
     if (version_from_file < 1 || version_from_file > FORMAT_VERSION)
         croak("Incompatible file format version %i", version_from_file);
 
@@ -297,7 +297,7 @@ SV *TraceFileReader::read_trace()
         int size = read_varint(in);
         switch (type) {
         case TAG_SAMPLE_START: {
-            int weight = read_varint(in);
+            unsigned int weight = read_varint(in);
             SV *op_name = read_string(aTHX_ in);
 
             sample = (HV *) sv_2mortal((SV *) newHV());
