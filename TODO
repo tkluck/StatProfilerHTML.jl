@@ -19,11 +19,7 @@
 - test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
 - handle subroutines defined in an eval
-- save currently-executing opcode as part of the stacktrace
-  - take into account that different Perl versions have different op numbers
-  - display pseudo-subroutine (package::CORE:op) in the profile visualization
-- configurable sampling
-  - stack depth
+- display pseudo-subroutine for slow opcodes (package::CORE:op) in the profile visualization
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
@@ -44,6 +40,8 @@
   - might be useful to have multiple different, potentially overlapping
     sub-segments (es. to mark a setup/teardown phase)
   - don't assume the metadata is available at the beginning of the request
+  ===> Currently supporting a simple notion of sections. Let's see if that's
+       good enough.
 - some serious benchmarking
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
