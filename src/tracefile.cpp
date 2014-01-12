@@ -532,14 +532,13 @@ int TraceFileWriter::end_sample()
     return status;
 }
 
-int TraceFileWriter::write_custom_metadata(const std::string &key,
-                                           const std::string &value)
+int TraceFileWriter::write_custom_metadata(SV *key, SV *value)
 {
     int status = 0;
     status += write_byte(out, TAG_CUSTOM_META);
-    status += write_varint(out, string_size(key.length())+string_size(value.length()));
-    status += write_string(out, key, 0); // all assumed binary for now
-    status += write_string(out, value, 0);
+    status += write_varint(out, SvCUR(key) + SvCUR(value));
+    status += write_string(aTHX_ out, key);
+    status += write_string(aTHX_ out, value);
     return status;
 }
 

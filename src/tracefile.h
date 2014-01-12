@@ -71,7 +71,7 @@ namespace devel {
             int add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP *line);
             int end_sample();
 
-            int write_custom_metadata(const std::string &key, const std::string &value);
+            int write_custom_metadata(SV *key, SV *value);
 
         private:
             int write_perl_version();
