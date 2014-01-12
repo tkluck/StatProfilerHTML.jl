@@ -15,6 +15,7 @@ my %args = (
     -file     => 1,
     -template => 1,
     -nostart  => 0,
+    -depth    => 1,
 );
 
 sub _croak {
@@ -47,6 +48,8 @@ sub import {
             set_output_file($value, 1);
         } elsif ($arg eq '-nostart') {
             set_enabled(0);
+        } elsif ($arg eq '-depth') {
+            set_stack_collection_depth($value);
         }
     }
 
