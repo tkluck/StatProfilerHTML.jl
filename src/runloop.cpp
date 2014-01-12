@@ -52,6 +52,8 @@ namespace {
 
         void enter_runloop();
         void leave_runloop();
+
+        bool is_running() const;
     };
 
     struct CounterCxt {
@@ -163,6 +165,12 @@ Cxt::leave_runloop()
     }
 
     --runloop_level;
+}
+
+bool
+Cxt::is_running() const
+{
+    return runloop_level > 0 || (trace && trace->is_valid());
 }
 
 
@@ -522,6 +530,11 @@ devel::statprofiler::set_output_file(const char *path, bool is_template)
     dTHX;
     dMY_CXT;
 
+    if (MY_CXT.is_running()) {
+        warn("Trying to change output file while profiling is in progress");
+        return;
+    }
+
     MY_CXT.filename = path;
     MY_CXT.is_template = is_template;
 }
@@ -529,12 +542,28 @@ devel::statprofiler::set_output_file(const char *path, bool is_template)
 void
 devel::statprofiler::set_sampling_interval(unsigned int interval)
 {
+    dTHX;
+    dMY_CXT;
+
+    if (MY_CXT.is_running()) {
+        warn("Trying to change sampling interval while profiling is in progress");
+        return;
+    }
+
     sampling_interval = interval;
 }
 
 void
 devel::statprofiler::set_stack_collection_depth(unsigned int num_stack_frames)
 {
+    dTHX;
+    dMY_CXT;
+
+    if (MY_CXT.is_running()) {
+        warn("Trying to change stack collection depth while profiling is in progress");
+        return;
+    }
+
     stack_collect_depth = num_stack_frames;
 }
 
