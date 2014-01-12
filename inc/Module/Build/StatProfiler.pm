@@ -19,12 +19,13 @@ sub _run_benchmark {
     my $prof = '-MDevel::StatProfiler=-template,benchmarks/output/bench.out';
     my $base = "$prof,-nostart";
 
+    my $args = $self->args;
     my @results;
     for my $params (['prof', $prof], ['base', $base]) {
         my $bench = Dumbbench->new(
-            initial_runs         => 35,
-            target_rel_precision => 0.002,
-            verbosity            => 0,
+            initial_runs         => $args->{"initial-runs"} || 35,
+            target_rel_precision => $args->{"rel-precision"} || 0.002,
+            verbosity            => $args->{"bench-verbosity"} || 0,
         );
 
         $bench->add_instances(
@@ -52,11 +53,23 @@ sub ACTION_benchmark {
     }
     $self->depends_on('build');
 
+    my $opt = $self->args();
+    my $freq_pinner;
+    local $SIG{INT} = $SIG{INT};
+    local $SIG{TERM} = $SIG{TERM};
+    if ($opt->{"pin-frequency"}) {
+        print "Pinning CPU frequency to lowest possible speed for benchmark.\n";
+        require Dumbbench::CPUFrequencyPinner;
+        $freq_pinner = Dumbbench::CPUFrequencyPinner->new;
+        $SIG{INT} = $SIG{TERM} = sub {undef $freq_pinner; exit};
+        $freq_pinner->set_max_frequencies($freq_pinner->min_frequencies->[0]);
+    }
     my @results;
     for my $benchmark (qw(shardedkv fibonacci hashsum subsum)) {
         print "Running $benchmark benchmark\n";
         push @results, $self->_run_benchmark($benchmark, "benchmarks/$benchmark.pl");
     }
+    undef $freq_pinner;
 
     my (%summary);
     for my $instance (@results) {
