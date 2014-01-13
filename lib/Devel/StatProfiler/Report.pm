@@ -31,7 +31,7 @@ sub new {
         },
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
-        tick          => 1000, # TODO get from profile files
+        tick          => 0,
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -117,7 +117,27 @@ sub add_trace_file {
     my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
     my $slowops = $self->{slowops};
 
-    # TODO handle metadata, die if inconsistent
+    if ($self->{tick} == 0) {
+        $self->{tick} = $r->get_source_tick_duration;
+        $self->{stack_depth} = $r->get_source_stack_sample_depth;
+        $self->{perl_version} = $r->get_source_perl_version;
+    } else {
+        my $tick = $r->get_source_tick_duration;
+        my $depth = $r->get_source_stack_sample_depth;
+        my $perl_version = $r->get_source_perl_version;
+
+        if ($tick != $self->{tick} ||
+                $depth != $self->{stack_depth} ||
+                $perl_version != $self->{perl_version}) {
+            die <<EOT;
+Inconsistent sampling parameters:
+Current tick duration: $self->{tick} stack sample depth: $self->{stack_depth} Perl version: $self->{perl_version}
+
+$file sampling parameters:
+Tick duration: $tick stack sample depth: $depth Perl version: $perl_version
+EOT
+        }
+    }
 
     while (my $trace = $r->read_trace) {
         my $weight = $trace->weight;
@@ -173,8 +193,6 @@ sub add_trace_file {
                 $sub->{exclusive} += $weight;
                 $sub->{lines}{exclusive}{$line} += $weight if $line > 0;
             }
-
-            # TODO aggregate opcodes
         }
 
         if ($flames) {

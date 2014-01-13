@@ -1,5 +1,3 @@
-- allow merging/analyzing multiple profiles
-  - check they have the same sample frequency, stack depth, Perl version
 - file output
   - decide whether to store the full sub/file name every time or
     cache recently-used ones to save on file size (and maybe I/O speed)
