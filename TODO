@@ -3,6 +3,26 @@
 - file output
   - decide whether to store the full sub/file name every time or
     cache recently-used ones to save on file size (and maybe I/O speed)
+    I can imagine two ways of going about this:
+    => A scheme like Sereal's COPY tag that could (in this case) appear
+       in any context where a string is expected and that encodes an
+       offset in the file from which the actual string is to be read.
+       Sereal chooses absolute offsets for a number of reasons. This might
+       be better off with relative backreferencing offsets. The upside of
+       this is that the data producer can itself make trade-offs as to
+       whether and where to make use of this. The decoder can start
+       decoding from arbitrary positions in a file (though it may have
+       to seek if it didn't read the entire file). The downside of this
+       is that if we don't know anything about the data we're reading,
+       in order to cache anything (to avoid lots of seeks), the decoder
+       has to keep ALL strings in an in-memory cache because the encoder
+       cannot realistically go back to flag strings that need keeping
+       around (seek on encoder/profiler side is even worse).
+    => More of an adaptive encoding where in order decode, one has to
+       decode the entire file running up to the atom to be decoded
+       because the state of the decoder ('s cached strings) is part of
+       the decoding decisions.
+    => I don't think these things are worth implementing.
   - use async I/O to reduce delays? (probably not)
 - test various interesting cases
   - eval {}
