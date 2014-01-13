@@ -7,7 +7,7 @@
 using namespace devel::statprofiler;
 using namespace std;
 
-#define MAGIC   "=statprofiler"
+#define FILE_MAGIC     "=statprofiler"
 #define FORMAT_VERSION 1
 
 #if PERL_SUBVERSION < 16
@@ -200,11 +200,11 @@ void TraceFileReader::open(const std::string &path)
 
 void TraceFileReader::read_header()
 {
-    char magic[sizeof(MAGIC) - 1];
+    char magic[sizeof(FILE_MAGIC) - 1];
 
     if (fread(magic, 1, sizeof(magic), in) != sizeof(magic))
         croak("Unexpected end-of-file while reading file magic");
-    if (strncmp(magic, MAGIC, sizeof(magic)))
+    if (strncmp(magic, FILE_MAGIC, sizeof(magic)))
         croak("Invalid file magic");
 
     // In future, will check that the version is at least not newer
@@ -424,7 +424,7 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
                                   unsigned int stack_collect_depth)
 {
     int status = 0;
-    status += write_bytes(out, MAGIC, sizeof(MAGIC) - 1);
+    status += write_bytes(out, FILE_MAGIC, sizeof(FILE_MAGIC) - 1);
     status += write_varint(out, FORMAT_VERSION);
 
     // Write meta data: Perl version, tick duration, stack sample depth
