@@ -7,13 +7,23 @@ use warnings;
 
 use Devel::StatProfiler::Report;
 
+my @files = @ARGV;
+
 my $outdir = 'statprof';
 
 my $report = Devel::StatProfiler::Report->new(
     flamegraph => 1,
     slowops    => [],
 );
-for my $f (glob('statprof.out.*')) {
+
+@files = glob('statprof.out.*')
+    if not @files;
+@files = glob('statprof.out')
+    if not @files;
+die "Missing input files (via ARGV or 'statprof.out.*' or 'statprof.out'\n"
+    if not @files;
+
+for my $f (@files) {
     $report->add_trace_file($f);
 }
 
