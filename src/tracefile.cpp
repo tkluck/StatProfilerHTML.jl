@@ -376,6 +376,11 @@ TraceFileWriter::~TraceFileWriter()
     close();
 }
 
+long TraceFileWriter::position() const
+{
+    return ftell(out);
+}
+
 int TraceFileWriter::open(const std::string &path, bool is_template)
 {
     close();

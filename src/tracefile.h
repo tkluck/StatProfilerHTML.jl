@@ -62,6 +62,8 @@ namespace devel {
 
             int open(const std::string &path, bool is_template);
             void close();
+            long position() const;
+
             bool is_valid() const { return out; }
 
             int write_header(unsigned int sampling_interval,

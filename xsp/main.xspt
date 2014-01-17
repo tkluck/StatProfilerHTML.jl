@@ -1,4 +1,5 @@
 %loadplugin{feature::default_xs_typemap};
 
+%typemap{size_t}{simple};
 %typemap{SV *}{simple};
 %typemap{HV *}{simple};

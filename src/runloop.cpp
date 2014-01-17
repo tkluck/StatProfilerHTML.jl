@@ -84,6 +84,8 @@ namespace {
     unsigned int random_start = 0;
     // number of stack frames to collect
     unsigned int stack_collect_depth = 20;
+    // Something largeish: 10MB
+    size_t max_output_file_size = 10 * 1024*1024;
     bool seeded = false;
 }
 
@@ -171,6 +173,17 @@ bool
 Cxt::is_running() const
 {
     return runloop_level > 0 || (trace && trace->is_valid());
+}
+
+
+static void
+reopen_output_file(pTHX)
+{
+    dMY_CXT;
+    MY_CXT.trace->close();
+    MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template);
+    MY_CXT.trace->write_header(sampling_interval, stack_collect_depth);
+    // XXX check if we need to write other metadata
 }
 
 
@@ -343,6 +356,11 @@ runloop(pTHX)
             }
             collect_trace(aTHX_ *trace, stack_collect_depth);
             trace->end_sample();
+            printf("POSITION: %i %i\n", (long)trace->position(), max_output_file_size );
+            if (trace->position() > max_output_file_size && MY_CXT.is_template) {
+                // Start new output file
+                reopen_output_file(aTHX);
+            }
             pred_counter = counter;
         }
         // here we save the argument to entersub/goto so, if it ends
@@ -423,7 +441,6 @@ switch_runloop(pTHX_ pMY_CXT_ bool enable)
     }
 }
 
-
 static OP *
 set_profiler_state(pTHX)
 {
@@ -437,12 +454,8 @@ set_profiler_state(pTHX)
         MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ state == 1);
         break;
     case 2: // restart
-        if (MY_CXT.trace) {
-            MY_CXT.trace->close();
-            MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template);
-            MY_CXT.trace->write_header(sampling_interval, stack_collect_depth);
-            // XXX check, write metadata
-        }
+        if (MY_CXT.trace)
+            reopen_output_file(aTHX);
         break;
     case 3: // stop
         if (MY_CXT.enabled) {
@@ -551,6 +564,16 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
     }
 
     sampling_interval = interval;
+}
+
+void
+devel::statprofiler::set_max_output_file_size(size_t max_size)
+{
+    dTHX;
+    dMY_CXT;
+
+    // Changing this at run time should be safe.
+    max_output_file_size = max_size;
 }
 
 void
