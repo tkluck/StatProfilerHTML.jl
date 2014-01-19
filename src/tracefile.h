@@ -58,7 +58,7 @@ namespace devel {
             HV *custom_metadata;
             HV *sections;
             // various stashes used by the reader
-            HV *st_stash, *sf_stash;
+            HV *st_stash, *sf_stash, *msf_stash;
 
             DECL_THX_MEMBER
         };

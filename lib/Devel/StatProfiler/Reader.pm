@@ -19,6 +19,17 @@ sub kind { $_[0]->{line} == -2 ? 2 :
            $_[0]->{line} == -1 ? 1 : # -1 means "XSUB"
                                  0 }
 
+package Devel::StatProfiler::MainStackFrame;
+
+sub id { $_[0]->{id} }
+sub file { $_[0]->{file} }
+sub line { $_[0]->{line} }
+
+sub package { '' }
+sub sub_name { '' }
+sub fq_sub_name { '' }
+sub kind { 0 }
+
 package Devel::StatProfiler::StackTrace;
 
 sub weight { $_[0]->{weight} }

@@ -37,10 +37,7 @@ eq_or_diff($sub->[2], bless {
 eq_or_diff($sub->[3], bless {
     file          => __FILE__,
     line          => $l4,
-    package       => '',
-    sub_name      => '',
-    fq_sub_name   => '',
-}, 'Devel::StatProfiler::StackFrame');
+}, 'Devel::StatProfiler::MainStackFrame');
 
 eq_or_diff($block->[2], bless {
     file          => __FILE__,
@@ -52,9 +49,6 @@ eq_or_diff($block->[2], bless {
 eq_or_diff($block->[3], bless {
     file          => __FILE__,
     line          => $l3,
-    package       => '',
-    sub_name      => '',
-    fq_sub_name   => '',
-}, 'Devel::StatProfiler::StackFrame');
+}, 'Devel::StatProfiler::MainStackFrame');
 
 done_testing();

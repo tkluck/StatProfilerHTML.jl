@@ -198,6 +198,7 @@ TraceFileReader::TraceFileReader(pTHX)
     custom_metadata = newHV();
     st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
     sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
+    msf_stash = gv_stashpv("Devel::StatProfiler::MainStackFrame", 0);
 }
 
 TraceFileReader::~TraceFileReader()
@@ -367,12 +368,9 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             HV *frame = newHV();
 
-            hv_stores(frame, "fq_sub_name", newSVpvn("", 0));
-            hv_stores(frame, "package", newSVpvn("", 0));
-            hv_stores(frame, "sub_name", newSVpvn("", 0));
             hv_stores(frame, "file", SvREFCNT_inc(file));
             hv_stores(frame, "line", newSViv(line));
-            av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
+            av_push(frames, sv_bless(newRV_noinc((SV *) frame), msf_stash));
 
             break;
         }
