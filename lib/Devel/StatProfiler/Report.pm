@@ -128,7 +128,7 @@ sub add_trace_file {
 
         if ($tick != $self->{tick} ||
                 $depth != $self->{stack_depth} ||
-                $perl_version != $self->{perl_version}) {
+                $perl_version ne $self->{perl_version}) {
             die <<EOT;
 Inconsistent sampling parameters:
 Current tick duration: $self->{tick} stack sample depth: $self->{stack_depth} Perl version: $self->{perl_version}
