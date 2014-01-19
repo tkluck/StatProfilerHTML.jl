@@ -356,7 +356,6 @@ runloop(pTHX)
             }
             collect_trace(aTHX_ *trace, stack_collect_depth);
             trace->end_sample();
-            printf("POSITION: %i %i\n", (long)trace->position(), max_output_file_size );
             if (trace->position() > max_output_file_size && MY_CXT.is_template) {
                 // Start new output file
                 reopen_output_file(aTHX);
