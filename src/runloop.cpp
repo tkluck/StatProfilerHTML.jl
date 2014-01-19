@@ -54,6 +54,7 @@ namespace {
         void leave_runloop();
 
         bool is_running() const;
+        bool is_any_running() const;
     };
 
     struct CounterCxt {
@@ -173,6 +174,18 @@ bool
 Cxt::is_running() const
 {
     return runloop_level > 0 || (trace && trace->is_valid());
+}
+
+bool
+Cxt::is_any_running() const
+{
+    if (is_running())
+        return true;
+
+    // no point in locking refcount_mutex here, if correctness is
+    // needed, the mutex needs to be held around the whole section
+    // using the result
+    return refcount > 0;
 }
 
 
@@ -557,7 +570,7 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
     dTHX;
     dMY_CXT;
 
-    if (MY_CXT.is_running()) {
+    if (MY_CXT.is_any_running()) {
         warn("Trying to change sampling interval while profiling is in progress");
         return;
     }
@@ -586,7 +599,7 @@ devel::statprofiler::set_stack_collection_depth(unsigned int num_stack_frames)
     dTHX;
     dMY_CXT;
 
-    if (MY_CXT.is_running()) {
+    if (MY_CXT.is_any_running()) {
         warn("Trying to change stack collection depth while profiling is in progress");
         return;
     }
