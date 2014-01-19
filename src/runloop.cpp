@@ -23,6 +23,7 @@ namespace {
     enum SourceCodeKind {
         NONE             = 0,
         TRACED_EVALS     = 1,
+        ALL_EVALS        = 2,
     };
 
     struct Mutex {
@@ -77,15 +78,7 @@ namespace {
 
         Cxt();
         Cxt(const Cxt &cxt);
-
-        ~Cxt() {
-            dTHX;
-
-            if (outer_runloop)
-                Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
-            PL_runops = original_runloop;
-            delete trace;
-        }
+        ~Cxt();
 
         TraceFileWriter *create_trace(pTHX);
 
@@ -140,6 +133,8 @@ namespace {
     size_t max_output_file_size = 10 * 1024*1024;
     // which source code needs saving, see StatProfiler.pm
     SourceCodeKind source_code_kind = NONE;
+    // old pp_enterval
+    OP * (*orig_entereval)(pTHX);
     bool seeded = false;
 }
 
@@ -199,6 +194,16 @@ Cxt::Cxt(const Cxt &cxt) :
 {
     new_id();
     memcpy(parent_id, cxt.id, sizeof(id));
+}
+
+Cxt::~Cxt() {
+    dTHX;
+
+    if (outer_runloop)
+        Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
+    PL_runops = original_runloop;
+    PL_ppaddr[OP_ENTEREVAL] = orig_entereval;
+    delete trace;
 }
 
 TraceFileWriter *
@@ -477,6 +482,26 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
     trace->end_sample();
 }
 
+
+static OP *
+save_eval_code(pTHX)
+{
+    OP *next = orig_entereval(aTHX);
+
+    // this handles the case where CATCH_GET is false in pp_entereval
+    if (source_code_kind == ALL_EVALS &&
+            next == PL_eval_start &&
+            next->op_type == OP_NEXTSTATE) {
+        dMY_CXT;
+        TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
+
+        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, (COP *) next);
+    }
+
+    return next;
+}
+
+
 static int
 runloop(pTHX)
 {
@@ -490,6 +515,13 @@ runloop(pTHX)
 
     if (!trace->is_valid())
         croak("Failed to open trace file");
+
+    // this handles the case where CATCH_GET is true in pp_entereval
+    if (source_code_kind == ALL_EVALS &&
+            op == PL_eval_start &&
+            op->op_type == OP_NEXTSTATE)
+        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, (COP *) op);
+
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (UNLIKELY( counter != pred_counter )) {
@@ -744,6 +776,9 @@ devel::statprofiler::init_runloop(pTHX)
             break;
         }
     }
+
+    orig_entereval = PL_ppaddr[OP_ENTEREVAL];
+    PL_ppaddr[OP_ENTEREVAL] = save_eval_code;
 }
 
 
