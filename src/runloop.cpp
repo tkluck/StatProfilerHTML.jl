@@ -562,7 +562,12 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
         return;
     }
 
-    sampling_interval = interval || 1;
+    if (interval == 0) {
+        warn("Setting sampling interval to less than a microsecond not "
+             "supported, defaulting to one microsecond");
+        sampling_interval = 1;
+    } else
+        sampling_interval = interval;
 }
 
 void
