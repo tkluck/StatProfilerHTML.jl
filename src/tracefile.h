@@ -54,6 +54,9 @@ namespace devel {
             // Returns the hash of custom meta data records that have been encountered
             // thus far.
             HV *get_custom_metadata();
+
+            // Returns the source code that has been collected thus far
+            HV *get_source_code();
         private:
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
@@ -65,7 +68,7 @@ namespace devel {
             Genealogy_t genealogy_info;
             int source_tick_duration;
             int source_stack_sample_depth;
-            HV *custom_metadata;
+            HV *custom_metadata, *source_code;
             HV *sections;
             // various stashes used by the reader
             HV *st_stash, *sf_stash, *msf_stash, *esf_stash;
@@ -95,6 +98,7 @@ namespace devel {
 
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
+            int add_eval_source(SV *eval_text, COP *line);
             int end_sample();
 
             int write_custom_metadata(SV *key, SV *value);

@@ -15,7 +15,7 @@ require feature;
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples temp_profile_file precision_factor run_ctests)
+  qw(take_sample get_samples get_sources temp_profile_file precision_factor run_ctests)
 );
 
 sub import {
@@ -57,6 +57,15 @@ sub get_samples {
     }
 
     return @samples;
+}
+
+sub get_sources {
+    my ($file) = @_;
+    my $r = Devel::StatProfiler::Reader->new($file);
+
+    1 while $r->read_trace;
+
+    return $r->get_source_code;
 }
 
 sub precision_factor {

@@ -21,6 +21,7 @@ enum {
     TAG_EVAL_FRAME              = 4,
     TAG_XSUB_FRAME              = 5,
     TAG_MAIN_FRAME              = 6,
+    TAG_EVAL_STRING             = 7,
     TAG_SECTION_START           = 198,
     TAG_SECTION_END             = 199,
     TAG_CUSTOM_META             = 200,
@@ -201,6 +202,7 @@ TraceFileReader::TraceFileReader(pTHX)
     source_perl_version.version = 0;
     source_perl_version.subversion = 0;
     custom_metadata = newHV();
+    source_code = newHV();
     st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
     sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     msf_stash = gv_stashpv("Devel::StatProfiler::MainStackFrame", 0);
@@ -387,6 +389,13 @@ SV *TraceFileReader::read_trace()
 
             break;
         }
+        case TAG_EVAL_STRING: {
+            SV *text = read_string(aTHX_ in);
+            SV *file = read_string(aTHX_ in);
+
+            hv_store_ent(source_code, file, SvREFCNT_inc(text), 0);
+            break;
+        }
         case TAG_MAIN_FRAME: {
             if (!sample)
                 croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
@@ -446,6 +455,11 @@ SV *TraceFileReader::read_trace()
 HV *TraceFileReader::get_custom_metadata()
 {
     return custom_metadata;
+}
+
+HV *TraceFileReader::get_source_code()
+{
+    return source_code;
 }
 
 
@@ -595,6 +609,22 @@ int TraceFileWriter::end_section(SV *section_name)
     status += write_varint(out, string_size(aTHX_ section_name));
     status += write_string(aTHX_ out, section_name);
     force_empty_frame = true;
+
+    return status;
+}
+
+int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
+{
+    const char *file = OutCopFILE(line);
+    size_t file_size = strlen(file);
+    int lineno = CopLINE(line), status = 0;
+
+    status += write_byte(out, TAG_EVAL_STRING);
+    status += write_varint(out, string_size(SvCUR(eval_text) - 2) +
+                                string_size(file_size) +
+                                varint_size(lineno));
+    status += write_string(out, SvPVX(eval_text), SvCUR(eval_text) - 2, SvUTF8(eval_text));
+    status += write_string(out, file, file_size, false);
 
     return status;
 }
