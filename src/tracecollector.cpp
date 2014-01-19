@@ -3,6 +3,10 @@
 
 using namespace devel::statprofiler;
 
+namespace {
+    MGVTBL eval_idx_vtbl;
+}
+
 
 // needs to be kept in sync with S_dopoptosub in op.c
 STATIC I32
@@ -37,7 +41,7 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 
 // needs to be kept in sync with Perl_caller_cx in op.c
 void
-devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
+devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool eval_source)
 {
     I32 cxix = S_dopoptosub_at(aTHX_ cxstack, cxstack_ix);
     const PERL_CONTEXT *ccstack = cxstack;
@@ -80,6 +84,17 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
                 } else if (CxOLD_OP_TYPE(sub) != OP_ENTEREVAL) {
                     trace.add_frame(FRAME_MAIN, NULL, NULL, line);
                 } else {
+                    if (eval_source) {
+                        SV *eval_text = sub->blk_eval.cur_text;
+                        MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &eval_idx_vtbl) : NULL;
+
+                        if (!marker) {
+                            sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
+                                        &eval_idx_vtbl, NULL, 0);
+                            trace.add_eval_source(eval_text, line);
+                        }
+                    }
+
                     trace.add_frame(FRAME_EVAL, NULL, NULL, line);
                 }
             }

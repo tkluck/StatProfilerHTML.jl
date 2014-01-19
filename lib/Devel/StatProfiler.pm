@@ -21,6 +21,7 @@ my %args = (
 
 my %source_args = (
     none           => 0,
+    traced_evals   => 1,
 );
 
 sub _croak {
@@ -145,6 +146,12 @@ Sets which source code is saved in the profile
 =item none
 
 No source code is saved in the profile file.
+
+=item traced_evals
+
+Only the source code for eval()s that have at least one sample
+B<during evaluation> is saved.  This does B<NOT> include eval()s that
+define subroutines that are sampled after the eval() ends.
 
 =back
 

@@ -22,6 +22,7 @@ using namespace std;
 namespace {
     enum SourceCodeKind {
         NONE             = 0,
+        TRACED_EVALS     = 1,
     };
 
     struct Mutex {
@@ -471,7 +472,8 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
         }
 #endif
     }
-    collect_trace(aTHX_ *trace, stack_collect_depth);
+    collect_trace(aTHX_ *trace, stack_collect_depth,
+                  source_code_kind == TRACED_EVALS);
     trace->end_sample();
 }
 

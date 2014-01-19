@@ -8,7 +8,7 @@ namespace devel {
     namespace statprofiler {
         class TraceFileWriter;
 
-        void collect_trace(pTHX_ TraceFileWriter &trace, int depth);
+        void collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool eval_source);
     }
 }
 
