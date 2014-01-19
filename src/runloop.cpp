@@ -20,6 +20,10 @@ using namespace std;
 #define MY_CXT_KEY "Devel::StatProfiler::_guts" XS_VERSION
 
 namespace {
+    enum SourceCodeKind {
+        NONE             = 0,
+    };
+
     struct Mutex {
         Mutex() {
             reinit();
@@ -133,6 +137,8 @@ namespace {
     unsigned int stack_collect_depth = 20;
     // Something largeish: 10MB
     size_t max_output_file_size = 10 * 1024*1024;
+    // which source code needs saving, see StatProfiler.pm
+    SourceCodeKind source_code_kind = NONE;
     bool seeded = false;
 }
 
@@ -828,6 +834,20 @@ devel::statprofiler::set_stack_collection_depth(unsigned int num_stack_frames)
     }
 
     stack_collect_depth = num_stack_frames;
+}
+
+void
+devel::statprofiler::set_save_source(unsigned int save_source)
+{
+    dTHX;
+    dMY_CXT;
+
+    if (MY_CXT.is_any_running()) {
+        warn("Trying to change source saving setting while profiling is in progress");
+        return;
+    }
+
+    source_code_kind = (SourceCodeKind) save_source;
 }
 
 void
