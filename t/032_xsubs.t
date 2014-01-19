@@ -4,7 +4,10 @@ use t::lib::Test;
 
 use Devel::StatProfiler::Reader;
 
-use Devel::StatProfiler -file => 'tprof.out', -interval => 1000;
+my $profile_file;
+BEGIN { $profile_file = temp_profile_file(); }
+
+use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 use Time::HiRes qw(usleep);
 
 {
@@ -51,7 +54,7 @@ $overload->(10000); BEGIN { $l5 = __LINE__; }
 
 Devel::StatProfiler::stop_profile();
 
-my @samples = get_samples('tprof.out');
+my @samples = get_samples($profile_file);
 
 my $xsub = bless {
     line          => -1,
