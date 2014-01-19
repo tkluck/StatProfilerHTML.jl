@@ -44,7 +44,6 @@ void write_custom_metadata(SV *key, SV *value);
         RETVAL = newSVpvf("%lu.%lu.%lu", (unsigned long)version.revision,
                                           (unsigned long)version.version,
                                           (unsigned long)version.subversion);
-        sv_2mortal(RETVAL);
       %};
 };
 
