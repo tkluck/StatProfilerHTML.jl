@@ -49,6 +49,8 @@ namespace devel {
             int source_tick_duration;
             int source_stack_sample_depth;
             HV *custom_metadata;
+            // various stashes used by the reader
+            HV *st_stash, *sf_stash;
 
             DECL_THX_MEMBER
         };

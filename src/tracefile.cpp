@@ -183,6 +183,8 @@ TraceFileReader::TraceFileReader(pTHX)
     source_perl_version.version = 0;
     source_perl_version.subversion = 0;
     custom_metadata = newHV();
+    st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
+    sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
 }
 
 TraceFileReader::~TraceFileReader()
@@ -274,10 +276,6 @@ void TraceFileReader::close()
 
 SV *TraceFileReader::read_trace()
 {
-    // This could possibly be cached across read_trace calls and may
-    // be worthwhile if there's lots.
-    HV *st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
-    HV *sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     HV *sample = NULL;
     AV *frames;
 
