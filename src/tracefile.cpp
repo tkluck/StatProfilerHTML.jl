@@ -329,10 +329,17 @@ SV *TraceFileReader::read_trace()
                 sv_catpvn(fullname, "::", 2);
                 sv_catsv(fullname, name);
 
-                hv_stores(frame, "subroutine", fullname);
+                SvREFCNT_inc(package);
+                SvREFCNT_inc(name);
+                hv_stores(frame, "package", package);
+                hv_stores(frame, "sub_name", name);
+                hv_stores(frame, "fq_sub_name", fullname);
             }
-            else
-                hv_stores(frame, "subroutine", newSVpvn("", 0));
+            else {
+                hv_stores(frame, "package", newSVpvn("", 0));
+                hv_stores(frame, "sub_name", newSVpvn("", 0));
+                hv_stores(frame, "fq_sub_name", newSVpvn("", 0));
+            }
 
             hv_stores(frame, "file", SvREFCNT_inc(file));
             hv_stores(frame, "line", newSViv(line));

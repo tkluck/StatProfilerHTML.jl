@@ -9,11 +9,14 @@ require Devel::StatProfiler; # load XS but don't start profiling
 package Devel::StatProfiler::StackFrame;
 
 sub id { $_[0]->{id} }
-sub subroutine { $_[0]->{subroutine} }
 sub file { $_[0]->{file} }
 sub line { $_[0]->{line} }
+
+sub package { $_[0]->{package} }
+sub sub_name { $_[0]->{sub_name} }
+sub fq_sub_name { $_[0]->{fq_sub_name} }
 sub kind { $_[0]->{line} == -2 ? 2 :
-           $_[0]->{line} == -1 ? 1 :
+           $_[0]->{line} == -1 ? 1 : # -1 means "XSUB"
                                  0 }
 
 package Devel::StatProfiler::StackTrace;

@@ -86,21 +86,19 @@ sub _sub_id {
 
 sub _sub {
     my ($self, $frame) = @_;
-    my ($sub, $file) = ($frame->subroutine, $frame->file);
+    my ($sub, $file) = ($frame->fq_sub_name, $frame->file);
     my $name = $sub || $file . ':main';
     my $id = $frame->id || $name;
 
     # count the number of subroutines of a certain package defined per
     # file, used as an heuristic for where to display xsub time
     if ($sub && $file) {
-        # TODO in the binary format there should be a 'package' accessor
-        my ($package) = $sub =~ m{^(.*)::[^:]+};
-
-        $self->{aggregate}{file_map}{$package}{$file}++;
+        $self->{aggregate}{file_map}{$frame->package}{$file}++;
     }
 
     return $self->{aggregate}{subs}{$id} ||= {
         name       => $name,
+        package    => $frame->package,
         file       => $file,
         inclusive  => 0,
         exclusive  => 0,
@@ -150,7 +148,9 @@ EOT
         if ($slowops->{my $op_name = $trace->op_name}) {
             unshift @$frames, bless {
                 id         => $frames->[0]->file . ":CORE::$op_name",
-                subroutine => "CORE::$op_name",
+                "package"  => "CORE",
+                sub_name   => $op_name,
+                fq_sub_name=> "CORE::$op_name",
                 file       => $frames->[0]->file,
                 line       => -2,
             }, 'Devel::StatProfiler::StackFrame';
@@ -196,7 +196,7 @@ EOT
         }
 
         if ($flames) {
-            my $key = join ';', map { $_->subroutine || 'MAIN' } reverse @$frames;
+            my $key = join ';', map { $_->fq_sub_name || 'MAIN' } reverse @$frames;
 
             $flames->{$key} += $weight;
         }
@@ -236,10 +236,7 @@ sub _finalize {
                       values %{$self->{aggregate}{subs}}) {
         # set the file for the xsub
         if ($sub->{kind} == 1) {
-            # TODO in the binary format there should be a 'package' accessor
-            my ($package) = $sub->{name} =~ m{^(.*)::[^:]+};
-
-            $sub->{file} = $package_map{$package} // '';
+            $sub->{file} = $package_map{$sub->{package}} // '';
         }
 
         my ($exclusive, $inclusive, $callees) = @{$sub->{lines}}{qw(exclusive inclusive callees)};

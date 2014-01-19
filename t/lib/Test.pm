@@ -50,7 +50,7 @@ sub get_samples {
     while (my $trace = $r->read_trace) {
         my $frames = $trace->frames;
         next unless @$frames;
-        next unless $frames->[0]->subroutine eq 'Time::HiRes::usleep';
+        next unless $frames->[0]->fq_sub_name eq 'Time::HiRes::usleep';
 
         push @samples, $frames;
     }
