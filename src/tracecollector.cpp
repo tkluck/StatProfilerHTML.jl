@@ -75,10 +75,13 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth)
             // ignore the set-up but-not-entered-yet stack frame
             // also ignore the call frame set up for BEGIN blocks
             if (line != caller->blk_oldcop && line != &PL_compiling) {
-                if (CxTYPE(sub) != CXt_EVAL)
+                if (CxTYPE(sub) != CXt_EVAL) {
                     trace.add_frame(FRAME_SUB, sub->blk_sub.cv, NULL, line);
-                else
+                } else if (CxOLD_OP_TYPE(sub) != OP_ENTEREVAL) {
                     trace.add_frame(FRAME_MAIN, NULL, NULL, line);
+                } else {
+                    trace.add_frame(FRAME_EVAL, NULL, NULL, line);
+                }
             }
             else
                 ++depth;

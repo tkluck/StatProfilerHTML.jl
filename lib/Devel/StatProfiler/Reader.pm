@@ -30,6 +30,10 @@ sub sub_name { '' }
 sub fq_sub_name { '' }
 sub kind { 0 }
 
+package Devel::StatProfiler::EvalStackFrame;
+
+our @ISA = qw(Devel::StatProfiler::MainStackFrame);
+
 package Devel::StatProfiler::StackTrace;
 
 sub weight { $_[0]->{weight} }

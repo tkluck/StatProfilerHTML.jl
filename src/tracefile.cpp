@@ -20,7 +20,7 @@ enum {
     TAG_SAMPLE_START            = 1,
     TAG_SAMPLE_END              = 2,
     TAG_SUB_FRAME               = 3,
-    TAG_EVAL_FRAME              = 4, // TODO implement
+    TAG_EVAL_FRAME              = 4,
     TAG_XSUB_FRAME              = 5,
     TAG_MAIN_FRAME              = 6,
     TAG_SECTION_START           = 198, // TODO implement
@@ -199,6 +199,7 @@ TraceFileReader::TraceFileReader(pTHX)
     st_stash = gv_stashpv("Devel::StatProfiler::StackTrace", 0);
     sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     msf_stash = gv_stashpv("Devel::StatProfiler::MainStackFrame", 0);
+    esf_stash = gv_stashpv("Devel::StatProfiler::EvalStackFrame", 0);
 }
 
 TraceFileReader::~TraceFileReader()
@@ -358,6 +359,19 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "file", newSVpvn("", 0));
             hv_stores(frame, "line", newSViv(-1));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
+
+            break;
+        }
+        case TAG_EVAL_FRAME: {
+            if (!sample)
+                croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
+            SV *file = read_string(aTHX_ in);
+            int line = read_varint(in);
+            HV *frame = newHV();
+
+            hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "line", newSViv(line));
+            av_push(frames, sv_bless(newRV_noinc((SV *) frame), esf_stash));
 
             break;
         }
@@ -561,7 +575,7 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
     // require: cx->blk_eval.old_namesv
     // mPUSHs(newSVsv(cx->blk_eval.old_namesv));
 
-    if (frame_type != FRAME_MAIN) {
+    if (frame_type == FRAME_SUB || frame_type == FRAME_XSUB) {
         const char *package = "__ANON__", *name = "(unknown)";
         bool package_utf8 = false, name_utf8 = false;
         size_t package_size = 8, name_size = 9;
@@ -604,6 +618,12 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
             status += write_string(out, package, package_size, package_utf8);
             status += write_string(out, name, name_size, name_utf8);
         }
+    } else if (frame_type == FRAME_EVAL) {
+        status += write_byte(out, TAG_EVAL_FRAME);
+        status += write_varint(out, string_size(file_size) +
+                                    varint_size(lineno));
+        status += write_string(out, file, file_size, false);
+        status += write_varint(out, lineno);
     } else {
         status += write_byte(out, TAG_MAIN_FRAME);
         status += write_varint(out, string_size(file_size) +

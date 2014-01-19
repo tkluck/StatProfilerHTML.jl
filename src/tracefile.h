@@ -23,6 +23,7 @@ namespace devel {
             FRAME_SUB,
             FRAME_XSUB,
             FRAME_MAIN,
+            FRAME_EVAL,
         };
 
         class TraceFileReader
@@ -58,7 +59,7 @@ namespace devel {
             HV *custom_metadata;
             HV *sections;
             // various stashes used by the reader
-            HV *st_stash, *sf_stash, *msf_stash;
+            HV *st_stash, *sf_stash, *msf_stash, *esf_stash;
 
             DECL_THX_MEMBER
         };
