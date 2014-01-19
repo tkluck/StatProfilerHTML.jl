@@ -285,11 +285,14 @@ sub _fetch_source {
 
     # temporary
     if (!-f $path) {
-        warn "Can't find source for '$path'";
+        warn "Can't find source for '$path'\n";
         return ['Eval source not available...'];
     }
 
-    open my $fh, '<', $path;
+    open my $fh, '<', $path
+        or die "Failed to open source code file '$path', "
+               . "do you have permission to read it? (Reason: $!)";
+
     while (defined (my $line = <$fh>)) {
         # this might match a token inside a string, and does not match
         # the token on a non-empty line; probably it should double-check
