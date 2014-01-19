@@ -562,7 +562,7 @@ devel::statprofiler::set_sampling_interval(unsigned int interval)
         return;
     }
 
-    sampling_interval = interval;
+    sampling_interval = interval || 1;
 }
 
 void
