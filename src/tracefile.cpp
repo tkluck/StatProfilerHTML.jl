@@ -470,7 +470,7 @@ int TraceFileWriter::add_frame(unsigned int cxt_type, CV *sub, GV *sub_name, COP
 {
     const char *file;
     size_t file_size;
-    int lineno, status;
+    int lineno, status = 0;
 
     // Perl sub vs XSUB
     if (line) {
