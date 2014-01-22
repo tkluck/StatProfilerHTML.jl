@@ -212,7 +212,7 @@ sub _fileify {
     return $base;
 }
 
-sub _finalize {
+sub finalize {
     my ($self) = @_;
     my (%files, %package_map);
 
@@ -306,7 +306,7 @@ sub output {
 
     mkdir $directory unless -d $directory;
 
-    $self->_finalize;
+    $self->finalize;
     my $files = $self->{aggregate}{files};
     my @subs = sort { $b->{exclusive} <=> $a->{exclusive} }
                     values %{$self->{aggregate}{subs}};
