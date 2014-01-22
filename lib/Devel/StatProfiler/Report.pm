@@ -92,7 +92,7 @@ sub _sub {
 
     # count the number of subroutines of a certain package defined per
     # file, used as an heuristic for where to display xsub time
-    if ($sub && $file) {
+    if ($frame->line > 0) {
         $self->{aggregate}{file_map}{$frame->package}{$file}++;
     }
 
