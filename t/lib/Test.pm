@@ -183,4 +183,31 @@ sub join {
         if waitpid($self->{pid}, 0) != $self->{pid};
 }
 
+package t::lib::Test::SingleReader;
+
+sub new {
+    my ($class, $reader) = @_;
+
+    return bless {
+        reader  => $reader,
+        trace   => undef,
+        read    => 0,
+    }, $class;
+}
+
+sub get_source_tick_duration { $_[0]->{reader}->get_source_tick_duration }
+sub get_source_stack_sample_depth { $_[0]->{reader}->get_source_stack_sample_depth }
+sub get_source_perl_version { $_[0]->{reader}->get_source_perl_version }
+sub get_genealogy_info { $_[0]->{reader}->get_genealogy_info }
+sub get_custom_metadata { $_[0]->{reader}->get_custom_metadata }
+
+sub done { !$_[0]->{trace} }
+
+sub read_trace {
+    my ($self) = @_;
+    return if $self->{read};
+    $self->{read} = 1;
+    return $self->{trace} ||= $self->{reader}->read_trace;
+}
+
 1;

@@ -33,6 +33,8 @@ sub new {
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
         tick          => 0,
+        stack_depth   => 0,
+        perl_version  => undef,
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -218,6 +220,132 @@ sub add_trace_file {
             my $key = join ';', map { $_->fq_sub_name || 'MAIN' } reverse @$frames;
 
             $flames->{$key} += $weight;
+        }
+    }
+}
+
+sub merge {
+    my ($self, $report) = @_;
+
+    $self->_check_consistency(
+        $report->{tick},
+        $report->{stack_depth},
+        $report->{perl_version},
+        'merged report',
+    );
+
+    $self->{aggregate}{total} += $report->{aggregate}{total};
+
+    {
+        my $my_map = $self->{aggregate}{file_map};
+        my $other_map = $report->{aggregate}{file_map};
+
+        for my $package (keys %$other_map) {
+            for my $file (keys %{$other_map->{$package}}) {
+                $my_map->{$package}{$file} += $other_map->{$package}{$file};
+            }
+        }
+    }
+
+    {
+        my $my_subs = $self->{aggregate}{subs};
+        my $other_subs = $report->{aggregate}{subs};
+
+        for my $id (keys %$other_subs) {
+            my $other_sub = $other_subs->{$id};
+            my $my_sub = $my_subs->{$id} ||= {
+                name       => $other_sub->{name},
+                uq_name    => $other_sub->{uq_name},
+                package    => $other_sub->{package},
+                file       => $other_sub->{file},
+                inclusive  => 0,
+                exclusive  => 0,
+                callees    => {},
+                call_sites => {},
+                start_line => $other_sub->{start_line},
+                uq_name    => $other_sub->{uq_name},
+                kind       => $other_sub->{kind},
+            };
+
+            $my_sub->{start_line} = $other_sub->{start_line} if $my_sub->{start_line} > $other_sub->{start_line};
+            $my_sub->{inclusive} += $other_sub->{inclusive};
+            $my_sub->{exclusive} += $other_sub->{exclusive};
+        }
+
+        for my $id (keys %$other_subs) {
+            my $other_sub = $other_subs->{$id};
+            my $my_sub = $my_subs->{$id};
+
+            for my $site_id (keys %{$other_sub->{call_sites}}) {
+                my $other_site = $other_sub->{call_sites}{$site_id};
+                my $site = $my_sub->{call_sites}{$site_id} ||= {
+                    caller    => $other_site->{caller},
+                    exclusive => 0,
+                    inclusive => 0,
+                    file      => $other_site->{file},
+                    line      => $other_site->{line},
+                };
+
+                $site->{inclusive} += $other_site->{inclusive};
+                $site->{exclusive} += $other_site->{exclusive};
+            }
+
+            for my $line (keys %{$other_sub->{callees}}) {
+                for my $callee_id (keys %{$other_sub->{callees}{$line}}) {
+                    my $callee = $my_sub->{callees}{$line}{$callee_id} ||= {
+                        callee    => $other_sub->{callees}{$line}{$callee_id}{callee},
+                        inclusive => 0,
+                    };
+
+                    $callee->{inclusive} += $other_sub->{callees}{$line}{$callee_id}{inclusive};
+                };
+            }
+        }
+    }
+
+    {
+        my $my_files = $self->{aggregate}{files};
+        my $other_files = $report->{aggregate}{files};
+
+        for my $file_id (keys %$other_files) {
+            my $other_file = $other_files->{$file_id};
+            my $file = $my_files->{$file_id} ||= {
+                name      => $other_file->{name},
+                basename  => $other_file->{basename},
+                report    => undef,
+                lines     => {
+                    exclusive       => [],
+                    inclusive       => [],
+                    callees         => {},
+                },
+                exclusive => 0,
+                subs      => {},
+            };
+
+            $file->{exclusive} += $other_file->{exclusive};
+
+            my $other_exclusive = $other_file->{lines}{exclusive};
+            my $my_exclusive = $file->{lines}{exclusive};
+            for my $i (0..$#$other_exclusive) {
+                $my_exclusive->[$i] += $other_exclusive->[$i]
+                    if $other_exclusive->[$i];
+            }
+
+            my $other_inclusive = $other_file->{lines}{inclusive};
+            my $my_inclusive = $file->{lines}{inclusive};
+            for my $i (0..$#$other_inclusive) {
+                $my_inclusive->[$i] += $other_inclusive->[$i]
+                    if $other_inclusive->[$i];
+            }
+        }
+    }
+
+    {
+        my $my_flames = $self->{aggregate}{flames};
+        my $other_flames = $report->{aggregate}{flames};
+
+        for my $key (keys %$other_flames) {
+            $my_flames->{$key} += $other_flames->{$key};
         }
     }
 }
