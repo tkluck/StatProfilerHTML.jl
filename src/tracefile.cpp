@@ -1,7 +1,5 @@
 #include "tracefile.h"
 
-#include "rand.h"
-
 #include <ctime>
 
 using namespace devel::statprofiler;
@@ -30,6 +28,7 @@ enum {
     TAG_META_TICK_DURATION      = 202,
     TAG_META_STACK_SAMPLE_DEPTH = 203,
     TAG_META_LIBRARY_VERSION    = 204, // TODO implement
+    TAG_META_GENEALOGY          = 205,
     TAG_HEADER_SEPARATOR        = 254,
     TAG_TAG_CONTINUATION        = 255 // just reserved for now
 };
@@ -40,8 +39,8 @@ namespace {
         static const char digits[] = "0123456789abcdef";
 
         for (int i = 0; i < 8; ++i) {
-            str += digits[value & 0xf];
-            value >>= 4;
+            str += digits[value >> 28];
+            value <<= 4;
         }
     }
 
@@ -81,6 +80,12 @@ namespace {
             if (to_read != read)
                 croak("Unexpected end-of-file while skipping over data");
         }
+    }
+
+    void read_bytes(FILE *in, void *buffer, size_t size)
+    {
+        if (fread(buffer, 1, size, in) != size)
+            croak("Unexpected end-of-file while reading bytes");
     }
 
     unsigned int read_varint(FILE *in)
@@ -125,7 +130,7 @@ namespace {
         return sv;
     }
 
-    int write_bytes(FILE *out, const char *bytes, size_t size)
+    int write_bytes(FILE *out, const void *bytes, size_t size)
     {
         return fwrite(bytes, 1, size, out) != 0;
     }
@@ -260,6 +265,13 @@ void TraceFileReader::read_header()
         }
         case TAG_META_STACK_SAMPLE_DEPTH: {
             source_stack_sample_depth = read_varint(in);
+            break;
+        }
+        case TAG_META_GENEALOGY: {
+            genealogy_info.ordinal = read_varint(in);
+            genealogy_info.parent_ordinal = read_varint(in);
+            read_bytes(in, genealogy_info.id, sizeof(genealogy_info.id));
+            read_bytes(in, genealogy_info.parent_id, sizeof(genealogy_info.parent_id));
             break;
         }
         case TAG_CUSTOM_META:
@@ -437,12 +449,10 @@ HV *TraceFileReader::get_custom_metadata()
 }
 
 
-TraceFileWriter::TraceFileWriter(pTHX_ const string &path, bool is_template) :
+TraceFileWriter::TraceFileWriter(pTHX) :
     out(NULL), force_empty_frame(false)
 {
     SET_THX_MEMBER
-    seed = rand_seed();
-    open(path, is_template);
 }
 
 TraceFileWriter::~TraceFileWriter()
@@ -455,19 +465,18 @@ long TraceFileWriter::position() const
     return ftell(out);
 }
 
-int TraceFileWriter::open(const std::string &path, bool is_template)
+int TraceFileWriter::open(const std::string &path, bool is_template, unsigned int id[ID_SIZE], unsigned int ordinal)
 {
     close();
     output_file = path;
 
     if (is_template) {
         output_file += '.';
-        append_hex(output_file, getpid());
-        append_hex(output_file, time(NULL));
-        for (int i = 0; i < 4; ++i) {
-            rand(&seed);
-            append_hex(output_file, seed);
-        }
+        for (int i = 0; i < 6; ++i)
+            append_hex(output_file, id[i]);
+
+        output_file += '.';
+        append_hex(output_file, ordinal);
     }
 
     out = fopen(output_file.c_str(), "w");
@@ -488,7 +497,9 @@ int TraceFileWriter::write_perl_version()
 }
 
 int TraceFileWriter::write_header(unsigned int sampling_interval,
-                                  unsigned int stack_collect_depth)
+                                  unsigned int stack_collect_depth,
+                                  unsigned int id[ID_SIZE], unsigned int ordinal,
+                                  unsigned int parent_id[ID_SIZE], unsigned int parent_ordinal)
 {
     int status = 0;
     status += write_bytes(out, FILE_MAGIC, sizeof(FILE_MAGIC) - 1);
@@ -503,16 +514,19 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
     status += write_byte(out, TAG_META_STACK_SAMPLE_DEPTH);
     status += write_varint(out, stack_collect_depth);
 
+    status += write_byte(out, TAG_META_GENEALOGY);
+    status += write_varint(out, ordinal);
+    status += write_varint(out, parent_ordinal);
+    status += write_bytes(out, id, sizeof(id[0]) * ID_SIZE);
+    status += write_bytes(out, parent_id, sizeof(parent_id[0]) * ID_SIZE);
+
     status += write_byte(out, TAG_HEADER_SEPARATOR);
     return status;
 }
 
 void TraceFileWriter::close()
 {
-    if (force_empty_frame) {
-        start_sample(0, NULL);
-        end_sample();
-    }
+    flush();
 
     if (out) {
         string temp = output_file + "_";
@@ -523,6 +537,24 @@ void TraceFileWriter::close()
     }
 
     out = NULL;
+}
+
+void TraceFileWriter::shut()
+{
+    fclose(out);
+
+    force_empty_frame = false;
+    out = NULL;
+}
+
+void TraceFileWriter::flush()
+{
+    if (force_empty_frame) {
+        start_sample(0, NULL);
+        end_sample();
+    }
+
+    fflush(out);
 }
 
 int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)

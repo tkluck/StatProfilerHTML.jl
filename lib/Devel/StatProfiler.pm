@@ -134,7 +134,8 @@ Sets the maximum number of stack frames saved for each sample.
 
 =head3 -file <path>
 
-In general, using C<-template> above is the preferred option.
+In general, using C<-template> above is the preferred option, since
+C<-file> will not work when using C<fork()> or threads.
 
 Sets the exact file path used for profile output file; if the file is
 already present, it's overwritten.

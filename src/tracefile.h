@@ -10,13 +10,20 @@
 
 #include "thx_member.h"
 
+#define ID_SIZE 6
+
 namespace devel {
     namespace statprofiler {
-        typedef struct {
+        struct PerlVersion_t {
             int revision;
             int version;
             int subversion;
-        } PerlVersion_t;
+        };
+
+        struct Genealogy_t {
+            unsigned int id[ID_SIZE], parent_id[ID_SIZE];
+            unsigned int ordinal, parent_ordinal;
+        };
 
         enum FrameType
         {
@@ -39,6 +46,7 @@ namespace devel {
 
             unsigned int get_format_version() const { return file_format_version; }
             const PerlVersion_t& get_source_perl_version() const { return source_perl_version; }
+            const Genealogy_t& get_genealogy_info() const { return genealogy_info; }
             int get_source_tick_duration() const { return source_tick_duration; }
             int get_source_stack_sample_depth() const { return source_stack_sample_depth; }
 
@@ -54,6 +62,7 @@ namespace devel {
             // TODO maybe introduce a header struct or class for cleanliness?
             unsigned int file_format_version;
             PerlVersion_t source_perl_version;
+            Genealogy_t genealogy_info;
             int source_tick_duration;
             int source_stack_sample_depth;
             HV *custom_metadata;
@@ -68,17 +77,21 @@ namespace devel {
         {
         public:
             // Usage in this order: Construct object, open, write_header, write samples
-            TraceFileWriter(pTHX_ const std::string &path, bool is_template);
+            TraceFileWriter(pTHX);
             ~TraceFileWriter();
 
-            int open(const std::string &path, bool is_template);
+            int open(const std::string &path, bool is_template, unsigned int id[ID_SIZE], unsigned int ordinal);
             void close();
+            void shut();
+            void flush();
             long position() const;
 
             bool is_valid() const { return out; }
 
             int write_header(unsigned int sampling_interval,
-                             unsigned int stack_collect_depth);
+                             unsigned int stack_collect_depth,
+                             unsigned int id[ID_SIZE], unsigned int ordinal,
+                             unsigned int parent_id[ID_SIZE], unsigned int parent_ordinal);
 
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
@@ -93,7 +106,6 @@ namespace devel {
 
             std::FILE *out;
             std::string output_file;
-            unsigned int seed;
             bool force_empty_frame;
 
             DECL_THX_MEMBER

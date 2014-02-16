@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <pthread.h>
+#include <sys/syscall.h>
 
 #include "tracecollector.h"
 #include "tracefile.h"
@@ -22,12 +23,7 @@ using namespace std;
 namespace {
     struct Mutex {
         Mutex() {
-            memset(&mutex, 0, sizeof(mutex)); // just in case
-
-            int rc = pthread_mutex_init(&mutex, NULL);
-
-            if (rc)
-                Perl_croak_nocontext("Devel::StatProfiler: error %d initializing mutex", rc);
+            reinit();
         }
 
         ~Mutex() {
@@ -51,6 +47,14 @@ namespace {
                 Perl_croak_nocontext("Devel::StatProfiler: error %d unlocking mutex", rc);
         }
 
+        void reinit() {
+            memset(&mutex, 0, sizeof(mutex)); // just in case
+
+            int rc = pthread_mutex_init(&mutex, NULL);
+
+            if (rc)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d initializing mutex", rc);
+        }
     private:
         pthread_mutex_t mutex;
     };
@@ -62,6 +66,10 @@ namespace {
         int runloop_level;
         runops_proc_t original_runloop;
         OP *switch_op;
+        unsigned int rand_id;
+        unsigned int id[ID_SIZE], parent_id[ID_SIZE];
+        unsigned int ordinal, parent_ordinal;
+        pid_t pid, tid;
         TraceFileWriter *trace;
 
         Cxt();
@@ -80,6 +88,9 @@ namespace {
 
         bool is_running() const;
         bool is_any_running() const;
+
+        void new_id();
+        void pid_changed();
     };
 
     struct CounterCxt {
@@ -89,6 +100,12 @@ namespace {
         CounterCxt(unsigned int delay) :
             terminate(false), start_delay(delay) { }
     };
+
+    inline pid_t
+    gettid()
+    {
+        return syscall(SYS_gettid);
+    }
 }
 
 typedef struct Cxt my_cxt_t;
@@ -96,11 +113,14 @@ typedef struct Cxt my_cxt_t;
 START_MY_CXT;
 
 namespace {
+    // call pthread_atfork once
+    pthread_once_t call_atfork = PTHREAD_ONCE_INIT;
     // global refcount for the counter thread
     int refcount = 0;
     // set to 'false' to terminate the counter thread
-    bool *terminate = NULL;
-    // hold this mutex before reading/writing refcount and terminate
+    bool *terminate_counter_thread = NULL;
+    // hold this mutex before reading/writing refcount and
+    // terminate_counter_thread
     Mutex refcount_mutex;
     // global counter, written by increment_counter(), read by the runloops
     unsigned int counter = 0;
@@ -128,8 +148,14 @@ Cxt::Cxt() :
     runloop_level(0),
     original_runloop(NULL),
     switch_op(NULL),
+    rand_id(rand_seed()),
+    ordinal(0),
+    parent_ordinal(-1),
+    pid(getpid()),
+    tid(gettid()),
     trace(NULL)
 {
+    new_id();
 }
 
 Cxt::Cxt(const Cxt &cxt) :
@@ -141,16 +167,32 @@ Cxt::Cxt(const Cxt &cxt) :
     runloop_level(0),
     original_runloop(NULL),
     switch_op(cxt.switch_op),
+    rand_id(cxt.rand_id),
+    ordinal(0),
+    parent_ordinal(cxt.ordinal),
+    pid(cxt.pid),
+    // called before the new thread is created, the tid is set in
+    // create_runloop
+    tid(-1),
     trace(NULL)
 {
+    memcpy(parent_id, cxt.id, sizeof(id));
 }
 
 TraceFileWriter *
 Cxt::create_trace(pTHX)
 {
     if (!trace) {
-        trace = new TraceFileWriter(aTHX_ filename, is_template);
-        trace->write_header(sampling_interval, stack_collect_depth);
+        if (tid == -1) {
+            tid = gettid();
+            new_id();
+        }
+        ++ordinal;
+
+        trace = new TraceFileWriter(aTHX);
+        trace->open(filename, is_template, id, ordinal);
+        trace->write_header(sampling_interval, stack_collect_depth,
+                            id, ordinal, parent_id, parent_ordinal);
     }
 
     return trace;
@@ -163,7 +205,7 @@ Cxt::enter_runloop()
         refcount_mutex.lock();
 
         if (++refcount == 1) {
-            if (!start_counter_thread(&terminate)) {
+            if (!start_counter_thread(&terminate_counter_thread)) {
                 refcount_mutex.unlock();
                 croak("Unable to start counter thread");
             }
@@ -185,8 +227,8 @@ Cxt::leave_runloop()
         refcount_mutex.lock();
 
         if (--refcount == 0) {
-            *terminate = true;
-            terminate = NULL;
+            *terminate_counter_thread = true;
+            terminate_counter_thread = NULL;
         }
 
         refcount_mutex.unlock();
@@ -213,14 +255,45 @@ Cxt::is_any_running() const
     return refcount > 0;
 }
 
+void
+Cxt::new_id()
+{
+    id[0] = pid;
+    id[1] = tid;
+    id[2] = time(NULL);
+
+    for (int i = 0; i < 3; ++i) {
+        rand(&rand_id);
+        id[i + 3] = rand_id;
+    }
+
+    ordinal = 0;
+}
+
+void
+Cxt::pid_changed()
+{
+    memcpy(parent_id, id, sizeof(parent_id));
+    parent_ordinal = ordinal;
+
+    pid = getpid();
+    tid = gettid();
+
+    new_id();
+}
 
 static void
 reopen_output_file(pTHX)
 {
     dMY_CXT;
     MY_CXT.trace->close();
-    MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template);
-    MY_CXT.trace->write_header(sampling_interval, stack_collect_depth);
+
+    ++MY_CXT.ordinal;
+
+    MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template,
+                       MY_CXT.id, MY_CXT.ordinal);
+    MY_CXT.trace->write_header(sampling_interval, stack_collect_depth,
+                               MY_CXT.id, MY_CXT.ordinal, MY_CXT.parent_id, MY_CXT.parent_ordinal);
     // XXX check if we need to write other metadata
 }
 
@@ -352,6 +425,10 @@ get_cv_from_sv(pTHX_ OP* op, SV *sv, GV **name)
 static void
 collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter, OP *op, OP *prev_op, SV *called_sv)
 {
+    if (trace->position() > max_output_file_size && MY_CXT.is_template) {
+        // Start new output file
+        reopen_output_file(aTHX);
+    }
     trace->start_sample(counter - pred_counter, prev_op);
     if (prev_op &&
         (prev_op->op_type == OP_ENTERSUB ||
@@ -380,10 +457,6 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
     }
     collect_trace(aTHX_ *trace, stack_collect_depth);
     trace->end_sample();
-    if (trace->position() > max_output_file_size && MY_CXT.is_template) {
-        // Start new output file
-        reopen_output_file(aTHX);
-    }
 }
 
 static int
@@ -523,6 +596,56 @@ cleanup_runloop(pTHX_ void *ptr)
 }
 
 
+static void
+prepare_fork()
+{
+    dTHX;
+    dMY_CXT;
+
+    if (MY_CXT.trace)
+        MY_CXT.trace->flush();
+    refcount_mutex.lock();
+}
+
+
+static void
+parent_after_fork()
+{
+    refcount_mutex.unlock();
+}
+
+
+static void
+child_after_fork()
+{
+    dTHX;
+    dMY_CXT;
+
+    bool running = MY_CXT.is_running();
+
+    if (MY_CXT.trace)
+        MY_CXT.trace->shut();
+
+    refcount_mutex.reinit();
+    refcount = running ? 1 : 0;
+
+    if (running && !start_counter_thread(&terminate_counter_thread))
+        croak("Unable to start counter thread");
+
+    MY_CXT.pid_changed();
+    MY_CXT.ordinal = 0;
+    if (MY_CXT.runloop_level)
+        reopen_output_file(aTHX);
+}
+
+
+static void
+init_atfork()
+{
+    pthread_atfork(prepare_fork, parent_after_fork, child_after_fork);
+}
+
+
 void
 devel::statprofiler::init_runloop(pTHX)
 {
@@ -533,6 +656,8 @@ devel::statprofiler::init_runloop(pTHX)
 #ifdef PERL_IMPLICIT_CONTEXT
     Perl_call_atexit(aTHX_ cleanup_runloop, NULL);
 #endif
+
+    pthread_once(&call_atfork, init_atfork);
 
     CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
 
