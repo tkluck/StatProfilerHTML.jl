@@ -102,10 +102,27 @@ sub _sub {
         file       => $file,
         inclusive  => 0,
         exclusive  => 0,
-        lines      => {},
+        callees    => {},
         call_sites => {},
         start_line => $frame->line,
         kind       => $frame->kind,
+    };
+}
+
+sub _file {
+    my ($self, $sub) = @_;
+
+    return $self->{aggregate}{files}{$sub->{file}} ||= {
+        name      => $sub->{file},
+        basename  => File::Basename::basename($sub->{file}),
+        report    => undef,
+        lines     => {
+            exclusive       => [],
+            inclusive       => [],
+            callees         => {},
+        },
+        exclusive => 0,
+        subs      => {},
     };
 }
 
@@ -160,10 +177,11 @@ EOT
             my $frame = $frames->[$i];
             my $line = $frame->line;
             my $sub = $self->_sub($frame);
+            my $file = $line > 0 ? $self->_file($sub) : undef;
 
             $sub->{start_line} = $line if $sub->{start_line} > $line;
             $sub->{inclusive} += $weight;
-            $sub->{lines}{inclusive}{$line} += $weight if $line > 0;
+            $file->{lines}{inclusive}[$line] += $weight if $file;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -180,7 +198,7 @@ EOT
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{lines}{callees}{$call_site->line}{_sub_id($sub)} ||= {
+                my $callee = $caller->{callees}{$call_site->line}{_sub_id($sub)} ||= {
                     callee    => $sub,
                     inclusive => 0,
                 };
@@ -191,7 +209,7 @@ EOT
 
             if (!$i) {
                 $sub->{exclusive} += $weight;
-                $sub->{lines}{exclusive}{$line} += $weight if $line > 0;
+                $file->{lines}{exclusive}[$line] += $weight if $file;
             }
         }
 
@@ -214,10 +232,10 @@ sub _fileify {
 
 sub finalize {
     my ($self) = @_;
-    my (%files, %package_map);
 
     # use the file defining the maximum number of subs of a certain
     # package as the main file for that package (for xsubs)
+    my %package_map;
     for my $package (keys %{$self->{aggregate}{file_map}}) {
         my $max = 0;
 
@@ -239,37 +257,19 @@ sub finalize {
             $sub->{file} = $package_map{$sub->{package}} // '';
         }
 
-        my ($exclusive, $inclusive, $callees) = @{$sub->{lines}}{qw(exclusive inclusive callees)};
-        my $entry = $files{$sub->{file}} ||= {
-            name      => $sub->{file},
-            basename  => $sub->{file} eq '' ? '' : File::Basename::basename($sub->{file}),
-            report    => sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal),
-            lines     => {
-                exclusive       => [],
-                inclusive       => [],
-                callees         => {},
-            },
-            exclusive => 0,
-            subs      => {},
-        };
+        # the entry for all files are already there, except for XSUBs
+        # that don't have an assigned file yet
+        my $entry = $self->{aggregate}{files}{$sub->{file}} ||= $self->_file($sub);
 
+        $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal);
         $entry->{exclusive} += $sub->{exclusive};
         push @{$entry->{subs}{$sub->{start_line}}}, $sub;
 
-        for my $line (keys %$exclusive) {
-            $entry->{lines}{exclusive}[$line] += $exclusive->{$line};
-        }
-
-        for my $line (keys %$inclusive) {
-            $entry->{lines}{inclusive}[$line] += $inclusive->{$line};
-        }
-
+        my $callees = $sub->{callees};
         for my $line (keys %$callees) {
             push @{$entry->{lines}{callees}{$line}}, values %{$callees->{$line}};
         }
     }
-
-    $self->{aggregate}{files} = \%files;
 }
 
 sub _fetch_source {
