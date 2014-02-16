@@ -126,21 +126,14 @@ sub _file {
     };
 }
 
-sub add_trace_file {
-    my ($self, $file) = @_;
-    my $r = Devel::StatProfiler::Reader->new($file);
-    my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
-    my $slowops = $self->{slowops};
+sub _check_consistency {
+    my ($self, $tick, $depth, $perl_version, $file) = @_;
 
     if ($self->{tick} == 0) {
-        $self->{tick} = $r->get_source_tick_duration;
-        $self->{stack_depth} = $r->get_source_stack_sample_depth;
-        $self->{perl_version} = $r->get_source_perl_version;
+        $self->{tick} = $tick;
+        $self->{stack_depth} = $depth;
+        $self->{perl_version} = $perl_version;
     } else {
-        my $tick = $r->get_source_tick_duration;
-        my $depth = $r->get_source_stack_sample_depth;
-        my $perl_version = $r->get_source_perl_version;
-
         if ($tick != $self->{tick} ||
                 $depth != $self->{stack_depth} ||
                 $perl_version ne $self->{perl_version}) {
@@ -153,6 +146,20 @@ Tick duration: $tick stack sample depth: $depth Perl version: $perl_version
 EOT
         }
     }
+}
+
+sub add_trace_file {
+    my ($self, $file) = @_;
+    my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file);
+    my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
+    my $slowops = $self->{slowops};
+
+    $self->_check_consistency(
+        $r->get_source_tick_duration,
+        $r->get_source_stack_sample_depth,
+        $r->get_source_perl_version,
+        $file,
+    );
 
     while (my $trace = $r->read_trace) {
         my $weight = $trace->weight;
@@ -198,7 +205,7 @@ EOT
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{callees}{$call_site->line}{_sub_id($sub)} ||= {
+                my $callee = $caller->{callees}{$site->{line}}{_sub_id($sub)} ||= {
                     callee    => $sub,
                     inclusive => 0,
                 };
