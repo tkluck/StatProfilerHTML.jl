@@ -30,6 +30,7 @@ sub new {
             file_map  => {},
             finalized => 0,
         },
+        genealogy     => {},
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
         tick          => 0,
@@ -160,6 +161,10 @@ sub add_trace_file {
         $file,
     );
 
+    my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+        @{$r->get_genealogy_info};
+    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
+
     while (my $trace = $r->read_trace) {
         my $weight = $trace->weight;
 
@@ -235,6 +240,12 @@ sub merge {
     );
 
     $self->{aggregate}{total} += $report->{aggregate}{total};
+
+    for my $process_id (keys %{$report->{genealogy}}) {
+        for my $process_ordinal (keys %{$report->{genealogy}{$process_id}}) {
+            $self->{genealogy}{$process_id}{$process_ordinal} ||= $report->{genealogy}{$process_id}{$process_ordinal};
+        }
+    }
 
     {
         my $my_map = $self->{aggregate}{file_map};
