@@ -33,7 +33,7 @@ $foo->();
 Devel::StatProfiler::stop_profile();
 
 my $take_sample_line = 42;
-my $r = Devel::StatProfiler::Report->new;
+my $r = Devel::StatProfiler::Report->new(flamegraph => 1);
 my $a = $r->{aggregate};
 $r->add_trace_file($profile_file);
 $r->finalize;
@@ -148,5 +148,20 @@ cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 20 / precision_fac
 is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 
 ### end file attributes
+
+### start flamegraph
+
+my @traces = qw(
+    MAIN;main::foo;t::lib::Test::take_sample;Time::HiRes::usleep
+    MAIN;X::__ANON__;t::lib::Test::take_sample;Time::HiRes::usleep
+    main::BEGIN
+    MAIN;Moo::bar;t::lib::Test::take_sample;Time::HiRes::usleep
+);
+
+for my $trace (@traces) {
+    ok(exists $a->{flames}{$trace});
+}
+
+### end flamegraph
 
 done_testing();
