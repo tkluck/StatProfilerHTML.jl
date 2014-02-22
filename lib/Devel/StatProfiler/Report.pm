@@ -29,6 +29,7 @@ sub new {
             flames    => {},
             files     => {},
             file_map  => {},
+            finalized => 0,
         },
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
@@ -239,6 +240,9 @@ sub _fileify {
 
 sub finalize {
     my ($self) = @_;
+
+    die "Reports can only be finalized once" if $self->{aggregate}{finalized};
+    $self->{aggregate}{finalized} = 1;
 
     # use the file defining the maximum number of subs of a certain
     # package as the main file for that package (for xsubs)
