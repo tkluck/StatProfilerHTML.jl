@@ -6,11 +6,13 @@ use warnings;
 use autodie qw(open close);
 
 use Devel::StatProfiler::Reader;
+use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part);
 use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
 use File::Which;
 use File::Copy ();
+use File::Path ();
 use Template::Perlish;
 
 my %templates = (
@@ -36,6 +38,7 @@ sub new {
         tick          => 0,
         stack_depth   => 0,
         perl_version  => undef,
+        serializer    => $opts{serializer} || 'storable',
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -43,6 +46,8 @@ sub new {
         $self->{fg_cmd} = "$fg --nametype=sub --countname=microseconds"
             if $fg;
     }
+
+    check_serializer($self->{serializer});
 
     return $self;
 }
@@ -196,18 +201,19 @@ sub add_trace_file {
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
                 my $caller = $self->_sub($call_site);
+                my $call_line = $call_site->line;
                 my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
                     caller    => $caller->{uq_name},
                     exclusive => 0,
                     inclusive => 0,
                     file      => $call_site->file,
-                    line      => $call_site->line,
+                    line      => $call_line,
                 };
 
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{callees}{$site->{line}}{$sub->{uq_name}} ||= {
+                my $callee = $caller->{callees}{$call_line}{$sub->{uq_name}} ||= {
                     callee    => $sub->{uq_name},
                     inclusive => 0,
                 };
@@ -359,6 +365,46 @@ sub merge {
             $my_flames->{$key} += $other_flames->{$key};
         }
     }
+}
+
+sub merge_genealogy {
+    my ($self, $genealogy) = @_;
+
+    for my $process_id (keys %$genealogy) {
+        my $item = $genealogy->{$process_id};
+
+        @{$self->{genealogy}{$process_id}}{keys %$item} = values %$item;
+    }
+}
+
+sub save {
+    my ($self, $root_dir, $report_dir) = @_;
+    my $state_dir = File::Spec::Functions::catdir($root_dir, '__state__');
+
+    File::Path::mkpath([$state_dir, $report_dir]);
+
+    write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+
+    # TODO save eval source code
+    # File::Spec::mkpath(File::Spec::Functions::catfile($root_dir, 'source'));
+
+    write_data_part($self->{serializer}, $report_dir, 'report', [
+        $self->{tick},
+        $self->{stack_depth},
+        $self->{perl_version},
+        $self->{aggregate}
+    ]);
+}
+
+sub load {
+    my ($self, $report) = @_;
+
+    @{$self}{qw(
+        tick
+        stack_depth
+        perl_version
+        aggregate
+    )} = @{read_data($self->{serializer}, $report)};
 }
 
 sub _fileify {

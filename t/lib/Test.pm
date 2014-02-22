@@ -188,6 +188,9 @@ package t::lib::Test::SingleReader;
 sub new {
     my ($class, $reader) = @_;
 
+    $reader->clear_custom_metadata;
+    %{$reader->get_active_sections} = ();
+
     return bless {
         reader  => $reader,
         trace   => undef,
@@ -199,7 +202,11 @@ sub get_source_tick_duration { $_[0]->{reader}->get_source_tick_duration }
 sub get_source_stack_sample_depth { $_[0]->{reader}->get_source_stack_sample_depth }
 sub get_source_perl_version { $_[0]->{reader}->get_source_perl_version }
 sub get_genealogy_info { $_[0]->{reader}->get_genealogy_info }
+sub get_active_sections { $_[0]->{reader}->get_active_sections }
 sub get_custom_metadata { $_[0]->{reader}->get_custom_metadata }
+sub clear_custom_metadata { $_[0]->{reader}->clear_custom_metadata }
+sub get_reader_state { $_[0]->{reader}->get_reader_state }
+sub set_reader_state { $_[0]->{reader}->set_reader_state($_[1]) }
 
 sub done { !$_[0]->{trace} }
 
@@ -208,6 +215,47 @@ sub read_trace {
     return if $self->{read};
     $self->{read} = 1;
     return $self->{trace} ||= $self->{reader}->read_trace;
+}
+
+package t::lib::Test::FilteredReader;
+
+sub new {
+    my ($class, $file, $meta_value) = @_;
+
+    return bless {
+        reader  => Devel::StatProfiler::Reader->new($file),
+        queue   => [],
+        value   => $meta_value,
+    }, $class;
+}
+
+sub get_source_tick_duration { $_[0]->{reader}->get_source_tick_duration }
+sub get_source_stack_sample_depth { $_[0]->{reader}->get_source_stack_sample_depth }
+sub get_source_perl_version { $_[0]->{reader}->get_source_perl_version }
+sub get_genealogy_info { $_[0]->{reader}->get_genealogy_info }
+sub get_custom_metadata { $_[0]->{reader}->get_custom_metadata }
+
+sub read_trace {
+    my ($self) = @_;
+    return shift @{$self->{queue}} if @{$self->{queue}};
+
+    my $r = $self->{reader};
+    my @queue;
+    while (my $trace = $r->read_trace) {
+        push @queue, $trace;
+        if ($trace->sections_changed) {
+            if (%{$r->get_custom_metadata} &&
+                    $self->{value} eq $r->get_custom_metadata->{key}) {
+                $self->{queue} = \@queue;
+                $r->clear_custom_metadata;
+                return shift @{$self->{queue}};
+            }
+            $r->clear_custom_metadata;
+            @queue = ();
+        }
+    }
+
+    return;
 }
 
 1;

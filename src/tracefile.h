@@ -123,6 +123,7 @@ namespace devel {
             // Returns the hash of custom meta data records that have been encountered
             // thus far.
             HV *get_custom_metadata();
+            void clear_custom_metadata();
 
             // Returns the source code that has been collected thus far
             HV *get_source_code();

@@ -694,6 +694,11 @@ HV *TraceFileReader::get_custom_metadata()
     return custom_metadata;
 }
 
+void TraceFileReader::clear_custom_metadata()
+{
+    hv_clear(custom_metadata);
+}
+
 HV *TraceFileReader::get_source_code()
 {
     return source_code;

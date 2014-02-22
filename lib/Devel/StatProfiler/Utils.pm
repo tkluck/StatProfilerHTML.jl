@@ -1,0 +1,103 @@
+package Devel::StatProfiler::Utils;
+
+use strict;
+use warnings;
+use autodie qw(open close rename);
+
+use File::Spec::Functions ();
+use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
+use Errno ();
+use Exporter qw(import);
+
+our @EXPORT_OK = qw(
+    check_serializer read_data write_data write_data_part
+);
+
+my ($sereal_encoder, $sereal_decoder);
+
+sub check_serializer {
+    my ($serializer) = @_;
+
+    if ($serializer eq 'storable') {
+        require Storable;
+    } elsif ($serializer eq 'sereal') {
+        require Sereal;
+
+        $sereal_encoder = Sereal::Encoder->new({
+            snappy         => 1,
+        });
+        $sereal_decoder = Sereal::Decoder->new;
+    } else {
+        die "Unsupported serializer format '$serializer'";
+    }
+}
+
+sub read_data {
+    my ($serializer, $file) = @_;
+    open my $fh, '<', $file;
+
+    if ($serializer eq 'storable') {
+        return Storable::fd_retrieve($fh);
+    } elsif ($serializer eq 'sereal') {
+        my ($data, $read);
+
+        1 while ($read = $fh->read($data, 256 * 1024, length $data));
+        die "Error while reading Sereal-ized data" if !defined $read;
+
+        return $sereal_decoder->decode($data);
+    } else {
+        die "Unsupported serializer format '$serializer'";
+    }
+}
+
+sub write_data_part {
+    my ($serializer, $dir, $file_base, $data) = @_;
+    my ($fh, $path) = _output_file($dir, $file_base);
+
+    _write_and_rename($serializer, $fh, $path, $data);
+}
+
+sub write_data {
+    my ($serializer, $dir, $file, $data) = @_;
+    my $full_path = File::Spec::Functions::catfile($dir, $file);
+    open my $fh, '>', "$full_path.tmp";
+
+    _write_and_rename($serializer, $fh, $full_path, $data);
+}
+
+sub _write_and_rename {
+    my ($serializer, $fh, $path, $data) = @_;
+
+    if ($serializer eq 'storable') {
+        Storable::nstore_fd($data, $fh)
+            or die "Internal error in Storable::nstore_fd"
+    } elsif ($serializer eq 'sereal') {
+        $fh->print($sereal_encoder->encode($data))
+            or die "Error while writing Sereal-ized data";
+    } else {
+        die "Unsupported serializer format '$serializer'";
+    }
+
+    close $fh;
+    rename "$path.tmp", $path;
+}
+
+sub _output_file {
+    my ($dir, $file_base) = @_;
+
+    for (;;) {
+        my $suffix = int(rand(2 ** 31));
+        my $path = File::Spec::Functions::catfile($dir, "$file_base.$suffix");
+
+        if (sysopen my $fh, "$path.tmp", O_WRONLY|O_CREAT|O_EXCL) {
+            return ($fh, $path);
+        }
+        if ($! != Errno::EEXIST) {
+            die "Error while opening report file: $!";
+        }
+    }
+
+    die "Can't get here";
+}
+
+1;

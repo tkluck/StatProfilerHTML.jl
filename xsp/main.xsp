@@ -45,6 +45,7 @@ bool is_running();
     int get_source_stack_sample_depth();
     HV *get_custom_metadata();
     HV *get_source_code();
+    void clear_custom_metadata();
     HV *get_active_sections();
     bool is_file_ended();
     bool is_stream_ended();

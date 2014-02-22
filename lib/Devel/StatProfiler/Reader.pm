@@ -6,6 +6,22 @@ use warnings;
 
 require Devel::StatProfiler; # load XS but don't start profiling
 
+sub get_reader_state {
+    my ($self) = @_;
+
+    return {
+        metadata => { %{$self->get_custom_metadata} },
+        sections => { %{$self->get_active_sections} },
+    };
+}
+
+sub set_reader_state {
+    my ($self, $state) = @_;
+
+    %{$self->get_custom_metadata} = %{$state->{metadata}};
+    %{$self->get_active_sections} = %{$state->{sections}};
+}
+
 package Devel::StatProfiler::StackFrame;
 
 sub file { $_[0]->{file} }
