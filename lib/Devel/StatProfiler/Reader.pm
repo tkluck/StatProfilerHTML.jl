@@ -42,5 +42,8 @@ package Devel::StatProfiler::StackTrace;
 sub weight { $_[0]->{weight} }
 sub frames { $_[0]->{frames} }
 sub op_name { $_[0]->{op_name} }
+sub metadata { $_[0]->{metadata} }
+sub sections_changed { $_[0]->{sections_changed} }
+sub metadata_changed { $_[0]->{metadata_changed} }
 
 1;

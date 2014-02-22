@@ -126,6 +126,9 @@ namespace devel {
 
             // Returns the source code that has been collected thus far
             HV *get_source_code();
+
+            // Returns currently-open sections
+            HV *get_active_sections();
         private:
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
@@ -141,6 +144,7 @@ namespace devel {
             HV *sections;
             // various stashes used by the reader
             HV *st_stash, *sf_stash, *msf_stash, *esf_stash;
+            bool sections_changed, metadata_changed;
 
             DECL_THX_MEMBER
         };

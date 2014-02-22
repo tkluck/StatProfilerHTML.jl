@@ -44,6 +44,7 @@ int get_precision();
     int get_source_stack_sample_depth();
     HV *get_custom_metadata();
     HV *get_source_code();
+    HV *get_active_sections();
 
     SV *get_source_perl_version()
       %code{%

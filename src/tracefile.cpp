@@ -404,7 +404,8 @@ namespace {
 
 
 TraceFileReader::TraceFileReader(pTHX)
-  : file_format_version(0), sections(NULL)
+  : file_format_version(0), sections(NULL),
+    sections_changed(false), metadata_changed(false)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -635,14 +636,17 @@ SV *TraceFileReader::read_trace()
                 croak("Invalid input file: Found stray sample-end tag without sample-start tag");
             in.skip_bytes(size);
 
-            hv_stores(sample, "active_sections", newRV_inc((SV *)sections));
             if (new_metadata)
                 hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));
+            hv_stores(sample, "sections_changed", sections_changed ? &PL_sv_yes : &PL_sv_no);
+            hv_stores(sample, "metadata_changed", metadata_changed ? &PL_sv_yes : &PL_sv_no);;
+            sections_changed = metadata_changed = false;
             return sv_bless(newRV_inc((SV *) sample), st_stash);
         case TAG_CUSTOM_META:
             if (!new_metadata)
                 new_metadata = (HV *)sv_2mortal((SV *)newHV());
             read_custom_meta_record(size, new_metadata);
+            metadata_changed = true;
             break;
         case TAG_SECTION_START: {
             SV *section_name = read_string(aTHX_ in);
@@ -651,6 +655,7 @@ SV *TraceFileReader::read_trace()
                 sv_setuv(HeVAL(depth), 1);
             else
                 sv_setuv(HeVAL(depth), 1 + SvUV(HeVAL(depth)));
+            sections_changed = true;
             break;
         }
         case TAG_SECTION_END: {
@@ -667,6 +672,7 @@ SV *TraceFileReader::read_trace()
                 hv_delete_ent(sections, section_name, G_DISCARD, 0);
             else
                 sv_setuv(HeVAL(depth), depth_num - 1);
+            sections_changed = true;
             break;
         }
         } // end switch
@@ -681,6 +687,11 @@ HV *TraceFileReader::get_custom_metadata()
 HV *TraceFileReader::get_source_code()
 {
     return source_code;
+}
+
+HV *TraceFileReader::get_active_sections()
+{
+    return sections;
 }
 
 

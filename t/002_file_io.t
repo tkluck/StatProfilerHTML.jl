@@ -37,13 +37,13 @@ my %incr_meta;
 my %valid_sections = qw(MySection 1 MySection2 1);
 my $any_sections = 0;
 while (my $trace = $r->read_trace) {
-    my $meta = $trace->{metadata};
-    if ($meta) {
+    if ($trace->metadata_changed) {
+        my $meta = $trace->metadata;
         $incr_meta{$_} = $meta->{$_} for keys %$meta;
     }
-    my $sections = $trace->{active_sections};
+    my $sections = $r->get_active_sections;
     is(ref($sections), "HASH", "active_sections is hash");
-    if (keys %$sections) {
+    if ($trace->sections_changed && keys %$sections) {
       is(scalar(grep exists($valid_sections{$_}), keys %$sections),
          scalar(keys %$sections), "Found sections and sections are recognized");
       $any_sections = 1;
