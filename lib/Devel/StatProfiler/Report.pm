@@ -14,6 +14,12 @@ use File::Copy ();
 use Scalar::Util ();
 use Template::Perlish;
 
+my %templates = (
+    file      => _get_template('file.tmpl'),
+    subs      => _get_template('subs.tmpl'),
+    index     => _get_template('index.tmpl'),
+);
+
 sub new {
     my ($class, %opts) = @_;
     my $self = bless {
@@ -23,11 +29,6 @@ sub new {
             flames    => {},
             files     => {},
             file_map  => {},
-        },
-        templates     => {
-            file      => _get_template('file.tmpl'),
-            subs      => _get_template('subs.tmpl'),
-            index     => _get_template('index.tmpl'),
         },
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
@@ -350,7 +351,7 @@ sub output {
             file_link   => $file_link,
         );
 
-        $self->_write_template($self->{templates}{file}, \%file_data,
+        $self->_write_template($templates{file}, \%file_data,
                                $directory, $entry->{report});
     }
 
@@ -381,7 +382,7 @@ sub output {
         sub_link        => $sub_link,
     );
 
-    $self->_write_template($self->{templates}{subs}, \%subs_data,
+    $self->_write_template($templates{subs}, \%subs_data,
                            $directory, 'subs.html');
 
     # format index page
@@ -393,7 +394,7 @@ sub output {
         sub_link        => $sub_link,
     );
 
-    $self->_write_template($self->{templates}{index}, \%main_data,
+    $self->_write_template($templates{index}, \%main_data,
                            $directory, 'index.html');
 
     # copy CSS
