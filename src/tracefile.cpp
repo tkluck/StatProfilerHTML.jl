@@ -438,7 +438,7 @@ HV *TraceFileReader::get_custom_metadata()
 
 
 TraceFileWriter::TraceFileWriter(pTHX_ const string &path, bool is_template) :
-    out(NULL)
+    out(NULL), force_empty_frame(false)
 {
     SET_THX_MEMBER
     seed = rand_seed();
@@ -509,6 +509,11 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
 
 void TraceFileWriter::close()
 {
+    if (force_empty_frame) {
+        start_sample(0, NULL);
+        end_sample();
+    }
+
     if (out) {
         string temp = output_file + "_";
 
@@ -544,6 +549,7 @@ int TraceFileWriter::start_section(SV *section_name)
     status += write_byte(out, TAG_SECTION_START);
     status += write_varint(out, string_size(aTHX_ section_name));
     status += write_string(aTHX_ out, section_name);
+    force_empty_frame = false;
 
     return status;
 }
@@ -556,6 +562,7 @@ int TraceFileWriter::end_section(SV *section_name)
     status += write_byte(out, TAG_SECTION_END);
     status += write_varint(out, string_size(aTHX_ section_name));
     status += write_string(aTHX_ out, section_name);
+    force_empty_frame = true;
 
     return status;
 }
@@ -640,6 +647,7 @@ int TraceFileWriter::end_sample()
     int status = 0;
     status += write_byte(out, TAG_SAMPLE_END);
     status += write_varint(out, 0);
+    force_empty_frame = false;
     return status;
 }
 
@@ -650,6 +658,7 @@ int TraceFileWriter::write_custom_metadata(SV *key, SV *value)
     status += write_varint(out, SvCUR(key) + SvCUR(value));
     status += write_string(aTHX_ out, key);
     status += write_string(aTHX_ out, value);
+    force_empty_frame = true;
     return status;
 }
 

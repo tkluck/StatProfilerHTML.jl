@@ -94,6 +94,7 @@ namespace devel {
             std::FILE *out;
             std::string output_file;
             unsigned int seed;
+            bool force_empty_frame;
 
             DECL_THX_MEMBER
         };
