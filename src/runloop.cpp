@@ -324,6 +324,43 @@ get_cv_from_sv(pTHX_ OP* op, SV *sv, GV **name)
     return cv;
 }
 
+static void
+collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter, OP *op, OP *prev_op, SV *called_sv)
+{
+    trace->start_sample(counter - pred_counter, prev_op);
+    if (prev_op &&
+        (prev_op->op_type == OP_ENTERSUB ||
+         prev_op->op_type == OP_GOTO) &&
+        (op == prev_op->op_next) && called_sv) {
+        // if the sub call is a normal Perl sub, op should be
+        // pointing to CvSTART(), the fact is points to
+        // op_next implies the call was to an XSUB
+        GV *cv_name;
+        CV *cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &cv_name);
+
+        if (cv && CvISXSUB(cv))
+            trace->add_frame(CXt_SUB, cv, cv_name, NULL);
+#if 0 // DEBUG
+        else {
+            const char *package = "__ANON__", *name = "(unknown)";
+
+            if (cv_name) {
+                package = HvNAME(GvSTASH(cv_name));
+                name = GvNAME(cv_name);
+            }
+
+            warn("Called sub %s::%s is not an XSUB", package, name);
+        }
+#endif
+    }
+    collect_trace(aTHX_ *trace, stack_collect_depth);
+    trace->end_sample();
+    if (trace->position() > max_output_file_size && MY_CXT.is_template) {
+        // Start new output file
+        reopen_output_file(aTHX);
+    }
+}
+
 static int
 runloop(pTHX)
 {
@@ -341,38 +378,7 @@ runloop(pTHX)
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (UNLIKELY( counter != pred_counter )) {
-            trace->start_sample(counter - pred_counter, prev_op);
-            if (prev_op &&
-                (prev_op->op_type == OP_ENTERSUB ||
-                 prev_op->op_type == OP_GOTO) &&
-                (op == prev_op->op_next)) {
-                // if the sub call is a normal Perl sub, op should be
-                // pointing to CvSTART(), the fact is points to
-                // op_next implies the call was to an XSUB
-                GV *cv_name;
-                CV *cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &cv_name);
-
-                if (cv && CvISXSUB(cv))
-                    trace->add_frame(CXt_SUB, cv, cv_name, NULL);
-#if 0 // DEBUG
-                else {
-                    const char *package = "__ANON__", *name = "(unknown)";
-
-                    if (cv_name) {
-                        package = HvNAME(GvSTASH(cv_name));
-                        name = GvNAME(cv_name);
-                    }
-
-                    warn("Called sub %s::%s is not an XSUB", package, name);
-                }
-#endif
-            }
-            collect_trace(aTHX_ *trace, stack_collect_depth);
-            trace->end_sample();
-            if (trace->position() > max_output_file_size && MY_CXT.is_template) {
-                // Start new output file
-                reopen_output_file(aTHX);
-            }
+            collect_sample(aTHX_ aMY_CXT_ trace, pred_counter, op, prev_op, called_sv);
             pred_counter = counter;
         }
         // here we save the argument to entersub/goto so, if it ends
@@ -380,7 +386,7 @@ runloop(pTHX)
         // later (there is the possibility of the called sub modifying
         // called_sv through an alias, but is such a corner case that
         // is not worth the trouble)
-        if (op->op_type == OP_ENTERSUB || op->op_type == OP_GOTO)
+        if (UNLIKELY( op->op_type == OP_ENTERSUB || op->op_type == OP_GOTO ))
             called_sv = *PL_stack_sp;
         prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
