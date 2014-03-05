@@ -10,6 +10,7 @@ sub new {
     return $class->SUPER::new(
         %args,
         share_dir          => 'share',
+        extra_compiler_flags => '-DPERL_NO_GET_CONTEXT',
         extra_linker_flags => [qw(-lrt)],
     );
 }
