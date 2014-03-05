@@ -386,8 +386,7 @@ runloop(pTHX)
         // later (there is the possibility of the called sub modifying
         // called_sv through an alias, but is such a corner case that
         // is not worth the trouble)
-        if (UNLIKELY( op->op_type == OP_ENTERSUB || op->op_type == OP_GOTO ))
-            called_sv = *PL_stack_sp;
+        called_sv = *PL_stack_sp;
         prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
     }
