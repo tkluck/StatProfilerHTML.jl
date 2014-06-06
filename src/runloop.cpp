@@ -529,7 +529,10 @@ devel::statprofiler::init_runloop(pTHX)
     MY_CXT_INIT;
     new(&MY_CXT) Cxt();
 
+    // declared static and destroyed during global destruction
+#ifdef PERL_IMPLICIT_CONTEXT
     Perl_call_atexit(aTHX_ cleanup_runloop, NULL);
+#endif
 
     CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
 
