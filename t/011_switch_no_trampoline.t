@@ -35,4 +35,4 @@ while (my $trace = $r->read_trace) {
 
 ok(!exists $sleep_pattern{$not_traced});
 ok(exists $sleep_pattern{$traced});
-cmp_ok($sleep_pattern{$traced} || 0, '>=', 700);
+cmp_ok($sleep_pattern{$traced} || 0, '>=', 700 / precision_factor);

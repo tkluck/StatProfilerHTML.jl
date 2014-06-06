@@ -23,6 +23,7 @@ void start_section(SV *section_name)
   %code{% start_section(aTHX_ section_name); %};
 void end_section(SV *section_name)
   %code{% end_section(aTHX_ section_name); %};
+int get_precision();
 
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {

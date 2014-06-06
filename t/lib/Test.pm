@@ -14,7 +14,7 @@ require feature;
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples temp_profile_file)
+  qw(take_sample get_samples temp_profile_file precision_factor)
 );
 
 sub import {
@@ -56,6 +56,15 @@ sub get_samples {
     }
 
     return @samples;
+}
+
+sub precision_factor {
+    my $precision = Devel::StatProfiler::get_precision();
+
+    if ($precision < 900) {
+        return 1;
+    }
+    return int(($precision / 1000) + 0.5) * 2;
 }
 
 1;

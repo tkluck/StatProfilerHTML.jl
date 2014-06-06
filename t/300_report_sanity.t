@@ -87,7 +87,7 @@ is($usleep->{package}, 'Time::HiRes');
 is($usleep->{start_line}, -1);
 is($usleep->{kind}, 1);
 is($usleep->{file}, '');
-cmp_ok($usleep->{exclusive}, '>=', 20);
+cmp_ok($usleep->{exclusive}, '>=', 20 / precision_factor);
 cmp_ok($usleep->{inclusive}, '==', $usleep->{exclusive});
 
 # the only usleep call site is from take_sample
@@ -107,8 +107,8 @@ is($take_sample->{package}, 't::lib::Test');
 is($take_sample->{start_line}, $take_sample_line);
 is($take_sample->{kind}, 0);
 is($take_sample->{file}, 't/lib/Test.pm');
-cmp_ok($take_sample->{exclusive}, '<', 10);
-cmp_ok($take_sample->{inclusive}, '>=', 20);
+cmp_ok($take_sample->{exclusive}, '<', 10 / precision_factor);
+cmp_ok($take_sample->{inclusive}, '>=', 20 / precision_factor);
 
 # three call sites for take_sample
 eq_or_diff([sort keys %{$take_sample->{call_sites}}],
@@ -118,8 +118,8 @@ eq_or_diff([sort keys %{$take_sample->{call_sites}}],
 {
     my $cs = $take_sample->{call_sites}{__FILE__ . ':' . $l2};
     is($cs->{caller}, $moo);
-    cmp_ok($cs->{exclusive}, '<=', 5);
-    cmp_ok($cs->{inclusive}, '>=', 5);
+    cmp_ok($cs->{exclusive}, '<=', 5 / precision_factor);
+    cmp_ok($cs->{inclusive}, '>=', 5 / precision_factor);
     is($cs->{file}, __FILE__);
     is($cs->{line}, $l2);
 }
@@ -131,15 +131,15 @@ eq_or_diff([sort keys %{$take_sample->{call_sites}}],
 is($test_pm->{name}, 't/lib/Test.pm');
 is($test_pm->{basename}, 'Test.pm');
 like($test_pm->{report}, qr/Test-pm-\d-line.html/);
-cmp_ok($test_pm->{exclusive}, '<=', 5);
+cmp_ok($test_pm->{exclusive}, '<=', 5 / precision_factor);
 # WTF cmp_ok($test_pm->{inclusive}, '>=', 20);
-cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 20);
+cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 20 / precision_factor);
 
 # callees
 {
     my $ca = $test_pm->{lines}{callees}{$take_sample_line}[0];
 
-    cmp_ok($ca->{inclusive}, '>=', 20);
+    cmp_ok($ca->{inclusive}, '>=', 20 / precision_factor);
     # WTF cmp_ok($ca->{esclusive}, '<=', 5);
     is($ca->{callee}, $usleep);
 }

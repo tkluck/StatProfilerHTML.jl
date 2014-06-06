@@ -19,6 +19,8 @@ namespace devel {
         void write_custom_metadata(pTHX_ SV *key, SV *value);
         void start_section(pTHX_ SV *section_name);
         void end_section(pTHX_ SV *section_name);
+
+        int get_precision();
     }
 }
 

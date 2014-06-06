@@ -631,3 +631,13 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
 
     MY_CXT.trace->end_section(section_name);
 }
+
+int
+devel::statprofiler::get_precision()
+{
+    timespec res;
+
+    clock_getres(CLOCK_MONOTONIC, &res);
+
+    return res.tv_sec * 1000000 + res.tv_nsec / 1000;
+}
