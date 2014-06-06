@@ -20,14 +20,39 @@ using namespace std;
 #define MY_CXT_KEY "Devel::StatProfiler::_guts" XS_VERSION
 
 namespace {
-    struct PerlMutex {
-        PerlMutex() { MUTEX_INIT(&mutex); }
-        ~PerlMutex() { MUTEX_DESTROY(&mutex); }
+    struct Mutex {
+        Mutex() {
+            memset(&mutex, 0, sizeof(mutex)); // just in case
 
-        operator perl_mutex *() { return &mutex; }
+            int rc = pthread_mutex_init(&mutex, NULL);
+
+            if (rc)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d initializing mutex", rc);
+        }
+
+        ~Mutex() {
+            int rc = pthread_mutex_destroy(&mutex);
+
+            if (rc)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d destroying mutex", rc);
+        }
+
+        void lock() {
+            int rc = pthread_mutex_lock(&mutex);
+
+            if (rc)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d locking mutex", rc);
+        }
+
+        void unlock() {
+            int rc = pthread_mutex_unlock(&mutex);
+
+            if (rc)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d unlocking mutex", rc);
+        }
 
     private:
-        perl_mutex mutex;
+        pthread_mutex_t mutex;
     };
 
     struct Cxt {
@@ -76,7 +101,7 @@ namespace {
     // set to 'false' to terminate the counter thread
     bool *terminate = NULL;
     // hold this mutex before reading/writing refcount and terminate
-    PerlMutex refcount_mutex;
+    Mutex refcount_mutex;
     // global counter, written by increment_counter(), read by the runloops
     unsigned int counter = 0;
     // sampling interval, in microseconds
@@ -135,16 +160,16 @@ void
 Cxt::enter_runloop()
 {
     if (runloop_level == 0) {
-        MUTEX_LOCK(refcount_mutex);
+        refcount_mutex.lock();
 
         if (++refcount == 1) {
             if (!start_counter_thread(&terminate)) {
-                MUTEX_UNLOCK(refcount_mutex);
+                refcount_mutex.unlock();
                 croak("Unable to start counter thread");
             }
         }
 
-        MUTEX_UNLOCK(refcount_mutex);
+        refcount_mutex.unlock();
     }
 
     ++runloop_level;
@@ -157,14 +182,14 @@ Cxt::leave_runloop()
         croak("Excess call to leave_runloop");
 
     if (runloop_level == 1) {
-        MUTEX_LOCK(refcount_mutex);
+        refcount_mutex.lock();
 
         if (--refcount == 0) {
             *terminate = true;
             terminate = NULL;
         }
 
-        MUTEX_UNLOCK(refcount_mutex);
+        refcount_mutex.unlock();
     }
 
     --runloop_level;
