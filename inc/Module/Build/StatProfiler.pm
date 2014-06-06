@@ -4,13 +4,20 @@ use strict;
 use warnings;
 use parent qw(Module::Build::WithXSpp);
 
+use Getopt::Long;
+
+# yes, doing this in a module is ugly; OTOH it's a private module
+GetOptions(
+    'g'         => \my $DEBUG,
+);
+
 sub new {
     my ($class, %args) = @_;
 
     return $class->SUPER::new(
         %args,
         share_dir          => 'share',
-        extra_compiler_flags => '-DPERL_NO_GET_CONTEXT',
+        extra_compiler_flags => '-DPERL_NO_GET_CONTEXT' . ($DEBUG ? ' -g' : ''),
         extra_linker_flags => [qw(-lrt)],
     );
 }
