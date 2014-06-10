@@ -175,3 +175,13 @@ time spent in callbacks.
 If an object has an overloaded C<&{}> operator (code dereference)
 returning an XSUB as the code reference, the overload might be called
 twice in some situations.
+
+=head2 changing profiler state
+
+Calling C<enable_profile>, C<disable_profile>, C<restart_profile> and
+C<stop_profile> from an inner runloop (including but not limited to
+from C<use>, C<require>, C<sort> blocks, callbacks invoked from XS
+code) can have confusing results: runloops started afterwards will
+honor the new state, outer runloops will not.
+
+Unfortunately there is no way to detect the situaltion at the moment.

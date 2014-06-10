@@ -1,4 +1,6 @@
+#define NO_XSLOCKS
 #include "runloop.h"
+#include "XSUB.h"
 #include "ppport.h"
 
 #include <time.h>
@@ -62,8 +64,7 @@ namespace {
     struct Cxt {
         string filename;
         bool is_template;
-        bool enabled, using_trampoline, resuming;
-        int runloop_level;
+        bool enabled, using_trampoline, resuming, outer_runloop;
         runops_proc_t original_runloop;
         OP *switch_op;
         unsigned int rand_id;
@@ -76,8 +77,8 @@ namespace {
         Cxt(const Cxt &cxt);
 
         ~Cxt() {
-            while (runloop_level)
-                leave_runloop();
+            if (outer_runloop)
+                Perl_croak_nocontext("Devel::StatProfiler: deleting context for a running runloop");
             delete trace;
         }
 
@@ -145,7 +146,7 @@ Cxt::Cxt() :
     enabled(true),
     using_trampoline(false),
     resuming(false),
-    runloop_level(0),
+    outer_runloop(false),
     original_runloop(NULL),
     switch_op(NULL),
     rand_id(rand_seed()),
@@ -164,7 +165,7 @@ Cxt::Cxt(const Cxt &cxt) :
     enabled(cxt.enabled),
     using_trampoline(false),
     resuming(false),
-    runloop_level(0),
+    outer_runloop(false),
     original_runloop(NULL),
     switch_op(cxt.switch_op),
     rand_id(cxt.rand_id),
@@ -201,46 +202,43 @@ Cxt::create_trace(pTHX)
 void
 Cxt::enter_runloop()
 {
-    if (runloop_level == 0) {
-        refcount_mutex.lock();
+    if (outer_runloop)
+        croak("Excess call to enter_runloop");
 
-        if (++refcount == 1) {
-            if (!start_counter_thread(&terminate_counter_thread)) {
-                refcount_mutex.unlock();
-                croak("Unable to start counter thread");
-            }
+    refcount_mutex.lock();
+    outer_runloop = true;
+
+    if (++refcount == 1) {
+        if (!start_counter_thread(&terminate_counter_thread)) {
+            refcount_mutex.unlock();
+            croak("Unable to start counter thread");
         }
-
-        refcount_mutex.unlock();
     }
 
-    ++runloop_level;
+    refcount_mutex.unlock();
 }
 
 void
 Cxt::leave_runloop()
 {
-    if (runloop_level == 0)
+    if (!outer_runloop)
         croak("Excess call to leave_runloop");
 
-    if (runloop_level == 1) {
-        refcount_mutex.lock();
+    refcount_mutex.lock();
+    outer_runloop = false;
 
-        if (--refcount == 0) {
-            *terminate_counter_thread = true;
-            terminate_counter_thread = NULL;
-        }
-
-        refcount_mutex.unlock();
+    if (--refcount == 0) {
+        *terminate_counter_thread = true;
+        terminate_counter_thread = NULL;
     }
 
-    --runloop_level;
+    refcount_mutex.unlock();
 }
 
 bool
 Cxt::is_running() const
 {
-    return runloop_level > 0 || (trace && trace->is_valid());
+    return outer_runloop || (trace && trace->is_valid());
 }
 
 bool
@@ -472,7 +470,6 @@ runloop(pTHX)
 
     if (!trace->is_valid())
         croak("Failed to open trace file");
-    MY_CXT.enter_runloop();
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
         if (UNLIKELY( counter != pred_counter )) {
@@ -488,7 +485,6 @@ runloop(pTHX)
         prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
     }
-    MY_CXT.leave_runloop();
     PERL_ASYNC_CHECK();
 
     TAINT_NOT;
@@ -500,22 +496,34 @@ static int
 trampoline(pTHX)
 {
     dMY_CXT;
+    dXCPT;
     int res;
 
     MY_CXT.using_trampoline = true;
-    SAVEVPTR(PL_runops);
+    MY_CXT.enter_runloop();
 
-    do {
-        MY_CXT.resuming = false;
+    XCPT_TRY_START {
+        do {
+            MY_CXT.resuming = false;
 
-        if (MY_CXT.enabled)
-            PL_runops = runloop;
-        else
-            PL_runops = MY_CXT.original_runloop;
+            if (MY_CXT.enabled)
+                PL_runops = runloop;
+            else
+                PL_runops = MY_CXT.original_runloop;
 
-        res = CALLRUNOPS(aTHX);
-        PL_op = MY_CXT.resuming ? MY_CXT.switch_op->op_next : NULL;
-    } while (PL_op);
+            res = CALLRUNOPS(aTHX);
+            PL_op = MY_CXT.resuming ? MY_CXT.switch_op->op_next : NULL;
+        } while (PL_op);
+    } XCPT_TRY_END;
+
+    XCPT_CATCH {
+        PL_runops = trampoline;
+        MY_CXT.leave_runloop();
+        XCPT_RETHROW;
+    }
+
+    PL_runops = trampoline;
+    MY_CXT.leave_runloop();
 
     return res;
 }
@@ -524,11 +532,6 @@ trampoline(pTHX)
 static bool
 switch_runloop(pTHX_ pMY_CXT_ bool enable)
 {
-    if (MY_CXT.runloop_level > 1) {
-        warn("Trying to change profiling state from a nested runloop");
-        return false;
-    }
-
     if (enable == MY_CXT.enabled)
         return false;
     MY_CXT.enabled = enable;
@@ -540,12 +543,26 @@ switch_runloop(pTHX_ pMY_CXT_ bool enable)
     if (!enable) {
         // this will exit the currently-running profiling runloop, and
         // continue at the line marked >>HERE<< below
-        PL_runops = MY_CXT.original_runloop;
         return true;
     } else {
+        dXCPT;
+
+        MY_CXT.enter_runloop();
         PL_runops = runloop;
         PL_op = NORMAL;
-        CALLRUNOPS(aTHX); // execution resumes >>HERE<<
+
+        XCPT_TRY_START {
+            CALLRUNOPS(aTHX); // execution resumes >>HERE<<
+        } XCPT_TRY_END;
+
+        XCPT_CATCH {
+            PL_runops = MY_CXT.original_runloop;
+            MY_CXT.leave_runloop();
+            XCPT_RETHROW;
+        }
+
+        PL_runops = MY_CXT.original_runloop;
+        MY_CXT.leave_runloop();
 
         // if not resuming, the program ended for real, othwerwise restore
         // PL_op so the outer runloop keeps executing
@@ -634,7 +651,7 @@ child_after_fork()
 
     MY_CXT.pid_changed();
     MY_CXT.ordinal = 0;
-    if (MY_CXT.runloop_level)
+    if (MY_CXT.outer_runloop)
         reopen_output_file(aTHX);
 }
 
