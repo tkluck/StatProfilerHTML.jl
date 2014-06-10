@@ -73,7 +73,21 @@ sub ACTION_benchmark {
         $freq_pinner->set_max_frequencies($freq_pinner->min_frequencies->[0]);
     }
     my @results;
-    for my $benchmark (qw(shardedkv fibonacci hashsum subsum)) {
+    my @benchmarks = (
+        [ 'shardedkv', 'ShardedKV' ],
+        qw(fibonacci hashsum subsum),
+    );
+  BENCH: for my $item (@benchmarks) {
+        my $benchmark = $item;
+        if (ref $item) {
+            $benchmark = $item->[0];
+            for my $req (@{$item}[1..$#$item]) {
+                eval "require $req; 1" or do {
+                    print "Skipping $benchmark due to missing $req\n";
+                    next BENCH;
+                }
+            }
+        }
         print "Running $benchmark benchmark\n";
         push @results, $self->_run_benchmark($benchmark, "benchmarks/$benchmark.pl");
     }
