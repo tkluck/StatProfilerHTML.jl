@@ -228,7 +228,6 @@ Cxt::enter_runloop()
         croak("Excess call to enter_runloop");
 
     refcount_mutex.lock();
-    outer_runloop = true;
 
     if (++refcount == 1) {
         if (!start_counter_thread(&terminate_counter_thread)) {
@@ -237,6 +236,7 @@ Cxt::enter_runloop()
         }
     }
 
+    outer_runloop = true;
     refcount_mutex.unlock();
 }
 
