@@ -62,7 +62,7 @@ sub import {
 }
 
 sub _set_profiler_state {
-    srand $_[0]; # the srand is replaced with runloop.c:switch_runloop
+    srand $_[0]; # the srand is replaced with runloop.cpp:set_profiler_state
 }
 
 sub disable_profile { _set_profiler_state(0) }
