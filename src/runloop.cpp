@@ -365,6 +365,7 @@ start_counter_thread(bool **terminate)
     CounterCxt *cxt = new CounterCxt((random_start >> 8) % sampling_interval);
     *terminate = &cxt->terminate;
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
+    ok = ok && !pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     ok = ok && !pthread_create(&thread, &attr, &increment_counter, cxt);
 
     int old_errno = errno;
