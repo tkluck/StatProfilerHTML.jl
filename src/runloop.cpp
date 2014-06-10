@@ -5,7 +5,6 @@
 
 #include <time.h>
 #include <pthread.h>
-#include <sys/syscall.h>
 
 #include "tracecollector.h"
 #include "tracefile.h"
@@ -101,12 +100,6 @@ namespace {
         CounterCxt(unsigned int delay) :
             terminate(false), start_delay(delay) { }
     };
-
-    inline pid_t
-    gettid()
-    {
-        return syscall(SYS_gettid);
-    }
 }
 
 typedef struct Cxt my_cxt_t;
@@ -123,6 +116,12 @@ namespace {
     // hold this mutex before reading/writing refcount and
     // terminate_counter_thread
     Mutex refcount_mutex;
+    // global thread identifier
+    int thread_id = 1;
+#ifdef USE_ITHREADS
+    // hold this mutex before reading/writing tid
+    Mutex tid_mutex;
+#endif
     // global counter, written by increment_counter(), read by the runloops
     unsigned int counter = 0;
     // sampling interval, in microseconds
@@ -140,6 +139,21 @@ static bool
 start_counter_thread(bool **terminate);
 
 
+static int
+new_thread_id()
+{
+#ifdef USE_ITHREADS
+    tid_mutex.lock();
+    int id = ++thread_id;
+    tid_mutex.unlock();
+
+    return id;
+#else
+    return ++thread_id;
+#endif
+}
+
+
 Cxt::Cxt() :
     filename("statprof.out"),
     is_template(true),
@@ -153,7 +167,7 @@ Cxt::Cxt() :
     ordinal(0),
     parent_ordinal(-1),
     pid(getpid()),
-    tid(gettid()),
+    tid(new_thread_id()),
     trace(NULL)
 {
     new_id();
@@ -172,11 +186,10 @@ Cxt::Cxt(const Cxt &cxt) :
     ordinal(0),
     parent_ordinal(cxt.ordinal),
     pid(cxt.pid),
-    // called before the new thread is created, the tid is set in
-    // create_runloop
-    tid(-1),
+    tid(new_thread_id()),
     trace(NULL)
 {
+    new_id();
     memcpy(parent_id, cxt.id, sizeof(id));
 }
 
@@ -184,10 +197,6 @@ TraceFileWriter *
 Cxt::create_trace(pTHX)
 {
     if (!trace) {
-        if (tid == -1) {
-            tid = gettid();
-            new_id();
-        }
         ++ordinal;
 
         trace = new TraceFileWriter(aTHX);
@@ -275,7 +284,7 @@ Cxt::pid_changed()
     parent_ordinal = ordinal;
 
     pid = getpid();
-    tid = gettid();
+    tid = new_thread_id();
 
     new_id();
 }
