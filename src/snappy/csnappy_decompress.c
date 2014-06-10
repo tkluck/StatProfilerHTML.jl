@@ -262,11 +262,11 @@ struct SnappyArrayWriter {
 };
 
 static INLINE int
-SAW__AppendFastPath(struct SnappyArrayWriter *this,
+SAW__AppendFastPath(struct SnappyArrayWriter *this_,
 		    const char *ip, uint32_t len)
 {
-	char *op = this->op;
-	const int space_left = this->op_limit - op;
+	char *op = this_->op;
+	const int space_left = this_->op_limit - op;
 	if (likely(space_left >= 16)) {
 		UnalignedCopy64(ip, op);
 		UnalignedCopy64(ip + 8, op + 8);
@@ -275,31 +275,31 @@ SAW__AppendFastPath(struct SnappyArrayWriter *this,
 			return CSNAPPY_E_OUTPUT_OVERRUN;
 		memcpy(op, ip, len);
 	}
-	this->op = op + len;
+	this_->op = op + len;
 	return CSNAPPY_E_OK;
 }
 
 static INLINE int
-SAW__Append(struct SnappyArrayWriter *this,
+SAW__Append(struct SnappyArrayWriter *this_,
 	    const char *ip, uint32_t len)
 {
-	char *op = this->op;
-	const int space_left = this->op_limit - op;
+	char *op = this_->op;
+	const int space_left = this_->op_limit - op;
         if (unlikely(space_left < (int32_t)len))
 		return CSNAPPY_E_OUTPUT_OVERRUN;
 	memcpy(op, ip, len);
-	this->op = op + len;
+	this_->op = op + len;
 	return CSNAPPY_E_OK;
 }
 
 static INLINE int
-SAW__AppendFromSelf(struct SnappyArrayWriter *this,
+SAW__AppendFromSelf(struct SnappyArrayWriter *this_,
 		    uint32_t offset, uint32_t len)
 {
-	char *op = this->op;
-	const int space_left = this->op_limit - op;
+	char *op = this_->op;
+	const int space_left = this_->op_limit - op;
 	/* -1u catches offset==0 */
-	if (op - this->base <= offset - 1u)
+	if (op - this_->base <= offset - 1u)
 		return CSNAPPY_E_DATA_MALFORMED;
 	/* Fast path, used for the majority (70-80%) of dynamic invocations. */
 	if (len <= 16 && offset >= 8 && space_left >= 16) {
@@ -312,7 +312,7 @@ SAW__AppendFromSelf(struct SnappyArrayWriter *this,
 			return CSNAPPY_E_OUTPUT_OVERRUN;
 		IncrementalCopy(op - offset, op, len);
 	}
-	this->op = op + len;
+	this_->op = op + len;
 	return CSNAPPY_E_OK;
 }
 
