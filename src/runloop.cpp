@@ -233,7 +233,7 @@ Cxt::enter_runloop()
     if (++refcount == 1) {
         if (!start_counter_thread(&terminate_counter_thread)) {
             refcount_mutex.unlock();
-            croak("Unable to start counter thread");
+            croak("Error %d while starting counter thread", errno);
         }
     }
 
@@ -366,11 +366,14 @@ start_counter_thread(bool **terminate)
     *terminate = &cxt->terminate;
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
     ok = ok && !pthread_create(&thread, &attr, &increment_counter, cxt);
+
+    int old_errno = errno;
     pthread_attr_destroy(&attr);
 
     if (!ok) {
         delete cxt;
         *terminate = NULL;
+        errno = old_errno;
     }
 
     return ok;
@@ -738,7 +741,7 @@ child_after_fork()
     refcount = running ? 1 : 0;
 
     if (running && !start_counter_thread(&terminate_counter_thread))
-        croak("Unable to start counter thread");
+        croak("Error %d while restarting counter thread", errno);
 
     MY_CXT.pid_changed();
     MY_CXT.ordinal = 0;
