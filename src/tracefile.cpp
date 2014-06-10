@@ -34,6 +34,204 @@ enum {
     TAG_TAG_CONTINUATION        = 255 // just reserved for now
 };
 
+
+InputBuffer::InputBuffer() :
+    fh(NULL), input_position(input_buffer), input_end(input_buffer)
+{
+}
+
+InputBuffer::~InputBuffer()
+{
+    close();
+}
+
+void InputBuffer::fill_buffer()
+{
+    size_t size;
+
+    if (input_position != input_end) {
+        memcpy(input_buffer, input_position, input_end - input_position);
+        input_end = input_buffer + (input_end - input_position);
+        input_position = input_buffer;
+        size = OUTPUT_BUFFER_SIZE - (input_end - input_position);
+    } else {
+        input_position = input_end = input_buffer;
+        size = OUTPUT_BUFFER_SIZE;
+    }
+
+    int bytes = fread(input_end, 1, size, fh);
+
+    input_end += bytes;
+}
+
+void InputBuffer::skip_bytes(size_t size)
+{
+    if (!size)
+        return;
+
+    for (;;) {
+        if (input_end - input_position >= size) {
+            input_position += size;
+
+            return;
+        } else {
+            size -= input_end - input_position;
+            input_position = input_end;
+        }
+
+        fill_buffer();
+
+        if (input_end == input_position)
+            croak("Unexpected end-of-file while skipping over data");
+    }
+}
+
+int InputBuffer::read_byte()
+{
+    if (input_end - input_position >= 1)
+        return (unsigned char) *input_position++;
+
+    fill_buffer();
+
+    if (input_end == input_position)
+        return EOF;
+
+    return (unsigned char) *input_position++;
+}
+
+void InputBuffer::read_bytes(void *buffer, size_t size)
+{
+    char *curr = (char *) buffer;
+
+    for (;;) {
+        if (input_end - input_position >= size) {
+            memcpy(curr, input_position, size);
+            input_position += size;
+
+            return;
+        } else {
+            memcpy(curr, input_position, input_end - input_position);
+            curr += input_end - input_position;
+            size -= input_end - input_position;
+            input_position = input_end;
+        }
+
+        fill_buffer();
+
+        if (input_end == input_position)
+            croak("Unexpected end-of-file while reading bytes");
+    }
+}
+
+void InputBuffer::open(std::FILE *_fh)
+{
+    fh = _fh;
+    input_position = input_end = input_buffer;
+}
+
+void InputBuffer::close()
+{
+    if (fh)
+        fclose(fh);
+    fh = NULL;
+}
+
+int InputBuffer::read_raw_byte()
+{
+    return fgetc(fh);
+}
+
+bool InputBuffer::read_raw_bytes(void *buffer, size_t size)
+{
+    return fread(buffer, 1, size, fh) == size;
+}
+
+
+OutputBuffer::OutputBuffer() :
+    fh(NULL), output_position(output_buffer)
+{
+}
+
+OutputBuffer::~OutputBuffer()
+{
+    close();
+}
+
+int OutputBuffer::flush_buffer()
+{
+    if (output_position == output_buffer)
+        return 1;
+
+    const char *pos = output_position;
+
+    output_position = output_buffer;
+
+    return fwrite(output_buffer, 1, pos - output_buffer, fh) == pos - output_buffer;
+}
+
+int OutputBuffer::flush()
+{
+    return flush_buffer() && fflush(fh) == 0;
+}
+
+int OutputBuffer::write_bytes(const void *bytes, size_t size)
+{
+    if ((output_position + size > output_buffer + OUTPUT_BUFFER_SIZE) ||
+            (size > OUTPUT_BUFFER_SIZE))
+        if (!flush_buffer())
+            return 0;
+
+    if (size > OUTPUT_BUFFER_SIZE)
+        return fwrite(bytes, 1, size, fh) == size;
+
+    memcpy(output_position, bytes, size);
+    output_position += size;
+
+    return 1;
+}
+
+int OutputBuffer::write_byte(const char byte)
+{
+    if (output_position + 1 > output_buffer + OUTPUT_BUFFER_SIZE)
+        if (!flush_buffer())
+            return 0;
+
+    *output_position++ = byte;
+
+    return 1;
+}
+
+int OutputBuffer::position() const
+{
+    return ftell(fh) + (output_position - output_buffer);
+}
+
+void OutputBuffer::open(std::FILE *_fh)
+{
+    fh = _fh;
+    output_position = output_buffer;
+}
+
+void OutputBuffer::close()
+{
+    if (fh) {
+        flush_buffer();
+        fclose(fh);
+    }
+    fh = NULL;
+}
+
+bool OutputBuffer::write_raw_byte(int c)
+{
+    return fputc(c, fh) != EOF;
+}
+
+bool OutputBuffer::write_raw_bytes(const void *buffer, size_t size)
+{
+    return fwrite(buffer, 1, size, fh) == size;
+}
+
+
 namespace {
     void append_hex(string &str, unsigned int value)
     {
@@ -68,34 +266,13 @@ namespace {
         return string_size(SvCUR(value));
     }
 
-    void skip_bytes(FILE *in, size_t size)
-    {
-        char buffer[128];
-
-        for (int read = -1; read && size; ) {
-            size_t to_read = min(sizeof(buffer), size);
-
-            read = fread(buffer, 1, to_read, in);
-            size -= read;
-
-            if (to_read != read)
-                croak("Unexpected end-of-file while skipping over data");
-        }
-    }
-
-    void read_bytes(FILE *in, void *buffer, size_t size)
-    {
-        if (fread(buffer, 1, size, in) != size)
-            croak("Unexpected end-of-file while reading bytes");
-    }
-
-    unsigned int read_varint(FILE *in)
+    unsigned int read_varint(InputBuffer &in)
     {
         int res = 0;
         int v;
 
         for (;;) {
-            v = fgetc(in);
+            v = in.read_byte();
             if (v == EOF)
                 croak("Unexpected end-of-file while reading a varint");
             res = (res << 7) | (v & 0x7f);
@@ -106,9 +283,9 @@ namespace {
         return res;
     }
 
-    SV *read_string(pTHX_ FILE *in)
+    SV *read_string(pTHX_ InputBuffer &in)
     {
-        int flags = fgetc(in);
+        int flags = in.read_byte();
         unsigned int size = read_varint(in);
 
         if (flags == EOF)
@@ -125,23 +302,12 @@ namespace {
         if (flags & 1)
             SvUTF8_on(sv);
 
-        if (fread(SvPVX(sv), 1, size, in) != size)
-            croak("Unexpected end-of-file while reading a string");
+        in.read_bytes(SvPVX(sv), size);
 
         return sv;
     }
 
-    int write_bytes(FILE *out, const void *bytes, size_t size)
-    {
-        return fwrite(bytes, 1, size, out) != 0;
-    }
-
-    int write_byte(FILE *out, const char byte)
-    {
-        return fwrite(&byte, 1, 1, out) != 0;
-    }
-
-    int write_varint(FILE *out, unsigned int value)
+    int write_varint(OutputBuffer &out, unsigned int value)
     {
         char buffer[10], *curr = &buffer[sizeof(buffer) - 1];
 
@@ -151,29 +317,29 @@ namespace {
         } while (value);
 
         buffer[sizeof(buffer) - 1] &= 0x7f;
-        return write_bytes(out, curr + 1, (buffer + sizeof(buffer)) - (curr + 1));
+        return out.write_bytes(curr + 1, (buffer + sizeof(buffer)) - (curr + 1));
     }
 
-    int write_string(FILE *out, const char *value, size_t length, bool utf8)
+    int write_string(OutputBuffer &out, const char *value, size_t length, bool utf8)
     {
         int status = 0;
-        status += write_byte(out, utf8 ? 1 : 0);
+        status += out.write_byte(utf8 ? 1 : 0);
         status += write_varint(out, length);
-        status += write_bytes(out, value, length);
+        status += out.write_bytes(value, length);
         return status;
     }
 
-    int write_string(FILE *out, const char *value, bool utf8)
+    int write_string(OutputBuffer &out, const char *value, bool utf8)
     {
         return write_string(out, value, value ? strlen(value) : 0, utf8);
     }
 
-    int write_string(FILE *out, const std::string &value, bool utf8)
+    int write_string(OutputBuffer &out, const std::string &value, bool utf8)
     {
         return write_string(out, value.c_str(), value.length(), utf8);
     }
 
-    int write_string(pTHX_ FILE *out, SV *value)
+    int write_string(pTHX_ OutputBuffer &out, SV *value)
     {
         U32 utf8 = SvUTF8(value);
         STRLEN len;
@@ -195,7 +361,7 @@ namespace {
 
 
 TraceFileReader::TraceFileReader(pTHX)
-  : in(NULL), file_format_version(0), sections(NULL)
+  : file_format_version(0), sections(NULL)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -221,7 +387,7 @@ void TraceFileReader::open(const std::string &path)
     SvREFCNT_dec(sections);
     sections = newHV();
     close();
-    in = fopen(path.c_str(), "r");
+    in.open(fopen(path.c_str(), "r"));
     read_header();
 }
 
@@ -229,7 +395,7 @@ void TraceFileReader::read_header()
 {
     char magic[sizeof(FILE_MAGIC) - 1];
 
-    if (fread(magic, 1, sizeof(magic), in) != sizeof(magic))
+    if (!in.read_raw_bytes(magic, sizeof(magic)))
         croak("Unexpected end-of-file while reading file magic");
     if (strncmp(magic, FILE_MAGIC, sizeof(magic)))
         croak("Invalid file magic");
@@ -237,7 +403,9 @@ void TraceFileReader::read_header()
     // In future, will check that the version is at least not newer
     // than this library's file format version. That's necessary even
     // if there's a backcompat layer.
-    unsigned int version_from_file = read_varint(in);
+    unsigned int version_from_file = in.read_raw_byte();
+    if (version_from_file == EOF)
+        croak("Unexpected end-of-file while reading file version");
     if (version_from_file < 1 || version_from_file > FORMAT_VERSION)
         croak("Incompatible file format version %i", version_from_file);
 
@@ -246,7 +414,7 @@ void TraceFileReader::read_header()
     // TODO this becomes a loop reading header records
     bool cont = 1;
     while (cont) {
-        const int tag = fgetc(in);
+        const int tag = in.read_byte();
 
         switch (tag) {
         case EOF:
@@ -272,8 +440,8 @@ void TraceFileReader::read_header()
         case TAG_META_GENEALOGY: {
             genealogy_info.ordinal = read_varint(in);
             genealogy_info.parent_ordinal = read_varint(in);
-            read_bytes(in, genealogy_info.id, sizeof(genealogy_info.id));
-            read_bytes(in, genealogy_info.parent_id, sizeof(genealogy_info.parent_id));
+            in.read_bytes(genealogy_info.id, sizeof(genealogy_info.id));
+            in.read_bytes(genealogy_info.parent_id, sizeof(genealogy_info.parent_id));
             break;
         }
         case TAG_CUSTOM_META:
@@ -301,9 +469,7 @@ void TraceFileReader::read_custom_meta_record(const int size, HV *extra_output_h
 
 void TraceFileReader::close()
 {
-    if (in)
-        fclose(in);
-    in = NULL;
+    in.close();
 }
 
 SV *TraceFileReader::read_trace()
@@ -319,7 +485,7 @@ SV *TraceFileReader::read_trace()
     HV *new_metadata = NULL;
 
     for (;;) {
-        int type = fgetc(in);
+        int type = in.read_byte();
 
         if (type == EOF)
             return newSV(0);
@@ -340,7 +506,7 @@ SV *TraceFileReader::read_trace()
         }
         default:
             warn("Unknown record type in trace file. Attempting to skip this record");
-            skip_bytes(in, size);
+            in.skip_bytes(size);
             break;
         case TAG_SUB_FRAME: {
             if (!sample)
@@ -412,7 +578,7 @@ SV *TraceFileReader::read_trace()
         case TAG_SAMPLE_END:
             if (!sample)
                 croak("Invalid input file: Found stray sample-end tag without sample-start tag");
-            skip_bytes(in, size);
+            in.skip_bytes(size);
 
             hv_stores(sample, "active_sections", newRV_inc((SV *)sections));
             if (new_metadata)
@@ -464,7 +630,7 @@ HV *TraceFileReader::get_source_code()
 
 
 TraceFileWriter::TraceFileWriter(pTHX) :
-    out(NULL), force_empty_frame(false)
+    force_empty_frame(false)
 {
     SET_THX_MEMBER
 }
@@ -476,7 +642,7 @@ TraceFileWriter::~TraceFileWriter()
 
 long TraceFileWriter::position() const
 {
-    return ftell(out);
+    return out.position();
 }
 
 int TraceFileWriter::open(const std::string &path, bool is_template, unsigned int id[ID_SIZE], unsigned int ordinal)
@@ -493,8 +659,8 @@ int TraceFileWriter::open(const std::string &path, bool is_template, unsigned in
         append_hex(output_file, ordinal);
     }
 
-    out = fopen(output_file.c_str(), "w");
-    if (!out)
+    out.open(fopen(output_file.c_str(), "w"));
+    if (!out.is_valid())
         return 1;
 
     return 0;
@@ -503,7 +669,7 @@ int TraceFileWriter::open(const std::string &path, bool is_template, unsigned in
 int TraceFileWriter::write_perl_version()
 {
     int status = 0;
-    status += write_byte(out, TAG_META_PERL_VERSION);
+    status += out.write_byte(TAG_META_PERL_VERSION);
     status += write_varint(out, PERL_REVISION);
     status += write_varint(out, PERL_VERSION);
     status += write_varint(out, PERL_SUBVERSION);
@@ -516,25 +682,25 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
                                   unsigned int parent_id[ID_SIZE], unsigned int parent_ordinal)
 {
     int status = 0;
-    status += write_bytes(out, FILE_MAGIC, sizeof(FILE_MAGIC) - 1);
-    status += write_varint(out, FORMAT_VERSION);
+    status += out.write_raw_bytes(FILE_MAGIC, sizeof(FILE_MAGIC) - 1);
+    status += out.write_raw_byte(FORMAT_VERSION);
 
     // Write meta data: Perl version, tick duration, stack sample depth
     status += write_perl_version();
 
-    status += write_byte(out, TAG_META_TICK_DURATION);
+    status += out.write_byte(TAG_META_TICK_DURATION);
     status += write_varint(out, sampling_interval);
 
-    status += write_byte(out, TAG_META_STACK_SAMPLE_DEPTH);
+    status += out.write_byte(TAG_META_STACK_SAMPLE_DEPTH);
     status += write_varint(out, stack_collect_depth);
 
-    status += write_byte(out, TAG_META_GENEALOGY);
+    status += out.write_byte(TAG_META_GENEALOGY);
     status += write_varint(out, ordinal);
     status += write_varint(out, parent_ordinal);
-    status += write_bytes(out, id, sizeof(id[0]) * ID_SIZE);
-    status += write_bytes(out, parent_id, sizeof(parent_id[0]) * ID_SIZE);
+    status += out.write_bytes(id, sizeof(id[0]) * ID_SIZE);
+    status += out.write_bytes(parent_id, sizeof(parent_id[0]) * ID_SIZE);
 
-    status += write_byte(out, TAG_HEADER_SEPARATOR);
+    status += out.write_byte(TAG_HEADER_SEPARATOR);
     return status;
 }
 
@@ -542,33 +708,33 @@ void TraceFileWriter::close()
 {
     flush();
 
-    if (out) {
+    if (out.is_valid()) {
         string temp = output_file + "_";
 
-        fclose(out);
+        out.close();
         if (!rename(temp.c_str(), output_file.c_str()))
             unlink(temp.c_str());
     }
-
-    out = NULL;
 }
 
 void TraceFileWriter::shut()
 {
-    fclose(out);
+    out.close();
 
     force_empty_frame = false;
-    out = NULL;
 }
 
 void TraceFileWriter::flush()
 {
+    if (!out.is_valid())
+        return;
+
     if (force_empty_frame) {
         start_sample(0, NULL);
         end_sample();
     }
 
-    fflush(out);
+    out.flush();
 }
 
 int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
@@ -579,7 +745,7 @@ int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
     const char *op_name = current_op ? OP_NAME(current_op) : NULL;
     int status = 0;
 
-    status += write_byte(out, TAG_SAMPLE_START);
+    status += out.write_byte(TAG_SAMPLE_START);
     status += write_varint(out, varint_size(weight) + string_size(op_name));
     status += write_varint(out, weight);
     status += write_string(out, op_name, false);
@@ -592,7 +758,7 @@ int TraceFileWriter::start_section(SV *section_name)
     // TODO possibly track sections fully to forbid generating invalid sections
     int status = 0;
 
-    status += write_byte(out, TAG_SECTION_START);
+    status += out.write_byte(TAG_SECTION_START);
     status += write_varint(out, string_size(aTHX_ section_name));
     status += write_string(aTHX_ out, section_name);
     force_empty_frame = false;
@@ -605,7 +771,7 @@ int TraceFileWriter::end_section(SV *section_name)
     // TODO possibly track sections fully to forbid generating invalid sections
     int status = 0;
 
-    status += write_byte(out, TAG_SECTION_END);
+    status += out.write_byte(TAG_SECTION_END);
     status += write_varint(out, string_size(aTHX_ section_name));
     status += write_string(aTHX_ out, section_name);
     force_empty_frame = true;
@@ -619,7 +785,7 @@ int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
     size_t file_size = strlen(file);
     int lineno = CopLINE(line), status = 0;
 
-    status += write_byte(out, TAG_EVAL_STRING);
+    status += out.write_byte(TAG_EVAL_STRING);
     status += write_varint(out, string_size(SvCUR(eval_text) - 2) +
                                 string_size(file_size) +
                                 varint_size(lineno));
@@ -671,7 +837,7 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 	}
 
         if (frame_type == FRAME_SUB) {
-            status += write_byte(out, TAG_SUB_FRAME);
+            status += out.write_byte(TAG_SUB_FRAME);
             status += write_varint(out, string_size(package_size) +
                                         string_size(name_size) +
                                         string_size(file_size) +
@@ -681,20 +847,20 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
             status += write_string(out, file, file_size, false);
             status += write_varint(out, lineno);
         } else {
-            status += write_byte(out, TAG_XSUB_FRAME);
+            status += out.write_byte(TAG_XSUB_FRAME);
             status += write_varint(out, string_size(package_size) +
                                         string_size(name_size));
             status += write_string(out, package, package_size, package_utf8);
             status += write_string(out, name, name_size, name_utf8);
         }
     } else if (frame_type == FRAME_EVAL) {
-        status += write_byte(out, TAG_EVAL_FRAME);
+        status += out.write_byte(TAG_EVAL_FRAME);
         status += write_varint(out, string_size(file_size) +
                                     varint_size(lineno));
         status += write_string(out, file, file_size, false);
         status += write_varint(out, lineno);
     } else {
-        status += write_byte(out, TAG_MAIN_FRAME);
+        status += out.write_byte(TAG_MAIN_FRAME);
         status += write_varint(out, string_size(file_size) +
                                     varint_size(lineno));
         status += write_string(out, file, file_size, false);
@@ -707,7 +873,7 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 int TraceFileWriter::end_sample()
 {
     int status = 0;
-    status += write_byte(out, TAG_SAMPLE_END);
+    status += out.write_byte(TAG_SAMPLE_END);
     status += write_varint(out, 0);
     force_empty_frame = false;
     return status;
@@ -716,7 +882,7 @@ int TraceFileWriter::end_sample()
 int TraceFileWriter::write_custom_metadata(SV *key, SV *value)
 {
     int status = 0;
-    status += write_byte(out, TAG_CUSTOM_META);
+    status += out.write_byte(TAG_CUSTOM_META);
     status += write_varint(out, SvCUR(key) + SvCUR(value));
     status += write_string(aTHX_ out, key);
     status += write_string(aTHX_ out, value);

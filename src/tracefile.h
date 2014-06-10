@@ -11,6 +11,7 @@
 #include "thx_member.h"
 
 #define ID_SIZE 6
+#define OUTPUT_BUFFER_SIZE 8192
 
 namespace devel {
     namespace statprofiler {
@@ -33,6 +34,60 @@ namespace devel {
             FRAME_EVAL,
         };
 
+        class InputBuffer
+        {
+        public:
+            InputBuffer();
+            ~InputBuffer();
+
+            void skip_bytes(size_t size);
+            int read_byte();
+            void read_bytes(void *buffer, size_t size);
+
+            bool is_valid() const { return fh; }
+
+            void open(std::FILE *fh);
+            void close();
+
+            int read_raw_byte();
+            bool read_raw_bytes(void *buffer, size_t size);
+
+        private:
+            void fill_buffer();
+
+            std::FILE *fh;
+            char input_buffer[OUTPUT_BUFFER_SIZE];
+            char *input_position, *input_end;
+        };
+
+        class OutputBuffer
+        {
+        public:
+            OutputBuffer();
+            ~OutputBuffer();
+
+            int write_bytes(const void *bytes, size_t size);
+            int write_byte(const char byte);
+            int flush();
+
+            bool is_valid() const { return fh; }
+
+            void open(std::FILE *fh);
+            void close();
+
+            int position() const;
+
+            bool write_raw_byte(int c);
+            bool write_raw_bytes(const void *buffer, size_t size);
+
+        private:
+            int flush_buffer();
+
+            std::FILE *fh;
+            char output_buffer[OUTPUT_BUFFER_SIZE];
+            char *output_position;
+        };
+
         class TraceFileReader
         {
         public:
@@ -42,7 +97,7 @@ namespace devel {
 
             void open(const std::string &path);
             void close();
-            bool is_valid() const { return in; }
+            bool is_valid() const { return in.is_valid(); }
 
             unsigned int get_format_version() const { return file_format_version; }
             const PerlVersion_t& get_source_perl_version() const { return source_perl_version; }
@@ -61,7 +116,7 @@ namespace devel {
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
 
-            std::FILE *in;
+            InputBuffer in;
             // TODO maybe introduce a header struct or class for cleanliness?
             unsigned int file_format_version;
             PerlVersion_t source_perl_version;
@@ -89,7 +144,7 @@ namespace devel {
             void flush();
             long position() const;
 
-            bool is_valid() const { return out; }
+            bool is_valid() const { return out.is_valid(); }
 
             int write_header(unsigned int sampling_interval,
                              unsigned int stack_collect_depth,
@@ -108,7 +163,7 @@ namespace devel {
         private:
             int write_perl_version();
 
-            std::FILE *out;
+            OutputBuffer out;
             std::string output_file;
             bool force_empty_frame;
 
