@@ -213,6 +213,9 @@ Cxt::create_trace(pTHX)
         ++ordinal;
 
         trace = new TraceFileWriter(aTHX);
+    }
+
+    if (!trace->is_valid()) {
         trace->open(filename, is_template, id, ordinal);
         trace->write_header(sampling_interval, stack_collect_depth,
                             id, ordinal, parent_id, parent_ordinal);
