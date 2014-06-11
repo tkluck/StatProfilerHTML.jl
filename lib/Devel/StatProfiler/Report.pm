@@ -37,9 +37,8 @@ sub new {
 
     if ($self->{flamegraph}) {
         my $fg = File::Which::which('flamegraph') // File::Which::which('flamegraph.pl');
-        die "Unable to find flamegraph executable, please install NYTProf"
-            unless $fg;
-        $self->{fg_cmd} = "$fg --nametype=sub --countname=microseconds";
+        $self->{fg_cmd} = "$fg --nametype=sub --countname=microseconds"
+            if $fg;
     }
 
     return $self;
@@ -358,6 +357,9 @@ sub output {
     # format flame graph
     my $flamegraph_link;
     if ($self->{flamegraph}) {
+        die "Unable to find flamegraph executable, please install NYTProf"
+            unless $self->{fg_cmd};
+
         $flamegraph_link = 'all_stacks_by_time.svg';
 
         my $flames = $self->{aggregate}{flames};
