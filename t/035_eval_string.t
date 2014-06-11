@@ -13,7 +13,8 @@ my ($l1, $l2);
 my $index = $1;
 
 sub foo {
-    eval <<'EOT'; BEGIN { $l2 = __LINE__ + 0 }
+    BEGIN { $l2 = __LINE__ + 0 } # Can't be moved on the next line (5.14 bug)
+    eval <<'EOT';
 take_sample();
 EOT
 }
@@ -41,7 +42,7 @@ eq_or_diff($samples[0][2], bless {
     file          => "(eval ${\($index + 1)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[0][3], bless {
-    line          => $l2,
+    line          => $l2 + 1,
     file          => __FILE__,
     package       => 'main',
     sub_name      => 'foo',
