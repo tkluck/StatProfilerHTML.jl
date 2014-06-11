@@ -1,6 +1,4 @@
-#define NO_XSLOCKS
 #include "runloop.h"
-#include "XSUB.h"
 #include "ppport.h"
 
 #include <time.h>
@@ -505,13 +503,16 @@ static int
 trampoline(pTHX)
 {
     dMY_CXT;
-    dXCPT;
-    int res;
+    dJMPENV;
+    int res, exc;
 
     MY_CXT.using_trampoline = true;
     MY_CXT.enter_runloop();
 
-    XCPT_TRY_START {
+    JMPENV_PUSH(exc);
+    switch (exc) {
+    case 0:
+    redo_body:
         do {
             MY_CXT.resuming = false;
 
@@ -523,14 +524,27 @@ trampoline(pTHX)
             res = CALLRUNOPS(aTHX);
             PL_op = MY_CXT.resuming ? MY_CXT.switch_op->op_next : NULL;
         } while (PL_op);
-    } XCPT_TRY_END;
 
-    XCPT_CATCH {
+        break;
+    case 3:
+	/* die caught by an inner eval - continue inner loop */
+	if (PL_restartop && PL_restartjmpenv == PL_top_env) {
+	    PL_restartjmpenv = NULL;
+	    PL_op = PL_restartop;
+	    PL_restartop = 0;
+	    goto redo_body;
+	}
+	/* FALL THROUGH */
+    default:
+	JMPENV_POP;
         PL_runops = trampoline;
         MY_CXT.leave_runloop();
-        XCPT_RETHROW;
+
+	JMPENV_JUMP(exc);
+	/* NOTREACHED */
     }
 
+    JMPENV_POP;
     PL_runops = trampoline;
     MY_CXT.leave_runloop();
 
@@ -554,22 +568,39 @@ switch_runloop(pTHX_ pMY_CXT_ bool enable)
         // continue at the line marked >>HERE<< below
         return true;
     } else {
-        dXCPT;
+        dJMPENV;
+        int exc;
 
         MY_CXT.enter_runloop();
         PL_runops = runloop;
         PL_op = NORMAL;
 
-        XCPT_TRY_START {
+        JMPENV_PUSH(exc);
+        switch (exc) {
+        case 0:
+        redo_body:
             CALLRUNOPS(aTHX); // execution resumes >>HERE<<
-        } XCPT_TRY_END;
+            break;
 
-        XCPT_CATCH {
+        case 3:
+            /* die caught by an inner eval - continue inner loop */
+            if (PL_restartop && PL_restartjmpenv == PL_top_env) {
+                PL_restartjmpenv = NULL;
+                PL_op = PL_restartop;
+                PL_restartop = 0;
+                goto redo_body;
+            }
+            /* FALL THROUGH */
+        default:
+            JMPENV_POP;
             PL_runops = MY_CXT.original_runloop;
             MY_CXT.leave_runloop();
-            XCPT_RETHROW;
+
+            JMPENV_JUMP(exc);
+            /* NOTREACHED */
         }
 
+        JMPENV_POP;
         PL_runops = MY_CXT.original_runloop;
         MY_CXT.leave_runloop();
 
