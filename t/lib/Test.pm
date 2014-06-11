@@ -8,13 +8,14 @@ use Test::Differences;
 use Time::HiRes qw(usleep);
 use File::Temp ();
 use File::Spec;
+use Capture::Tiny qw(capture);
 
 require feature;
 
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples temp_profile_file precision_factor)
+  qw(take_sample get_samples temp_profile_file precision_factor run_ctests)
 );
 
 sub import {
@@ -65,6 +66,35 @@ sub precision_factor {
         return 1;
     }
     return int(($precision / 1000) + 0.5) * 2;
+}
+
+sub run_ctests {
+    my (@tests) = @_;
+    my $profile_file = temp_profile_file();
+
+    for my $test (@tests) {
+        my ($fh, $filename) = File::Temp::tempfile('testXXXXXX', UNLINK => 1);
+
+        print $fh $test->{source};
+        $fh->flush;
+
+        my ($stdout, $stderr, $exit) = capture {
+            system('t/callsv', '-Mblib',
+                   '-MDevel::StatProfiler=-file,' . $profile_file .
+                       ($test->{start} ? '' : ',-nostart'),
+                   $filename);
+        };
+
+        if ($exit & 0xff) {
+            fail("$test->{name} - terminated by signal");
+        } else {
+            is($exit >> 8, $test->{exit} // 0,  "$test->{name} - exit code is equal");
+        }
+        is($stdout, $test->{stdout} // '', "$test->{name} - stdout is equal");
+        is($stderr, $test->{stderr} // '', "$test->{name} - stderr is equal");
+    }
+
+    done_testing();
 }
 
 1;

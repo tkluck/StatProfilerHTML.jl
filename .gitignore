@@ -9,6 +9,8 @@
 /blib
 /buildtmp
 /pod2htm?.tmp
+/t/callsv*
+/t/xsinit.c
 *.o
 *.obj
 .*.sw*

@@ -5,6 +5,7 @@ use warnings;
 use parent qw(Module::Build::WithXSpp);
 
 use Getopt::Long;
+use Config;
 
 # yes, doing this in a module is ugly; OTOH it's a private module
 GetOptions(
@@ -109,6 +110,37 @@ sub ACTION_benchmark {
                $name,
                $ratio->number - 100, $ratio->error->[0];
     }
+}
+
+sub ACTION_cdriver {
+    my ($self) = @_;
+    my $cbuilder = $self->cbuilder;
+    my $expected_exe = "t/callsv$Config{_exe}";
+
+    return if -f $expected_exe;
+
+    $self->add_to_cleanup('t/xsinit.c', $expected_exe);
+
+    require ExtUtils::Embed;
+
+    ExtUtils::Embed::xsinit('t/xsinit.c', '-std');
+
+    my $driver = $cbuilder->compile(source => 't/driver.c');
+    my $xsinit = $cbuilder->compile(source => 't/xsinit.c');
+    my $exe = $cbuilder->link_executable(
+        exe_file           => $expected_exe,
+        objects            => [$driver, $xsinit],
+        extra_linker_flags => ExtUtils::Embed::ldopts(),
+    );
+
+    $self->add_to_cleanup($driver, $xsinit);
+}
+
+sub ACTION_test {
+    my ($self) = @_;
+
+    $self->depends_on('cdriver');
+    $self->SUPER::ACTION_test;
 }
 
 1;
