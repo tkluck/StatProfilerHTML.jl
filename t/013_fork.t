@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Config;
-use if $Config{d_fork} ne 'define', 'Test::More' => skip_all =>
+use if !$Config{d_fork}, 'Test::More' => skip_all =>
     "fork() not available";
 
 use t::lib::Test tests => 12;

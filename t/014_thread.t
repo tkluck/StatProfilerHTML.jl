@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Config;
-use if $Config{usethreads} ne 'define', 'Test::More' => skip_all =>
+use if !$Config{usethreads}, 'Test::More' => skip_all =>
     "threads not available";
 
 use t::lib::Test tests => 12;
