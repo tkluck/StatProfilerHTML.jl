@@ -607,7 +607,7 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 
     if (frame_type != FRAME_XSUB) {
         file = OutCopFILE(line);
-        file_size = strlen(file);
+        file_size = file ? strlen(file) : 0;
         lineno = CopLINE(line);
     }
 
