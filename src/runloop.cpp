@@ -308,15 +308,17 @@ increment_counter(void *arg)
 {
     CounterCxt *cxt = static_cast<CounterCxt *>(arg);
     bool *terminate = &cxt->terminate;
-    unsigned int delay = cxt->start_delay * 1000;
+    unsigned int delay_sec = cxt->start_delay / 1000000,
+                 delay_nsec = cxt->start_delay % 1000000 * 1000;
 
     while (!*terminate) {
-        timespec sleep = {0, delay};
+        timespec sleep = {delay_sec, delay_nsec};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
         if (*terminate)
             break;
-        delay = sampling_interval * 1000;
+        delay_sec = sampling_interval / 1000000;
+        delay_nsec = sampling_interval % 1000000 * 1000;
         ++counter;
     }
     delete cxt;
