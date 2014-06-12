@@ -632,11 +632,10 @@ set_profiler_state(pTHX)
             reopen_output_file(aTHX);
         break;
     case 3: // stop
-        if (MY_CXT.enabled) {
+        if (MY_CXT.enabled)
             MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ false);
-            if (MY_CXT.trace)
-                MY_CXT.trace->close();
-        }
+        if (MY_CXT.trace)
+            MY_CXT.trace->close();
         break;
     }
 
