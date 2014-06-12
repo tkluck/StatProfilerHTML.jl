@@ -94,11 +94,10 @@ namespace {
     };
 
     struct CounterCxt {
-        bool terminate;
         unsigned int start_delay;
 
         CounterCxt(unsigned int delay) :
-            terminate(false), start_delay(delay) { }
+            start_delay(delay) { }
     };
 }
 
@@ -116,11 +115,8 @@ namespace {
     // call pthread_atfork once
     pthread_once_t call_atfork = PTHREAD_ONCE_INIT;
     // global refcount for the counter thread
-    int refcount = 0;
-    // set to 'false' to terminate the counter thread
-    bool *terminate_counter_thread = NULL;
-    // hold this mutex before reading/writing refcount and
-    // terminate_counter_thread
+    volatile int refcount = 0;
+    // hold this mutex before reading/writing refcount
     Mutex refcount_mutex;
     // global thread identifier
     int thread_id = 1;
@@ -151,7 +147,7 @@ namespace {
 }
 
 static bool
-start_counter_thread(bool **terminate);
+start_counter_thread();
 
 
 static int
@@ -245,7 +241,8 @@ Cxt::enter_runloop()
     refcount_mutex.lock();
 
     if (++refcount == 1) {
-        if (!start_counter_thread(&terminate_counter_thread)) {
+        if (!start_counter_thread()) {
+            --refcount;
             refcount_mutex.unlock();
             croak("Error %d while starting counter thread", errno);
         }
@@ -264,10 +261,7 @@ Cxt::leave_runloop()
     refcount_mutex.lock();
     outer_runloop = false;
 
-    if (--refcount == 0) {
-        *terminate_counter_thread = true;
-        terminate_counter_thread = NULL;
-    }
+    --refcount;
 
     refcount_mutex.unlock();
 }
@@ -287,7 +281,7 @@ Cxt::is_any_running() const
     // no point in locking refcount_mutex here, if correctness is
     // needed, the mutex needs to be held around the whole section
     // using the result
-    return refcount > 0;
+    return refcount > 1;
 }
 
 void
@@ -336,28 +330,54 @@ static void *
 increment_counter(void *arg)
 {
     CounterCxt *cxt = static_cast<CounterCxt *>(arg);
-    bool *terminate = &cxt->terminate;
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
+    int countdown = 0;
 
-    while (!*terminate) {
+    delete cxt;
+
+    for (;;) {
         timespec sleep = {delay_sec, delay_nsec};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
-        if (*terminate)
-            break;
         delay_sec = sampling_interval / 1000000;
         delay_nsec = sampling_interval % 1000000 * 1000;
         ++counter;
+
+        // we only synchronize when checking whether the thread needs
+        // to really terminate, but there is no need to lock around
+        // the checks used to start/stop the countdown
+        if (countdown) {
+            // if we're counting down, check whether something
+            // re-incremented the refcount, and if so keep running
+            if (refcount > 1)
+                countdown = 0;
+            else if (--countdown == 0) {
+                // if the refcount is still 1, decrement it and terminate
+                refcount_mutex.lock();
+
+                if (refcount == 1) {
+                    --refcount;
+                    refcount_mutex.unlock();
+
+                    return NULL;
+                } else {
+                    // fall through and keep running
+                    refcount_mutex.unlock();
+                }
+            }
+        } else if (refcount == 1) {
+            // count down for 1 second or 1 interval (whatever is smaller)
+            countdown = sampling_interval > 1000000 ? 1 : 1000000 / sampling_interval;
+        }
     }
-    delete cxt;
 
     return NULL;
 }
 
 
 static bool
-start_counter_thread(bool **terminate)
+start_counter_thread()
 {
     pthread_attr_t attr;
     pthread_t thread;
@@ -377,7 +397,6 @@ start_counter_thread(bool **terminate)
     // discard low-order bits (they tend to be less random and we
     // don't need them anyway)
     CounterCxt *cxt = new CounterCxt((random_start >> 8) % sampling_interval);
-    *terminate = &cxt->terminate;
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
     ok = ok && !pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     ok = ok && !pthread_create(&thread, &attr, increment_counter_function, cxt);
@@ -387,9 +406,11 @@ start_counter_thread(bool **terminate)
 
     if (!ok) {
         delete cxt;
-        *terminate = NULL;
         errno = old_errno;
     }
+
+    // implicit reference held by the counter thread
+    ++refcount;
 
     return ok;
 }
@@ -557,9 +578,9 @@ trampoline(pTHX)
     dMY_CXT;
     dJMPENV;
     int res, exc;
+    volatile bool entered = false; // changed between setjmp and longjmp
 
     MY_CXT.using_trampoline = true;
-    MY_CXT.enter_runloop();
 
     JMPENV_PUSH(exc);
     switch (exc) {
@@ -572,6 +593,12 @@ trampoline(pTHX)
                 PL_runops = runloop;
             else
                 PL_runops = MY_CXT.original_runloop;
+
+            if (MY_CXT.enabled && !entered)
+                MY_CXT.enter_runloop();
+            else if (!MY_CXT.enabled && entered)
+                MY_CXT.leave_runloop();
+            entered = MY_CXT.enabled;
 
             res = CALLRUNOPS(aTHX);
             PL_op = MY_CXT.resuming ? MY_CXT.switch_op->op_next : NULL;
@@ -590,7 +617,8 @@ trampoline(pTHX)
     default:
 	JMPENV_POP;
         PL_runops = trampoline;
-        MY_CXT.leave_runloop();
+        if (entered)
+            MY_CXT.leave_runloop();
 
 	JMPENV_JUMP(exc);
 	/* NOTREACHED */
@@ -598,7 +626,8 @@ trampoline(pTHX)
 
     JMPENV_POP;
     PL_runops = trampoline;
-    MY_CXT.leave_runloop();
+    if (entered)
+        MY_CXT.leave_runloop();
 
     return res;
 }
@@ -761,7 +790,7 @@ child_after_fork()
     refcount_mutex.reinit();
     refcount = running ? 1 : 0;
 
-    if (running && !start_counter_thread(&terminate_counter_thread))
+    if (running && !start_counter_thread())
         croak("Error %d while restarting counter thread", errno);
 
     MY_CXT.pid_changed();
@@ -981,7 +1010,7 @@ static Perl_ppaddr_t orig_ftdir, orig_unstack, orig_nextstate;
 static OP *
 test_ftdir(pTHX)
 {
-    test_force_sample(79);
+    test_force_sample(43);
 
     return orig_ftdir(aTHX);
 }
@@ -1116,9 +1145,10 @@ static void *
 test_increment_counter(void *arg)
 {
     CounterCxt *cxt = static_cast<CounterCxt *>(arg);
-    bool *terminate = &cxt->terminate;
 
-    while (!*terminate) {
+    delete cxt;
+
+    for (;;) {
         timespec sleep = {0, 100000};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
@@ -1130,10 +1160,20 @@ test_increment_counter(void *arg)
         }
         test_counter_increment_mutex.unlock();
 
-        if (*terminate)
-            break;
+        if (refcount == 1) {
+            refcount_mutex.lock();
+
+            // avoid the complex termination logic in the non-test function
+            if (refcount == 1) {
+                --refcount;
+                refcount_mutex.unlock();
+
+                return NULL;
+            } else {
+                refcount_mutex.unlock();
+            }
+        }
     }
-    delete cxt;
 
     return NULL;
 }
