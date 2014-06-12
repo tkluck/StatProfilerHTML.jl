@@ -640,7 +640,9 @@ set_profiler_state(pTHX)
         break;
     }
 
-    if (MY_CXT.resuming)
+    // PL_op can be NULL if we aren't using the trampoline and the
+    // program ran to completion with tracing still on
+    if (MY_CXT.resuming || !PL_op)
         RETURNOP((OP *) NULL);
     else
         RETURN;

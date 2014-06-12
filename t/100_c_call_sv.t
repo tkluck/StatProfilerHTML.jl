@@ -149,6 +149,26 @@ ok 1
 ok 2
 EOT
     },
+    {
+        name   => 'successful eval - no trampoline',
+        start  => 0,
+        source => <<'EOT',
+sub test {
+    Devel::StatProfiler::enable_profile();
+    eval {
+        print "ok 1\n";
+    } or do {
+        print "KO\n";
+    };
+    print "ok 2\n";
+}
+EOT
+        exit   => 0,
+        stdout => <<'EOT',
+ok 1
+ok 2
+EOT
+    },
 );
 
 run_ctests(@tests);
