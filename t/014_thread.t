@@ -59,7 +59,7 @@ ok( exists $sleep_patterns[0]{$in_parent_before});
 ok( exists $sleep_patterns[0]{$in_parent_after});
 ok(!exists $sleep_patterns[0]{$in_child});
 is($genealogies[0][2], "\x00" x 24);
-is($genealogies[0][3], 0xffffffff);
+is($genealogies[0][3], 0);
 
 #child
 ok(!exists $sleep_patterns[1]{$in_parent_before});

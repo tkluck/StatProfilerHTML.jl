@@ -166,7 +166,7 @@ Cxt::Cxt() :
     switch_op(NULL),
     rand_id(rand_seed()),
     ordinal(0),
-    parent_ordinal(-1),
+    parent_ordinal(0),
     pid(getpid()),
     tid(new_thread_id()),
     trace(NULL)
