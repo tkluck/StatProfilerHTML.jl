@@ -169,6 +169,27 @@ ok 1
 ok 2
 EOT
     },
+    {
+        name   => 'no trampoline - all subs are traced',
+        start  => 0,
+        tests  => ['test1', 'test2'],
+        source => <<'EOT',
+sub test1 {
+    Devel::StatProfiler::enable_profile();
+    print "ok 1\n";
+}
+
+sub test2 {
+    print "ok 2\n";
+    Devel::StatProfiler::disable_profile();
+}
+EOT
+        exit   => 0,
+        stdout => <<'EOT',
+ok 1
+ok 2
+EOT
+    },
 );
 
 run_ctests(@tests);

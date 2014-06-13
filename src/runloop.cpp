@@ -74,8 +74,11 @@ namespace {
         Cxt(const Cxt &cxt);
 
         ~Cxt() {
+            dTHX;
+
             if (outer_runloop)
-                Perl_croak_nocontext("Devel::StatProfiler: deleting context for a running runloop");
+                Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
+            PL_runops = original_runloop;
             delete trace;
         }
 
@@ -603,7 +606,12 @@ switch_runloop(pTHX_ pMY_CXT_ bool enable)
         }
 
         JMPENV_POP;
-        PL_runops = MY_CXT.original_runloop;
+        // for embedded interpreters where the code is called via call_sv,
+        // preserve the tracing status between call_sv invocations
+        if (MY_CXT.enabled)
+            PL_runops = trampoline;
+        else
+            PL_runops = MY_CXT.original_runloop;
         MY_CXT.leave_runloop();
 
         // if not resuming, the program ended for real, othwerwise restore
