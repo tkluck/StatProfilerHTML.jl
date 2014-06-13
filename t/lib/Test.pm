@@ -82,7 +82,7 @@ sub run_ctests {
             system('t/callsv', '-Mblib',
                    '-MDevel::StatProfiler=-file,' . $profile_file .
                        ($test->{start} ? '' : ',-nostart'),
-                   $filename);
+                   $filename, $test->{tests} ? @{$test->{tests}} : 'test');
         };
 
         if ($exit & 0xff) {

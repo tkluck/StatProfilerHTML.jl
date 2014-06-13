@@ -8,7 +8,9 @@ extern void xs_init(pTHX);
 int main(int argc, char **argv, char **env)
 {
     char *args[] = { NULL };
-    int exitstatus;
+    int exitstatus, i;
+    AV* plargv;
+
     PERL_SYS_INIT3(&argc,&argv,&env);
     my_perl = perl_alloc();
     perl_construct(my_perl);
@@ -18,7 +20,13 @@ int main(int argc, char **argv, char **env)
 
     /*** skipping perl_run() ***/
 
-    call_argv("test", G_DISCARD | G_NOARGS, args);
+    plargv = GvAV(PL_argvgv);
+
+    for (i = 0; i <= av_len(plargv); ++i) {
+        SV **item = av_fetch(plargv, i, 0);
+
+        call_argv(SvPV_nolen(*item), G_DISCARD | G_NOARGS, args);
+    }
 
     exitstatus = perl_destruct(my_perl);
     perl_free(my_perl);
