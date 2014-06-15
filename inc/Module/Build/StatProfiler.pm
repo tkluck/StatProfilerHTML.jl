@@ -18,7 +18,7 @@ sub new {
     return $class->SUPER::new(
         %args,
         share_dir          => 'share',
-        extra_compiler_flags => '-DPERL_NO_GET_CONTEXT' . ($DEBUG ? ' -g' : ''),
+        extra_compiler_flags => '-DSNAPPY=1 -DPERL_NO_GET_CONTEXT' . ($DEBUG ? ' -g' : ''),
         extra_linker_flags => [qw(-lrt)],
     );
 }

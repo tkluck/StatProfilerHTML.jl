@@ -1,5 +1,9 @@
 #include "tracefile.h"
 
+#if SNAPPY
+#include "snappy.h"
+#endif
+
 #include <ctime>
 
 using namespace devel::statprofiler;
@@ -38,11 +42,17 @@ enum {
 InputBuffer::InputBuffer() :
     fh(NULL), input_position(input_buffer), input_end(input_buffer)
 {
+#if SNAPPY
+    snappy = new SnappyInput(OUTPUT_BUFFER_SIZE);
+#endif
 }
 
 InputBuffer::~InputBuffer()
 {
     close();
+#if SNAPPY
+    delete snappy;
+#endif
 }
 
 void InputBuffer::fill_buffer()
@@ -59,7 +69,11 @@ void InputBuffer::fill_buffer()
         size = OUTPUT_BUFFER_SIZE;
     }
 
+#if SNAPPY
+    int bytes = snappy->read(fh, input_end, OUTPUT_BUFFER_SIZE - (input_end - input_buffer));
+#else
     int bytes = fread(input_end, 1, size, fh);
+#endif
 
     input_end += bytes;
 }
@@ -150,11 +164,17 @@ bool InputBuffer::read_raw_bytes(void *buffer, size_t size)
 OutputBuffer::OutputBuffer() :
     fh(NULL), output_position(output_buffer)
 {
+#if SNAPPY
+    snappy = new SnappyOutput(OUTPUT_BUFFER_SIZE);
+#endif
 }
 
 OutputBuffer::~OutputBuffer()
 {
     close();
+#if SNAPPY
+    delete snappy;
+#endif
 }
 
 int OutputBuffer::flush_buffer()
@@ -166,7 +186,11 @@ int OutputBuffer::flush_buffer()
 
     output_position = output_buffer;
 
+#if SNAPPY
+    return snappy->write(fh, output_buffer, pos - output_buffer);
+#else
     return fwrite(output_buffer, 1, pos - output_buffer, fh) == pos - output_buffer;
+#endif
 }
 
 int OutputBuffer::flush()
@@ -181,8 +205,17 @@ int OutputBuffer::write_bytes(const void *bytes, size_t size)
         if (!flush_buffer())
             return 0;
 
-    if (size > OUTPUT_BUFFER_SIZE)
+    if (size > OUTPUT_BUFFER_SIZE) {
+#if SNAPPY
+        for (size_t pos = 0; pos < size; pos += OUTPUT_BUFFER_SIZE)
+            if (!write_bytes(((const char *) bytes) + pos, min(size - pos, (size_t) OUTPUT_BUFFER_SIZE)))
+                return 0;
+
+        return 1;
+#else
         return fwrite(bytes, 1, size, fh) == size;
+#endif
+    }
 
     memcpy(output_position, bytes, size);
     output_position += size;

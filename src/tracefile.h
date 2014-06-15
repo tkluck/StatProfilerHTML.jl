@@ -11,7 +11,12 @@
 #include "thx_member.h"
 
 #define ID_SIZE 6
-#define OUTPUT_BUFFER_SIZE 8192
+// bigger buffers compress better
+#if SNAPPY
+    #define OUTPUT_BUFFER_SIZE 32000
+#else
+    #define OUTPUT_BUFFER_SIZE 8192
+#endif
 
 namespace devel {
     namespace statprofiler {
@@ -34,6 +39,9 @@ namespace devel {
             FRAME_EVAL,
         };
 
+        class SnappyInput;
+        class SnappyOutput;
+
         class InputBuffer
         {
         public:
@@ -55,6 +63,9 @@ namespace devel {
         private:
             void fill_buffer();
 
+#if SNAPPY
+            SnappyInput *snappy;
+#endif
             std::FILE *fh;
             char input_buffer[OUTPUT_BUFFER_SIZE];
             char *input_position, *input_end;
@@ -83,6 +94,9 @@ namespace devel {
         private:
             int flush_buffer();
 
+#if SNAPPY
+            SnappyOutput *snappy;
+#endif
             std::FILE *fh;
             char output_buffer[OUTPUT_BUFFER_SIZE];
             char *output_position;
