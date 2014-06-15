@@ -23,19 +23,17 @@
     => I don't think these things are worth implementing.
   - use async I/O to reduce delays? (probably not)
 - test various interesting cases
-  - eval {}
-  - eval ""
   - do ""
   - sort {}/map {}
 - test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
-- handle subroutines defined in an eval
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
   - 0x10  keep information about the definition line for a subroutine
+  - 0x400 save source code for all files (optionally dumping it as soon
+    as possible)
 - command line options for analysis script
-- multiplicty/threads/fork
 - calling stop -> enable DTRT
 - generated code containing #line directives
   - it might be useful to have both the original and generated code
