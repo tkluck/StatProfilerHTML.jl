@@ -6,8 +6,9 @@ use Time::HiRes qw(usleep);
 
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
+my $src = "# " . ("FILLER " x 100000) . "\n" . "usleep(1000) for 1..10;\n";
 
-use Devel::StatProfiler -file => $profile_file, -interval => 1000;
+use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 'all_evals';
 
 usleep(1000) for 1..10; # 10ms
 Devel::StatProfiler::write_custom_metadata(foo => "bar");
@@ -20,6 +21,7 @@ SCOPE: {
   Devel::StatProfiler::write_custom_metadata(bar => 1);
   usleep(1000) for 1..10; # 10ms
 }
+eval $src;
 Devel::StatProfiler::write_custom_metadata(foo => "baz");
 usleep(1000*10) for 1..10; # 100ms
 Devel::StatProfiler::stop_profile();
@@ -52,5 +54,9 @@ is_deeply(\%incr_meta, $expected_final_meta, "Incremental meta data parsing work
 
 my $meta_data = $r->get_custom_metadata();
 is_deeply($meta_data, $expected_final_meta, "Complete custom meta data comes out correctly");
+
+my $sources = $r->get_source_code;
+cmp_ok(scalar keys %$sources, '>=', 1, 'got some eval source code');
+ok((grep $_ eq $src, values %$sources), 'got the source code for long eval');
 
 done_testing();
