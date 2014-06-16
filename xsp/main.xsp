@@ -45,6 +45,8 @@ int get_precision();
     HV *get_custom_metadata();
     HV *get_source_code();
     HV *get_active_sections();
+    bool is_file_ended();
+    bool is_stream_ended();
 
     SV *get_source_perl_version()
       %code{%

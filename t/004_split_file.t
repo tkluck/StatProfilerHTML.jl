@@ -20,12 +20,13 @@ my @files = glob "$template.*";
 
 cmp_ok(scalar @files, '>', 1, 'got more than one trace file');
 
-my $meta;
+my ($meta, $r);
 
 for my $profile_file (@files) {
-    my $r = Devel::StatProfiler::Reader->new($profile_file);
+    $r = Devel::StatProfiler::Reader->new($profile_file);
 
     while (my $trace = $r->read_trace) {
+        ok(!$r->is_stream_ended, 'stream has not ended yet (file not ended)');
         if ($trace->metadata_changed) {
             if (!$meta) {
                 $meta = $trace->metadata;
@@ -33,6 +34,13 @@ for my $profile_file (@files) {
                 die "Causal failure: multiple metadata changes"
             }
         }
+    }
+
+    ok($r->is_file_ended, 'file has ended now (end of any file)');
+    if ($profile_file eq $files[-1]) {
+        ok($r->is_stream_ended, 'stream has ended now (end of last file)');
+    } else {
+        ok(!$r->is_stream_ended, 'stream has not ended yet (end of intermediate file)');
     }
 }
 

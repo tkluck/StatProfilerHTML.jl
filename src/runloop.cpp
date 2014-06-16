@@ -211,6 +211,8 @@ Cxt::~Cxt() {
         Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
     PL_runops = original_runloop;
     PL_ppaddr[OP_ENTEREVAL] = orig_entereval;
+    if (trace && trace->is_valid())
+        trace->close(TraceFileWriter::write_end_tag);
     delete trace;
 }
 
@@ -737,7 +739,7 @@ set_profiler_state(pTHX)
         if (MY_CXT.enabled)
             MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ false);
         if (MY_CXT.trace)
-            MY_CXT.trace->close();
+            MY_CXT.trace->close(TraceFileWriter::write_end_tag);
         break;
     }
 
@@ -756,7 +758,7 @@ cleanup_runloop(pTHX_ void *ptr)
     dMY_CXT;
 
     if (MY_CXT.trace)
-        MY_CXT.trace->close();
+        MY_CXT.trace->close(TraceFileWriter::write_end_tag);
 
     // declared static and destroyed during global destruction
 #ifdef PERL_IMPLICIT_CONTEXT

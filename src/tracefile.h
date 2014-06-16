@@ -129,6 +129,10 @@ namespace devel {
 
             // Returns currently-open sections
             HV *get_active_sections();
+
+            bool is_file_ended() const { return file_ended; }
+            bool is_stream_ended() const { return stream_ended; }
+
         private:
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
@@ -145,6 +149,7 @@ namespace devel {
             // various stashes used by the reader
             HV *st_stash, *sf_stash, *msf_stash, *esf_stash;
             bool sections_changed, metadata_changed;
+            bool stream_ended, file_ended;
 
             DECL_THX_MEMBER
         };
@@ -152,12 +157,14 @@ namespace devel {
         class TraceFileWriter
         {
         public:
+            static const bool write_end_tag = true;
+
             // Usage in this order: Construct object, open, write_header, write samples
             TraceFileWriter(pTHX);
             ~TraceFileWriter();
 
             int open(const std::string &path, bool is_template, uint32_t id[ID_SIZE], unsigned int ordinal);
-            void close();
+            void close(bool write_end_tag = false);
             void shut();
             void flush();
             long position() const;

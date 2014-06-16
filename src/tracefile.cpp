@@ -26,6 +26,8 @@ enum {
     TAG_XSUB_FRAME              = 5,
     TAG_MAIN_FRAME              = 6,
     TAG_EVAL_STRING             = 7,
+    TAG_FILE_END                = 196,
+    TAG_STREAM_END              = 197,
     TAG_SECTION_START           = 198,
     TAG_SECTION_END             = 199,
     TAG_CUSTOM_META             = 200,
@@ -405,7 +407,8 @@ namespace {
 
 TraceFileReader::TraceFileReader(pTHX)
   : file_format_version(0), sections(NULL),
-    sections_changed(false), metadata_changed(false)
+    sections_changed(false), metadata_changed(false),
+    stream_ended(false), file_ended(false)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -675,6 +678,13 @@ SV *TraceFileReader::read_trace()
             sections_changed = true;
             break;
         }
+        case TAG_STREAM_END:
+            stream_ended = true;
+            file_ended = true;
+            break;
+        case TAG_FILE_END:
+            file_ended = true;
+            break;
         } // end switch
     }
 }
@@ -772,8 +782,11 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
     return status;
 }
 
-void TraceFileWriter::close()
+void TraceFileWriter::close(bool write_end_tag)
 {
+    out.write_byte(write_end_tag ? TAG_STREAM_END : TAG_FILE_END);
+    write_varint(out, 0);
+
     flush();
 
     if (out.is_valid()) {
