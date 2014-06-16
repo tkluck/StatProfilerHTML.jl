@@ -35,6 +35,8 @@
     as possible)
 - command line options for analysis script
 - calling stop -> enable DTRT
+  - generate a new file id (child of the previous one)
+  - check the file is reopened when re-entering the new runloop
 - generated code containing #line directives
   - it might be useful to have both the original and generated code
     in the report, with some way to toggle between the two
