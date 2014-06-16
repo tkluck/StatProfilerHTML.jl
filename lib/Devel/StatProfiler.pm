@@ -17,6 +17,7 @@ my %args = (
     -nostart  => 0,
     -depth    => 1,
     -source   => 1,
+    -maxsize  => 1,
 );
 
 my %source_args = (
@@ -57,6 +58,8 @@ sub import {
             set_enabled(0);
         } elsif ($arg eq '-depth') {
             set_stack_collection_depth($value);
+        } elsif ($arg eq '-maxsize') {
+            set_max_output_file_size($value);
         } elsif ($arg eq '-source') {
             _croak("Invalid value for -source option") unless exists $source_args{$value};
             set_save_source($source_args{$value});
@@ -137,6 +140,11 @@ call C<enable_profile()>.
 =head3 -interval <microsecs> (default 10000)
 
 Sets the sampling interval, in microseconds.
+
+=head3 -maxsize <size> (default 10MB)
+
+After the trace file grows bigger than this size, start a new one with
+a bigger ordinal.
 
 =head3 -source <strategy> (default 'none')
 

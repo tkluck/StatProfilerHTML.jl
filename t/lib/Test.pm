@@ -15,7 +15,7 @@ require feature;
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples get_sources temp_profile_file precision_factor run_ctests)
+  qw(take_sample get_samples get_sources temp_profile_file temp_profile_dir precision_factor run_ctests)
 );
 
 our $TAKE_SAMPLE_LINE;
@@ -38,6 +38,16 @@ sub temp_profile_file {
         say "# Temporary profiling output file: '$file'";
     }
     return $file;
+}
+
+sub temp_profile_dir {
+    state $debugging = $ENV{DEBUG};
+    my $tmpdir = File::Temp::tempdir(CLEANUP => !$debugging);
+    my $file = File::Spec->catfile($tmpdir, "tprof.out");
+    if ($debugging) {
+        say "# Temporary profiling output file: '$file'";
+    }
+    return ($tmpdir, $file);
 }
 
 sub take_sample {
