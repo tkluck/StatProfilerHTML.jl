@@ -305,9 +305,8 @@ Cxt::pid_changed()
 }
 
 static void
-reopen_output_file(pTHX)
+reopen_output_file(pTHX_ pMY_CXT)
 {
-    dMY_CXT;
     MY_CXT.trace->close();
 
     ++MY_CXT.ordinal;
@@ -455,7 +454,7 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
 {
     if (trace->position() > max_output_file_size && MY_CXT.is_template) {
         // Start new output file
-        reopen_output_file(aTHX);
+        reopen_output_file(aTHX_ aMY_CXT);
     }
     trace->start_sample(counter - pred_counter, prev_op);
     if (prev_op &&
@@ -683,7 +682,7 @@ set_profiler_state(pTHX)
         break;
     case 2: // restart
         if (MY_CXT.trace)
-            reopen_output_file(aTHX);
+            reopen_output_file(aTHX_ aMY_CXT);
         break;
     case 3: // stop
         if (MY_CXT.enabled)
@@ -756,7 +755,7 @@ child_after_fork()
     MY_CXT.pid_changed();
     MY_CXT.ordinal = 0;
     if (MY_CXT.outer_runloop)
-        reopen_output_file(aTHX);
+        reopen_output_file(aTHX_ aMY_CXT);
 }
 
 
