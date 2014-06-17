@@ -731,7 +731,17 @@ prepare_fork()
 static void
 parent_after_fork()
 {
+    dTHX;
+    dMY_CXT;
+
     refcount_mutex.unlock();
+    // ensures that any eval text the child depends on is in an
+    // already closed file, ready for processing
+    if (MY_CXT.trace && MY_CXT.trace->is_valid()) {
+        MY_CXT.trace->close();
+        if (MY_CXT.outer_runloop)
+            reopen_output_file(aTHX_ aMY_CXT);
+    }
 }
 
 
@@ -803,6 +813,15 @@ devel::statprofiler::clone_runloop(pTHX)
 
     MY_CXT_CLONE;
     new(&MY_CXT) Cxt(*original_cxt);
+
+    // ensures that any eval text the child depends on is in an
+    // already closed file, ready for processing
+    if (original_cxt->trace && original_cxt->trace->is_valid())
+        reopen_output_file(aTHX_
+#ifdef PERL_IMPLICIT_CONTEXT
+                           original_cxt
+#endif
+        );
 }
 
 

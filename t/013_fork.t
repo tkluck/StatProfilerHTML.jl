@@ -4,7 +4,7 @@ use Config;
 use if !$Config{d_fork}, 'Test::More' => skip_all =>
     "fork() not available";
 
-use t::lib::Test tests => 12;
+use t::lib::Test tests => 18;
 
 use Devel::StatProfiler::Reader;
 use Time::HiRes qw(usleep);
@@ -17,7 +17,7 @@ my ($in_parent_before, $in_parent_after, $in_child);
 
 usleep(50000); BEGIN { $in_parent_before = __LINE__ }
 
-my @parent = map s/_$//r, glob $profile_file . '*';
+my ($parent_base) = map s/\.[0-9]+_$//r, glob $profile_file . '*';
 
 my $pid = fork();
 die "fork() failed: $!" unless defined $pid;
@@ -35,10 +35,12 @@ die "waitpid() error: $!"
 
 Devel::StatProfiler::stop_profile();
 
-my @files = glob $profile_file . '*';
-@files = reverse @files if $files[0] ne $parent[0];
+my @files = (
+    (grep  /^\Q$parent_base\E/, glob $profile_file . '*'),
+    (grep !/^\Q$parent_base\E/, glob $profile_file . '*'),
+);
 
-is(scalar @files, 2, 'both processes wrote a trace file');
+is(scalar @files, 3, 'both processes wrote a trace file');
 my (@sleep_patterns, @genealogies);
 
 for my $file (@files) {
@@ -57,19 +59,27 @@ for my $file (@files) {
     push @genealogies, $r->get_genealogy_info;
 }
 
-# parent
+# parent before fork
 ok( exists $sleep_patterns[0]{$in_parent_before});
-ok( exists $sleep_patterns[0]{$in_parent_after});
+ok(!exists $sleep_patterns[0]{$in_parent_after});
 ok(!exists $sleep_patterns[0]{$in_child});
 is($genealogies[0][2], "\x00" x 24);
 is($genealogies[0][3], 0);
 
-#child
+# parent after fork
 ok(!exists $sleep_patterns[1]{$in_parent_before});
-ok(!exists $sleep_patterns[1]{$in_parent_after});
-ok( exists $sleep_patterns[1]{$in_child});
-is($genealogies[1][2], $genealogies[0][0]);
-is($genealogies[1][3], $genealogies[0][1]);
+ok( exists $sleep_patterns[1]{$in_parent_after});
+ok(!exists $sleep_patterns[1]{$in_child});
+is($genealogies[1][2], "\x00" x 24);
+is($genealogies[1][3], 0);
+
+# child
+ok(!exists $sleep_patterns[2]{$in_parent_before});
+ok(!exists $sleep_patterns[2]{$in_parent_after});
+ok( exists $sleep_patterns[2]{$in_child});
+is($genealogies[2][2], $genealogies[0][0]);
+is($genealogies[2][3], $genealogies[0][1]);
 
 # sanity
-isnt($genealogies[0][0], $genealogies[1][0]);
+is($genealogies[0][0], $genealogies[1][0]);
+isnt($genealogies[0][0], $genealogies[2][0]);
