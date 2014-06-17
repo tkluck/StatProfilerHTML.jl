@@ -17,7 +17,7 @@ my ($in_parent_before, $in_parent_after, $in_child);
 
 usleep(50000); BEGIN { $in_parent_before = __LINE__ }
 
-my @parent = glob $profile_file . '*';
+my @parent = map s/_$//r, glob $profile_file . '*';
 
 my $pid = fork();
 die "fork() failed: $!" unless defined $pid;

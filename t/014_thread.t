@@ -22,7 +22,7 @@ sub my_thread {
 
 usleep(50000); BEGIN { $in_parent_before = __LINE__ }
 
-my @parent = glob $profile_file . '*';
+my @parent = map s/_$//r, glob $profile_file . '*';
 
 my $thr = threads->create('my_thread');
 

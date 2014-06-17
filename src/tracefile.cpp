@@ -692,7 +692,9 @@ int TraceFileWriter::open(const std::string &path, bool is_template, unsigned in
         append_hex(output_file, ordinal);
     }
 
-    out.open(fopen(output_file.c_str(), "w"));
+    string temp = output_file + "_";
+
+    out.open(fopen(temp.c_str(), "w"));
     if (!out.is_valid())
         return 1;
 
