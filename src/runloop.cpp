@@ -707,7 +707,14 @@ static void
 cleanup_runloop(pTHX_ void *ptr)
 {
     dMY_CXT;
+
+    if (MY_CXT.trace)
+        MY_CXT.trace->close();
+
+    // declared static and destroyed during global destruction
+#ifdef PERL_IMPLICIT_CONTEXT
     MY_CXT.~Cxt();
+#endif
 }
 
 
@@ -767,10 +774,7 @@ devel::statprofiler::init_runloop(pTHX)
     MY_CXT_INIT;
     new(&MY_CXT) Cxt();
 
-    // declared static and destroyed during global destruction
-#ifdef PERL_IMPLICIT_CONTEXT
     Perl_call_atexit(aTHX_ cleanup_runloop, NULL);
-#endif
 
     pthread_once(&call_atfork, init_atfork);
 
