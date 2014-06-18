@@ -498,9 +498,12 @@ save_eval_code(pTHX)
             next == PL_eval_start &&
             next->op_type == OP_NEXTSTATE) {
         dMY_CXT;
-        TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
 
-        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, (COP *) next);
+        if (MY_CXT.enabled) {
+            TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
+
+            trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, (COP *) next);
+        }
     }
 
     return next;
