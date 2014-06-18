@@ -10,6 +10,8 @@ BEGIN { $profile_file = temp_profile_file(); }
 use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 my ($foo, $l1, $l2, $l3);
 
+BEGIN { Time::HiRes::sleep(0.05); }
+
 {
     package X;
 
@@ -154,7 +156,7 @@ is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 my @traces = qw(
     MAIN;main::foo;t::lib::Test::take_sample;Time::HiRes::usleep
     MAIN;X::__ANON__;t::lib::Test::take_sample;Time::HiRes::usleep
-    main::BEGIN
+    main::BEGIN;Time::HiRes::sleep
     MAIN;Moo::bar;t::lib::Test::take_sample;Time::HiRes::usleep
 );
 
