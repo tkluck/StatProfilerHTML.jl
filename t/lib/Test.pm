@@ -18,6 +18,8 @@ our @EXPORT = (
   qw(take_sample get_samples get_sources temp_profile_file precision_factor run_ctests)
 );
 
+our $TAKE_SAMPLE_LINE;
+
 sub import {
     unshift @INC, 't/lib';
 
@@ -40,7 +42,7 @@ sub temp_profile_file {
 
 sub take_sample {
     # tests run with 1ms sample, use 10 times that
-    usleep(10000);
+    usleep(10000); BEGIN { $TAKE_SAMPLE_LINE = __LINE__ }
 }
 
 sub get_samples {

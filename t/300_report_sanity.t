@@ -32,7 +32,7 @@ $foo->();
 
 Devel::StatProfiler::stop_profile();
 
-my $take_sample_line = 43;
+my $take_sample_line = $t::lib::Test::TAKE_SAMPLE_LINE;
 my $r = Devel::StatProfiler::Report->new(flamegraph => 1);
 my $a = $r->{aggregate};
 $r->add_trace_file($profile_file);
