@@ -71,7 +71,7 @@ namespace {
         runops_proc_t original_runloop;
         OP *switch_op;
         unsigned int rand_id;
-        unsigned int id[ID_SIZE], parent_id[ID_SIZE];
+        uint32_t id[ID_SIZE], parent_id[ID_SIZE];
         unsigned int ordinal, parent_ordinal;
         pid_t pid, tid;
         TraceFileWriter *trace;

@@ -266,12 +266,22 @@ bool OutputBuffer::write_raw_bytes(const void *buffer, size_t size)
 
 
 namespace {
-    void append_hex(string &str, unsigned int value)
+    void append_hex(string &str, uint32_t value)
     {
         static const char digits[] = "0123456789abcdef";
 
         for (int i = 0; i < 8; ++i) {
             str += digits[value >> 28];
+            value <<= 4;
+        }
+    }
+
+    void append_hex(char *buffer, uint32_t value)
+    {
+        static const char digits[] = "0123456789abcdef";
+
+        for (int i = 0; i < 8; ++i) {
+            buffer[i] = digits[value >> 28];
             value <<= 4;
         }
     }
@@ -471,10 +481,19 @@ void TraceFileReader::read_header()
             break;
         }
         case TAG_META_GENEALOGY: {
+            uint32_t temp[ID_SIZE];
+
             genealogy_info.ordinal = read_varint(in);
             genealogy_info.parent_ordinal = read_varint(in);
-            in.read_bytes(genealogy_info.id, sizeof(genealogy_info.id));
-            in.read_bytes(genealogy_info.parent_id, sizeof(genealogy_info.parent_id));
+
+            in.read_bytes(temp, sizeof(temp));
+            for (int i = 0; i < ID_SIZE; ++i)
+                append_hex(genealogy_info.id + i * 8, temp[i]);
+
+            in.read_bytes(temp, sizeof(temp));
+            for (int i = 0; i < ID_SIZE; ++i)
+                append_hex(genealogy_info.parent_id + i * 8, temp[i]);
+
             break;
         }
         case TAG_CUSTOM_META:
@@ -678,14 +697,14 @@ long TraceFileWriter::position() const
     return out.position();
 }
 
-int TraceFileWriter::open(const std::string &path, bool is_template, unsigned int id[ID_SIZE], unsigned int ordinal)
+int TraceFileWriter::open(const std::string &path, bool is_template, uint32_t id[ID_SIZE], unsigned int ordinal)
 {
     close();
     output_file = path;
 
     if (is_template) {
         output_file += '.';
-        for (int i = 0; i < 6; ++i)
+        for (int i = 0; i < ID_SIZE; ++i)
             append_hex(output_file, id[i]);
 
         output_file += '.';
@@ -713,8 +732,8 @@ int TraceFileWriter::write_perl_version()
 
 int TraceFileWriter::write_header(unsigned int sampling_interval,
                                   unsigned int stack_collect_depth,
-                                  unsigned int id[ID_SIZE], unsigned int ordinal,
-                                  unsigned int parent_id[ID_SIZE], unsigned int parent_ordinal)
+                                  uint32_t id[ID_SIZE], unsigned int ordinal,
+                                  uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal)
 {
     int status = 0;
     status += out.write_raw_bytes(FILE_MAGIC, sizeof(FILE_MAGIC) - 1);

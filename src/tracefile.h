@@ -27,7 +27,7 @@ namespace devel {
         };
 
         struct Genealogy_t {
-            unsigned int id[ID_SIZE], parent_id[ID_SIZE];
+            char id[ID_SIZE * 4 * 2], parent_id[ID_SIZE * 4 * 2];
             unsigned int ordinal, parent_ordinal;
         };
 
@@ -152,7 +152,7 @@ namespace devel {
             TraceFileWriter(pTHX);
             ~TraceFileWriter();
 
-            int open(const std::string &path, bool is_template, unsigned int id[ID_SIZE], unsigned int ordinal);
+            int open(const std::string &path, bool is_template, uint32_t id[ID_SIZE], unsigned int ordinal);
             void close();
             void shut();
             void flush();
@@ -162,8 +162,8 @@ namespace devel {
 
             int write_header(unsigned int sampling_interval,
                              unsigned int stack_collect_depth,
-                             unsigned int id[ID_SIZE], unsigned int ordinal,
-                             unsigned int parent_id[ID_SIZE], unsigned int parent_ordinal);
+                             uint32_t id[ID_SIZE], unsigned int ordinal,
+                             uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal);
 
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
