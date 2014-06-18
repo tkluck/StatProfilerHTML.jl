@@ -20,7 +20,7 @@ Devel::StatProfiler::stop_profile();
 my @samples = get_samples($profile_file);
 my $source = get_sources($profile_file);
 
-is(@samples, 8);
+cmp_ok(scalar @samples, '>=', 8);
 cmp_ok(scalar keys %$source, '>=', 4);
 cmp_ok(scalar keys %$source, '<=', 12);
 
