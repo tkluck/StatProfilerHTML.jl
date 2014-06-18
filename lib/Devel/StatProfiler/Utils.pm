@@ -10,7 +10,7 @@ use Errno ();
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(
-    check_serializer read_data write_data write_data_part
+    check_serializer read_data read_file write_data write_data_part write_file
 );
 
 my ($sereal_encoder, $sereal_decoder);
@@ -63,6 +63,23 @@ sub write_data {
     open my $fh, '>', "$full_path.tmp";
 
     _write_and_rename($serializer, $fh, $full_path, $data);
+}
+
+sub write_file {
+    my ($dir, $file, $data) = @_;
+    my ($fh, $path) = _output_file($dir, $file);
+
+    $fh->print($data) or die "Error while writing file data";
+    close $fh;
+    rename "$path.tmp", File::Spec::Functions::catfile($dir, $file);
+}
+
+sub read_file {
+    my ($file) = @_;
+    local $/;
+
+    open my $fh, '<', $file;
+    return readline $fh;
 }
 
 sub _write_and_rename {

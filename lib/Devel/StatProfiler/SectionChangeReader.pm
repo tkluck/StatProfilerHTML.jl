@@ -43,6 +43,7 @@ sub get_genealogy_info { $_[0]->{reader}->get_genealogy_info }
 sub get_active_sections { $_[0]->{reader}->get_active_sections }
 sub get_custom_metadata { $_[0]->{reader}->get_custom_metadata }
 sub clear_custom_metadata { $_[0]->{reader}->clear_custom_metadata }
+sub get_source_code { $_[0]->{reader}->get_source_code }
 
 sub read_trace {
     return @{$_[0]->{traces}} ? shift @{$_[0]->{traces}} : undef;

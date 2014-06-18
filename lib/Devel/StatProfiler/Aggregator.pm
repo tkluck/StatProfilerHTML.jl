@@ -7,7 +7,8 @@ use warnings;
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::SectionChangeReader;
 use Devel::StatProfiler::Report;
-use Devel::StatProfiler::Utils qw(check_serializer read_data write_data);
+use Devel::StatProfiler::EvalSource;
+use Devel::StatProfiler::Utils qw(check_serializer read_data write_data write_data_part);
 
 use File::Path ();
 
@@ -24,6 +25,11 @@ sub new {
         processed    => {},
         reports      => {},
         partial      => {},
+        source       => Devel::StatProfiler::EvalSource->new(
+            serializer     => $opts{serializer},
+            root_directory => $opts{root_directory},
+        ),
+        genealogy    => {},
     }, $class;
 
     check_serializer($self->{serializer});
@@ -38,7 +44,8 @@ sub process_trace_files {
     for my $file (@files) {
         my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file);
         my $sc = Devel::StatProfiler::SectionChangeReader->new($r);
-        my ($process_id, $process_ordinal) = @{$r->get_genealogy_info};
+        my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+            @{$r->get_genealogy_info};
         my $state = $self->{processed}{$process_id} ||= {
             process_id   => $process_id,
             ordinal      => 0,
@@ -46,6 +53,8 @@ sub process_trace_files {
             reader_state => undef,
         };
         next if $process_ordinal != $state->{ordinal} + 1;
+
+        $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
 
         if (my $reader_state = delete $state->{reader_state}) {
             $r->set_reader_state($reader_state);
@@ -71,6 +80,8 @@ sub process_trace_files {
         }
         $state->{ordinal} = $process_ordinal;
         $state->{reader_state} = $r->get_reader_state;
+
+        $self->{source}->add_sources_from_reader($r);
     }
 }
 
@@ -86,6 +97,8 @@ sub save {
     my $state_dir = File::Spec::Functions::catdir($self->{root_dir}, '__state__');
     File::Path::mkpath($state_dir);
 
+    write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};
 
@@ -94,8 +107,11 @@ sub save {
 
     for my $key (keys %{$self->{reports}}) {
         my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $key);
+        # writes some genealogy and source data twice, but it's OK for now
         $self->{reports}{$key}->save($self->{root_dir}, $report_dir);
     }
+
+    $self->{source}->save($self->{root_dir});
 }
 
 sub load {
@@ -115,6 +131,11 @@ sub merged_report {
     my ($self, $report_id) = @_;
 
     my $res = $self->_fresh_report;
+    my $source = Devel::StatProfiler::EvalSource->new(
+        serializer     => $self->{serializer},
+        root_directory => $self->{root_dir},
+        genealogy      => $self->{genealogy},
+    );
 
     for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, '*')) {
         my $report = $self->_fresh_report;
@@ -126,6 +147,14 @@ sub merged_report {
     for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'genealogy.*')) {
         $res->merge_genealogy(read_data($self->{serializer}, $file));
     }
+
+    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'source.*')) {
+        $source->load_and_merge($file);
+    }
+
+    # TODO fix this incestuous relation
+    %{$self->{genealogy}} = %{$res->{genealogy}};
+    $res->{source} = $source;
 
     return $res;
 }
@@ -141,9 +170,11 @@ sub _fresh_report {
     my ($self) = @_;
 
     return Devel::StatProfiler::Report->new(
-        slowops    => $self->{slowops},
-        flamegraph => $self->{flamegraph},
-        serializer => $self->{serializer},
+        slowops        => $self->{slowops},
+        flamegraph     => $self->{flamegraph},
+        serializer     => $self->{serializer},
+        sources        => 0,
+        root_directory => $self->{root_dir},
     );
 }
 

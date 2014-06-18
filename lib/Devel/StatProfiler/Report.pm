@@ -6,6 +6,7 @@ use warnings;
 use autodie qw(open close);
 
 use Devel::StatProfiler::Reader;
+use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part);
 use File::ShareDir;
 use File::Basename ();
@@ -23,6 +24,7 @@ my %templates = (
 
 sub new {
     my ($class, %opts) = @_;
+    my $genealogy = {};
     my $self = bless {
         aggregate     => {
             total     => 0,
@@ -32,7 +34,15 @@ sub new {
             file_map  => {},
             finalized => 0,
         },
-        genealogy     => {},
+        $opts{sources} ? (
+            source    => Devel::StatProfiler::EvalSource->new(
+                serializer     => $opts{serializer},
+                genealogy      => $genealogy,
+            ),
+        ) : (
+            source    => undef,
+        ),
+        genealogy     => $genealogy,
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
         tick          => 0,
@@ -233,6 +243,8 @@ sub add_trace_file {
             $flames->{$key} += $weight;
         }
     }
+
+    $self->{source}->add_sources_from_reader($r) if $self->{source};
 }
 
 sub merge {
@@ -384,9 +396,7 @@ sub save {
     File::Path::mkpath([$state_dir, $report_dir]);
 
     write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
-
-    # TODO save eval source code
-    # File::Spec::mkpath(File::Spec::Functions::catfile($root_dir, 'source'));
+    $self->{source}->save($root_dir) if $self->{source};
 
     write_data_part($self->{serializer}, $report_dir, 'report', [
         $self->{tick},

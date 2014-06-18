@@ -68,6 +68,7 @@
   - for non-Git, fetch it from disk
   - for generated code, allow some custom mapping
 - eval aggregation
+- detect multiple eval with the same #line directive
 - closure aggregation
 - recursive sub aggregation
 - would be nice to support arbitrary aggregation (es. by URL)

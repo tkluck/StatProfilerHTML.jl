@@ -71,6 +71,9 @@ my $r3 = $a2->merged_report('__main__');
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
     for $r1, $r2, $r3;
 
+# we test source code in another test
+delete $_->{source} for $r1, $r2, $r3;
+
 eq_or_diff($r2, $r1);
 eq_or_diff($r3, $r1);
 done_testing();

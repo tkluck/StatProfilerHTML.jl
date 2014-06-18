@@ -104,6 +104,12 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
         $main2, $content2, $list2,
         $main3, $content3, $list3;
 
+# we test source code in another test
+delete $_->{source}
+    for $main1, $content1, $list1,
+        $main2, $content2, $list2,
+        $main3, $content3, $list3;
+
 eq_or_diff($main2, $main1);
 eq_or_diff($content2, $content1);
 eq_or_diff($list2, $list1);
