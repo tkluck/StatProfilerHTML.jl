@@ -69,6 +69,7 @@ sub process_trace_files {
             $state->{report} ||= $self->_fresh_report;
             $state->{report}->add_trace_file($sc);
         }
+        $state->{ordinal} = $process_ordinal;
         $state->{reader_state} = $r->get_reader_state;
     }
 }

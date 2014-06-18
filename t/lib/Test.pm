@@ -201,7 +201,6 @@ sub new {
 sub get_source_tick_duration { $_[0]->{reader}->get_source_tick_duration }
 sub get_source_stack_sample_depth { $_[0]->{reader}->get_source_stack_sample_depth }
 sub get_source_perl_version { $_[0]->{reader}->get_source_perl_version }
-sub get_genealogy_info { $_[0]->{reader}->get_genealogy_info }
 sub get_active_sections { $_[0]->{reader}->get_active_sections }
 sub get_custom_metadata { $_[0]->{reader}->get_custom_metadata }
 sub clear_custom_metadata { $_[0]->{reader}->clear_custom_metadata }
@@ -215,6 +214,20 @@ sub read_trace {
     return if $self->{read};
     $self->{read} = 1;
     return $self->{trace} ||= $self->{reader}->read_trace;
+}
+
+# horrible, horrible hack
+sub get_genealogy_info {
+    state %ordinals;
+
+    my ($self) = @_;
+
+    return $self->{genealogy} ||= do {
+        my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+            @{$self->{reader}->get_genealogy_info};
+
+        [$process_id, ++$ordinals{$self->{reader}}, $parent_id, $parent_ordinal];
+    };
 }
 
 package t::lib::Test::FilteredReader;

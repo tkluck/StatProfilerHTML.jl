@@ -51,6 +51,7 @@ Devel::StatProfiler::stop_profile();
 }
 
 my @files = glob "$template.*";
+my $process_id;
 
 my ($main1, $content1, $list1) = map Devel::StatProfiler::Report->new, 1..3;
 $main1->add_trace_file($_) for @files;
@@ -63,6 +64,7 @@ my $a1 = TestAggregator->new(
 );
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
+    ($process_id) = @{$r->get_genealogy_info};
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
         $a1->process_trace_files($sr);
@@ -95,6 +97,12 @@ my ($main3, $content3, $list3) = map $a2->merged_report($_), qw(
     __main__ content list
 );
 # no need to finalize the report for comparison
+
+# we fake the ordinals in t::lib::Test::SingleReader
+$_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
+    for $main1, $content1, $list1,
+        $main2, $content2, $list2,
+        $main3, $content3, $list3;
 
 eq_or_diff($main2, $main1);
 eq_or_diff($content2, $content1);

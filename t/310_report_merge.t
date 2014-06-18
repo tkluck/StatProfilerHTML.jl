@@ -21,6 +21,8 @@ for (my $count = 10000; ; $count *= 2) {
 
 Devel::StatProfiler::stop_profile();
 
+my ($process_id);
+
 my $r1 = Devel::StatProfiler::Report->new(
     flamegraph => 1,
     slowops    => [qw(ftdir unstack)],
@@ -33,6 +35,7 @@ my $r2 = Devel::StatProfiler::Report->new(
     slowops    => [qw(ftdir unstack)],
 );
 my $r = Devel::StatProfiler::Reader->new($profile_file);
+($process_id) = @{$r->get_genealogy_info};
 
 for (;;) {
     my $sr = t::lib::Test::SingleReader->new($r);
@@ -45,6 +48,10 @@ for (;;) {
     last if $sr->done;
 }
 # no need to finalize the report for comparison
+
+# we fake the ordinals in t::lib::Test::SingleReader
+$_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
+    for $r1, $r2;
 
 eq_or_diff($r2, $r1);
 done_testing();

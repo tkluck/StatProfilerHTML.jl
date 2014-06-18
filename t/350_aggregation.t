@@ -22,6 +22,7 @@ for (my $count = 10000; ; $count *= 2) {
 Devel::StatProfiler::stop_profile();
 
 my @files = glob "$template.*";
+my $process_id;
 
 my $r1 = Devel::StatProfiler::Report->new(
     slowops => [qw(ftdir unstack)],
@@ -35,6 +36,7 @@ my $a1 = Devel::StatProfiler::Aggregator->new(
 );
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
+    ($process_id) = @{$r->get_genealogy_info};
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
         $a1->process_trace_files($sr);
@@ -64,6 +66,10 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 );
 my $r3 = $a2->merged_report('__main__');
 # no need to finalize the report for comparison
+
+# we fake the ordinals in t::lib::Test::SingleReader
+$_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
+    for $r1, $r2, $r3;
 
 eq_or_diff($r2, $r1);
 eq_or_diff($r3, $r1);
