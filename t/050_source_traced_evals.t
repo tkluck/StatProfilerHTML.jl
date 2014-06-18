@@ -22,7 +22,7 @@ my $source = get_sources($profile_file);
 
 is(@samples, 8);
 cmp_ok(scalar keys %$source, '>=', 4);
-cmp_ok(scalar keys %$source, '<=', 8);
+cmp_ok(scalar keys %$source, '<=', 12);
 
 for my $sample (@samples) {
     ok(exists $source->{$sample->[2]->file}, 'source code is there');
