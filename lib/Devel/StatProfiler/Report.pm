@@ -3,7 +3,7 @@ package Devel::StatProfiler::Report;
 
 use strict;
 use warnings;
-use autodie qw(open close mkdir);
+use autodie qw(open close);
 
 use Devel::StatProfiler::Reader;
 use File::ShareDir;
@@ -308,7 +308,7 @@ sub _fetch_source {
 sub output {
     my ($self, $directory) = @_;
 
-    mkdir $directory unless -d $directory;
+    File::Path::mkpath([$directory]);
 
     $self->finalize;
     my $files = $self->{aggregate}{files};
