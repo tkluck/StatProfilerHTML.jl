@@ -496,7 +496,8 @@ save_eval_code(pTHX)
     // this handles the case where CATCH_GET is false in pp_entereval
     if (source_code_kind == ALL_EVALS &&
             next == PL_eval_start &&
-            next->op_type == OP_NEXTSTATE) {
+            next->op_type == OP_NEXTSTATE &&
+            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL) {
         dMY_CXT;
 
         if (MY_CXT.enabled) {
@@ -527,7 +528,8 @@ runloop(pTHX)
     // this handles the case where CATCH_GET is true in pp_entereval
     if (source_code_kind == ALL_EVALS &&
             op == PL_eval_start &&
-            op->op_type == OP_NEXTSTATE)
+            op->op_type == OP_NEXTSTATE &&
+            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL)
         trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, (COP *) op);
 
     OP_ENTRY_PROBE(OP_NAME(op));
