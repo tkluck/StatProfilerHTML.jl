@@ -838,12 +838,20 @@ int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
     const char *file = OutCopFILE(line);
     size_t file_size = strlen(file);
     int lineno = CopLINE(line), status = 0;
+    int eval_size = SvCUR(eval_text);
+    const char *eval = SvPVX(eval_text) ;
+
+    // the code in toke.c:Perl_lex_start appends "\n;" to the string
+    // if it does not end in ";" already; this is an heuristic to try
+    // to get the original source code
+    if (eval_size >= 2 && eval[eval_size - 1] == ';' && eval[eval_size - 2] == '\n')
+        eval_size -= 2;
 
     status += out.write_byte(TAG_EVAL_STRING);
-    status += write_varint(out, string_size(SvCUR(eval_text) - 2) +
+    status += write_varint(out, string_size(eval_size) +
                                 string_size(file_size) +
                                 varint_size(lineno));
-    status += write_string(out, SvPVX(eval_text), SvCUR(eval_text) - 2, SvUTF8(eval_text));
+    status += write_string(out, eval, eval_size, SvUTF8(eval_text));
     status += write_string(out, file, file_size, false);
 
     return status;
