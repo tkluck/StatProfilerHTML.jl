@@ -36,6 +36,7 @@ eq_or_diff($samples[0][2], bless {
 }, 'Devel::StatProfiler::MainStackFrame');
 eq_or_diff($samples[1][2], bless {
     line          => $l4,
+    first_line    => $l4,
     file          => __FILE__,
     package       => 'main',
     sub_name      => 'bar',

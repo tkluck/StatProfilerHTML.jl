@@ -567,6 +567,7 @@ SV *TraceFileReader::read_trace()
             SV *name = read_string(aTHX_ in);
             SV *file = read_string(aTHX_ in);
             int line = read_varint(in);
+            int first_line = read_varint(in);
             HV *frame = newHV();
 
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
@@ -574,6 +575,7 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "sub_name", SvREFCNT_inc(name));
             hv_stores(frame, "file", SvREFCNT_inc(file));
             hv_stores(frame, "line", newSViv(line));
+            hv_stores(frame, "first_line", newSViv(first_line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
 
             break;
@@ -590,6 +592,7 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "sub_name", SvREFCNT_inc(name));
             hv_stores(frame, "file", newSVpvn("", 0));
             hv_stores(frame, "line", newSViv(-1));
+            hv_stores(frame, "first_line", newSViv(-1));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
 
             break;
@@ -907,15 +910,21 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 	}
 
         if (frame_type == FRAME_SUB) {
+            OP *first = CvSTART(sub);
+            COP *first_line = first->op_type == OP_NEXTSTATE ? (COP *) first : NULL;
+            int first_lineno = first_line ? CopLINE(first_line) : -1;
+
             status += out.write_byte(TAG_SUB_FRAME);
             status += write_varint(out, string_size(package_size) +
                                         string_size(name_size) +
                                         string_size(file_size) +
-                                        varint_size(lineno));
+                                        varint_size(lineno) +
+                                        varint_size(first_lineno));
             status += write_string(out, package, package_size, package_utf8);
             status += write_string(out, name, name_size, name_utf8);
             status += write_string(out, file, file_size, false);
             status += write_varint(out, lineno);
+            status += write_varint(out, first_lineno);
         } else {
             status += out.write_byte(TAG_XSUB_FRAME);
             status += write_varint(out, string_size(package_size) +

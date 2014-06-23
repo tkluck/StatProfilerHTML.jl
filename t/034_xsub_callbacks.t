@@ -33,6 +33,7 @@ my ($block) = grep $_->[2]->line == $l2, @samples;
 eq_or_diff($sub->[2], bless {
     file          => __FILE__,
     line          => $l1,
+    first_line    => $l1,
     package       => 'main',
     sub_name      => 'odd',
     fq_sub_name   => 'main::odd',
@@ -45,6 +46,7 @@ eq_or_diff($sub->[3], bless {
 eq_or_diff($block->[2], bless {
     file          => __FILE__,
     line          => $l2,
+    first_line    => $l2,
     package       => 'main',
     sub_name      => '__ANON__',
     fq_sub_name   => 'main::__ANON__',

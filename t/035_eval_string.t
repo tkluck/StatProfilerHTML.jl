@@ -43,6 +43,7 @@ eq_or_diff($samples[0][2], bless {
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[0][3], bless {
     line          => $l2 + 1,
+    first_line    => $l2 + 1,
     file          => __FILE__,
     package       => 'main',
     sub_name      => 'foo',
@@ -54,6 +55,7 @@ eq_or_diff($samples[0][4], bless {
 }, 'Devel::StatProfiler::MainStackFrame');
 eq_or_diff($samples[1][2], bless {
     line          => 2,
+    first_line    => 2,
     file          => "(eval ${\($index + 2)})",
     package       => 'main',
     sub_name      => 'moo',

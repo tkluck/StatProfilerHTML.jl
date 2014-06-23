@@ -14,6 +14,7 @@ my ($foo, $l1, $l2, $l3);
     package X;
 
     $foo = sub {
+        my $x; # some dummy statement
         main::take_sample(); BEGIN { $l1 = __LINE__ + 0 }
     };
 }
@@ -36,6 +37,7 @@ my @samples = get_samples($profile_file);
 
 eq_or_diff($samples[0][2], bless {
     line          => $l3,
+    first_line    => $l3,
     file          => __FILE__,
     package       => 'main',
     sub_name      => 'foo',
@@ -43,6 +45,7 @@ eq_or_diff($samples[0][2], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($samples[1][2], bless {
     line          => $l2,
+    first_line    => $l2,
     file          => __FILE__,
     package       => 'Moo',
     sub_name      => 'bar',
@@ -50,6 +53,7 @@ eq_or_diff($samples[1][2], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($samples[2][2], bless {
     line          => $l1,
+    first_line    => $l1 - 1,
     file          => __FILE__,
     package       => 'X',
     sub_name      => '__ANON__',

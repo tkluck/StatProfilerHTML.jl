@@ -58,6 +58,7 @@ my @samples = get_samples($profile_file);
 
 my $xsub = bless {
     line          => -1,
+    first_line    => -1,
     file          => '',
     package       => 'Time::HiRes',
     sub_name      => 'usleep',
