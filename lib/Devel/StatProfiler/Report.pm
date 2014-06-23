@@ -87,9 +87,8 @@ sub _sub_id {
 
 sub _sub {
     my ($self, $frame) = @_;
-    my ($sub, $file) = ($frame->fq_sub_name, $frame->file);
-    my $name = $sub || $file . ':main';
-    my $id = $frame->id || $name;
+    my $file = $frame->file;
+    my $name = $frame->fq_sub_name || $frame->uq_sub_name;
 
     # count the number of subroutines of a certain package defined per
     # file, used as an heuristic for where to display xsub time
@@ -97,7 +96,7 @@ sub _sub {
         $self->{aggregate}{file_map}{$frame->package}{$file}++;
     }
 
-    return $self->{aggregate}{subs}{$id} ||= {
+    return $self->{aggregate}{subs}{$frame->uq_sub_name} ||= {
         name       => $name,
         package    => $frame->package,
         file       => $file,
@@ -172,7 +171,6 @@ sub add_trace_file {
         # TODO move it to Reader.pm?
         if ($slowops->{my $op_name = $trace->op_name}) {
             unshift @$frames, bless {
-                id         => $frames->[0]->file . ":CORE::$op_name",
                 "package"  => "CORE",
                 sub_name   => $op_name,
                 fq_sub_name=> "CORE::$op_name",
