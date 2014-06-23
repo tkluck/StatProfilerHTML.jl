@@ -21,6 +21,8 @@ namespace devel {
         void start_section(pTHX_ SV *section_name);
         void end_section(pTHX_ SV *section_name);
 
+        bool is_running();
+
         int get_precision();
     }
 }

@@ -1002,3 +1002,12 @@ devel::statprofiler::get_precision()
 
     return res.tv_sec * 1000000 + res.tv_nsec / 1000;
 }
+
+bool
+devel::statprofiler::is_running()
+{
+    dTHX;
+    dMY_CXT;
+
+    return MY_CXT.is_running();
+}
