@@ -48,6 +48,7 @@ sub new {
         tick          => 0,
         stack_depth   => 0,
         perl_version  => undef,
+        process_id    => $opts{mixed_process} ? 'mixed' : undef,
         serializer    => $opts{serializer} || 'storable',
     }, $class;
 
@@ -142,12 +143,13 @@ sub _file {
 }
 
 sub _check_consistency {
-    my ($self, $tick, $depth, $perl_version, $file) = @_;
+    my ($self, $tick, $depth, $perl_version, $process_id, $file) = @_;
 
     if ($self->{tick} == 0) {
         $self->{tick} = $tick;
         $self->{stack_depth} = $depth;
         $self->{perl_version} = $perl_version;
+        $self->{process_id} //= $process_id;
     } else {
         if ($tick != $self->{tick} ||
                 $depth != $self->{stack_depth} ||
@@ -160,6 +162,16 @@ $file sampling parameters:
 Tick duration: $tick stack sample depth: $depth Perl version: $perl_version
 EOT
         }
+
+        if ($self->{process_id} ne 'mixed' &&
+                ($process_id // 'undef') ne ($self->{process_id} // 'undef')) {
+            my ($p1_str, $p2_str) = ($process_id // 'undef', $self->{process_id} // 'undef');
+            die <<EOT;
+Inconsistent process IDs:
+Current process ID: $p2_str
+$file process ID: $p1_str
+EOT
+        }
     }
 }
 
@@ -169,16 +181,17 @@ sub add_trace_file {
     my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
     my $slowops = $self->{slowops};
 
+    my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+        @{$r->get_genealogy_info};
+    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
+
     $self->_check_consistency(
         $r->get_source_tick_duration,
         $r->get_source_stack_sample_depth,
         $r->get_source_perl_version,
+        $process_id,
         $file,
     );
-
-    my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
-        @{$r->get_genealogy_info};
-    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
 
     while (my $trace = $r->read_trace) {
         my $weight = $trace->weight;
@@ -254,6 +267,7 @@ sub merge {
         $report->{tick},
         $report->{stack_depth},
         $report->{perl_version},
+        $report->{process_id},
         'merged report',
     );
 
@@ -392,16 +406,18 @@ sub merge_genealogy {
 sub save {
     my ($self, $root_dir, $report_dir) = @_;
     my $state_dir = File::Spec::Functions::catdir($root_dir, '__state__');
+    my $report_base = sprintf('report.%s', $self->{process_id} // 'aggregate');
 
     File::Path::mkpath([$state_dir, $report_dir]);
 
     write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
     $self->{source}->save($root_dir) if $self->{source};
 
-    write_data_part($self->{serializer}, $report_dir, 'report', [
+    write_data_part($self->{serializer}, $report_dir, $report_base, [
         $self->{tick},
         $self->{stack_depth},
         $self->{perl_version},
+        $self->{process_id},
         $self->{aggregate}
     ]);
 }
@@ -413,6 +429,7 @@ sub load {
         tick
         stack_depth
         perl_version
+        process_id
         aggregate
     )} = @{read_data($self->{serializer}, $report)};
 }

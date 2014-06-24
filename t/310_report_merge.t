@@ -52,6 +52,7 @@ for (;;) {
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
     for $r1, $r2;
+delete $_->{process_id} for $r1, $r2;
 
 eq_or_diff($r2, $r1);
 done_testing();

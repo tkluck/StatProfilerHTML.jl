@@ -31,12 +31,16 @@ Devel::StatProfiler::stop_profile();
 
 my @files = glob "$template.*";
 
-my $r1 = Devel::StatProfiler::Report->new(sources => 1);
+my $r1 = Devel::StatProfiler::Report->new(
+    sources       => 1,
+    mixed_process => 1,
+);
 $r1->add_trace_file($_) for @files;
 # no need to finalize the report for comparison
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    mixed_process  => 1,
 );
 $a1->process_trace_files(@files);
 $a1->save;

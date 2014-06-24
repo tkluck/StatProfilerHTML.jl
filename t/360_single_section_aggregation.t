@@ -53,7 +53,7 @@ Devel::StatProfiler::stop_profile();
 my @files = glob "$template.*";
 my $process_id;
 
-my ($main1, $content1, $list1) = map Devel::StatProfiler::Report->new, 1..3;
+my ($main1, $content1, $list1) = map Devel::StatProfiler::Report->new(mixed_process => 1), 1..3;
 $main1->add_trace_file($_) for @files;
 $content1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'content')) for @files;
 $list1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'list')) for @files;

@@ -29,6 +29,7 @@ sub new {
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
         ),
+        mixed_process=> $opts{mixed_process},
         genealogy    => {},
     }, $class;
 
@@ -130,7 +131,7 @@ sub load {
 sub merged_report {
     my ($self, $report_id) = @_;
 
-    my $res = $self->_fresh_report;
+    my $res = $self->_fresh_report(mixed_process => 1);
     my $source = Devel::StatProfiler::EvalSource->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
@@ -167,7 +168,7 @@ sub _merge_report {
 }
 
 sub _fresh_report {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
     return Devel::StatProfiler::Report->new(
         slowops        => $self->{slowops},
@@ -175,6 +176,7 @@ sub _fresh_report {
         serializer     => $self->{serializer},
         sources        => 0,
         root_directory => $self->{root_dir},
+        mixed_process  => $opts{mixed_process} // $self->{mixed_process},
     );
 }
 
