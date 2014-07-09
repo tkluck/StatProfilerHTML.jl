@@ -837,7 +837,7 @@ int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
 {
     const char *file = OutCopFILE(line);
     size_t file_size = strlen(file);
-    int lineno = CopLINE(line), status = 0;
+    int status = 0;
     int eval_size = SvCUR(eval_text);
     const char *eval = SvPVX(eval_text) ;
 
@@ -849,8 +849,7 @@ int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
 
     status += out.write_byte(TAG_EVAL_STRING);
     status += write_varint(out, string_size(eval_size) +
-                                string_size(file_size) +
-                                varint_size(lineno));
+                                string_size(file_size));
     status += write_string(out, eval, eval_size, SvUTF8(eval_text));
     status += write_string(out, file, file_size, false);
 
