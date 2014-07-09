@@ -833,13 +833,22 @@ int TraceFileWriter::end_section(SV *section_name)
     return status;
 }
 
-int TraceFileWriter::add_eval_source(SV *eval_text, COP *line)
+int TraceFileWriter::add_eval_source(SV *eval_text, COP *line, U32 eval_seq)
 {
-    const char *file = OutCopFILE(line);
-    size_t file_size = strlen(file);
+    char buffer[28]; // 20 for 64-bit int, 7 for (eval ), 1 for null
+    const char *file;
+    size_t file_size;
     int status = 0;
     int eval_size = SvCUR(eval_text);
     const char *eval = SvPVX(eval_text) ;
+
+    if (line) {
+        file = OutCopFILE(line);
+        file_size = strlen(file);
+    } else {
+        file = buffer;
+        file_size = sprintf(buffer, "(eval %lu)", (unsigned long) eval_seq);
+    }
 
     // the code in toke.c:Perl_lex_start appends "\n;" to the string
     // if it does not end in ";" already; this is an heuristic to try

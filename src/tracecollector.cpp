@@ -91,7 +91,7 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
                         if (!marker) {
                             sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
                                         &eval_idx_vtbl, NULL, 0);
-                            trace.add_eval_source(eval_text, line);
+                            trace.add_eval_source(eval_text, line, 0);
                         }
                     }
 
