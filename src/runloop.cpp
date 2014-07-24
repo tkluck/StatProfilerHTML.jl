@@ -755,7 +755,7 @@ child_after_fork()
 
     MY_CXT.pid_changed();
     MY_CXT.ordinal = 0;
-    if (MY_CXT.outer_runloop)
+    if (running && MY_CXT.trace)
         reopen_output_file(aTHX_ aMY_CXT);
 }
 

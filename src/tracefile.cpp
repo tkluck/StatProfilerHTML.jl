@@ -784,6 +784,9 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
     status += out.write_bytes(parent_id, sizeof(parent_id[0]) * ID_SIZE);
 
     status += out.write_byte(TAG_HEADER_SEPARATOR);
+
+    flush();
+
     return status;
 }
 
