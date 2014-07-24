@@ -814,9 +814,6 @@ devel::statprofiler::init_runloop(pTHX)
             break;
         }
     }
-
-    orig_entereval = PL_ppaddr[OP_ENTEREVAL];
-    PL_ppaddr[OP_ENTEREVAL] = save_eval_code;
 }
 
 
@@ -851,8 +848,10 @@ devel::statprofiler::install_runloop()
     dMY_CXT;
 
     MY_CXT.original_runloop = PL_runops;
-    if (MY_CXT.enabled)
-        PL_runops = trampoline;
+    PL_runops = trampoline;
+
+    orig_entereval = PL_ppaddr[OP_ENTEREVAL];
+    PL_ppaddr[OP_ENTEREVAL] = save_eval_code;
 }
 
 
