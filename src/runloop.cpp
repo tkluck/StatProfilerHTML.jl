@@ -538,10 +538,13 @@ runloop(pTHX)
     if (source_code_kind == ALL_EVALS &&
             op == PL_eval_start &&
             op->op_type == OP_NEXTSTATE &&
-            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL)
+            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL &&
+            MY_CXT.eval_seq != 0) {
         // here eval_seq might be set to the wrong value in some
         // obscure case, see the comment in save_eval_code
         trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, NULL, MY_CXT.eval_seq);
+        MY_CXT.eval_seq = 0;
+    }
 
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
