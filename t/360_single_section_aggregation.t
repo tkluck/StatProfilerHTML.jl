@@ -105,7 +105,7 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
         $main3, $content3, $list3;
 
 # we test source code in another test
-delete $_->{source}
+delete $_->{source}, delete $_->{sourcemap}
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;

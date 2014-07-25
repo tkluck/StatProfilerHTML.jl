@@ -8,6 +8,7 @@ use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::SectionChangeReader;
 use Devel::StatProfiler::Report;
 use Devel::StatProfiler::EvalSource;
+use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Utils qw(check_serializer read_data write_data write_data_part);
 
 use File::Path ();
@@ -26,6 +27,10 @@ sub new {
         reports      => {},
         partial      => {},
         source       => Devel::StatProfiler::EvalSource->new(
+            serializer     => $opts{serializer},
+            root_directory => $opts{root_directory},
+        ),
+        sourcemap    => Devel::StatProfiler::SourceMap->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
         ),
@@ -83,6 +88,7 @@ sub process_trace_files {
         $state->{reader_state} = $r->get_reader_state;
 
         $self->{source}->add_sources_from_reader($r);
+        $self->{sourcemap}->add_sources_from_reader($r);
     }
 }
 
@@ -113,6 +119,7 @@ sub save {
     }
 
     $self->{source}->save($self->{root_dir});
+    $self->{sourcemap}->save($self->{root_dir});
 }
 
 sub load {
@@ -137,6 +144,10 @@ sub merged_report {
         root_directory => $self->{root_dir},
         genealogy      => $self->{genealogy},
     );
+    my $sourcemap = Devel::StatProfiler::SourceMap->new(
+        serializer     => $self->{serializer},
+        root_directory => $self->{root_dir},
+    );
 
     for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, '*')) {
         my $report = $self->_fresh_report;
@@ -153,9 +164,14 @@ sub merged_report {
         $source->load_and_merge($file);
     }
 
+    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'sourcemap.*')) {
+        $sourcemap->load_and_merge($file);
+    }
+
     # TODO fix this incestuous relation
     %{$self->{genealogy}} = %{$res->{genealogy}};
     $res->{source} = $source;
+    $res->{sourcemap} = $sourcemap;
 
     return $res;
 }

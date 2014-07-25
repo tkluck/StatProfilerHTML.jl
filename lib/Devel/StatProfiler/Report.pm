@@ -7,6 +7,7 @@ use autodie qw(open close);
 
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
+use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part);
 use File::ShareDir;
 use File::Basename ();
@@ -39,8 +40,12 @@ sub new {
                 serializer     => $opts{serializer},
                 genealogy      => $genealogy,
             ),
+            sourcemap => Devel::StatProfiler::SourceMap->new(
+                serializer     => $opts{serializer},
+            ),
         ) : (
             source    => undef,
+            sourcemap => undef,
         ),
         genealogy     => $genealogy,
         flamegraph    => $opts{flamegraph} || 0,
@@ -258,6 +263,7 @@ sub add_trace_file {
     }
 
     $self->{source}->add_sources_from_reader($r) if $self->{source};
+    $self->{sourcemap}->add_sources_from_reader($r) if $self->{sourcemap};
 }
 
 sub merge {
@@ -506,13 +512,19 @@ sub _fetch_source {
         or die "Failed to open source code file '$path', "
                . "do you have permission to read it? (Reason: $!)";
 
+    $self->{sourcemap}->start_file_mapping($path);
+
     while (defined (my $line = <$fh>)) {
         # this might match a token inside a string, and does not match
         # the token on a non-empty line; probably it should double-check
         # using the range of lines with samples
         last if $line =~ /^__(?:DATA|END)__\s+$/;
+        $self->{sourcemap}->add_file_mapping(@lines + 2, $2, $1)
+            if $line =~ /^#line\s+(\d+)\s+(.+)$/;
         push @lines, $line;
     }
+
+    $self->{sourcemap}->end_file_mapping(scalar @lines);
 
     return ['I hope you never see this...', @lines];
 }

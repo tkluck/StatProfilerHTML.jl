@@ -28,6 +28,7 @@ Devel::StatProfiler::stop_profile();
 my $r = Devel::StatProfiler::Report->new(
     slowops    => [qw(ftdir unstack)],
     flamegraph => 1,
+    sources    => 1,
 );
 $r->add_trace_file($profile_file);
 

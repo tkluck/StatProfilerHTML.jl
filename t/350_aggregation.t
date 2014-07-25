@@ -73,6 +73,7 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
 
 # we test source code in another test
 delete $_->{source} for $r1, $r2, $r3;
+delete $_->{sourcemap} for $r1, $r2, $r3;
 delete $_->{process_id} for $r1, $r2, $r3;
 
 eq_or_diff($r2, $r1);
