@@ -110,7 +110,7 @@ sub _sub {
 
     # count the number of subroutines of a certain package defined per
     # file, used as an heuristic for where to display xsub time
-    if ($frame->line > 0) {
+    if ($frame->line > 0 && $frame->package) {
         $self->{aggregate}{file_map}{$frame->package}{$file}++;
     }
 
@@ -264,6 +264,145 @@ sub add_trace_file {
 
     $self->{source}->add_sources_from_reader($r) if $self->{source};
     $self->{sourcemap}->add_sources_from_reader($r) if $self->{sourcemap};
+}
+
+sub _map_hash_rx {
+    my ($hash, $rx, $subst, $map, $merge) = @_;
+
+    for my $key (keys %$hash) {
+        my $value = $hash->{$key};
+        my $new_key = $map->{$key};
+
+        if (!$new_key && $key =~ $rx) {
+            $new_key = $subst->($key);
+        }
+
+        if ($new_key) {
+            if (!exists $hash->{$new_key}) {
+                $hash->{$new_key} = delete $hash->{$key};
+            } elsif ($merge) {
+                $merge->($hash->{$new_key}, delete $hash->{$key});
+            } else {
+                Carp::confess("Duplicate value for key '$key' => '$new_key' without a merge function");
+            }
+        }
+
+        if (ref $value) {
+            $value->{uq_name} = $subst->($value->{uq_name}) if $value->{uq_name};
+            $value->{file} = $subst->($value->{file}) if $value->{file};
+            $value->{callee} = $subst->($value->{callee}) if $value->{callee};
+            $value->{caller} = $subst->($value->{caller}) if $value->{caller};
+        }
+    }
+}
+
+sub _merge_lines {
+    my ($a, $b) = @_;
+    my $max = $#$a > $#$b ? $#$a : $#$b;
+
+    $a->[$_] += $b->[$_] // 0 for 0..$max;
+}
+
+sub _merge_file_map_entry {
+    $_[0] += $_[1];
+}
+
+sub _merge_file_entry {
+    my ($a, $b) = @_;
+
+    $a->{name} = $b->{name} if $a->{name} gt $b->{name};
+    $a->{basename} = $b->{basename} if $a->{basename} gt $b->{basename};
+
+    _merge_lines($a->{lines}{exclusive}, $b->{lines}{exclusive});
+    _merge_lines($a->{lines}{inclusive}, $b->{lines}{inclusive});
+}
+
+sub _merge_call_sites {
+    my ($a, $b) = @_;
+
+    $a->{inclusive} += $b->{inclusive};
+    $a->{exclusive} += $b->{exclusive};
+}
+
+sub _merge_callees {
+    my ($a, $b) = @_;
+
+    $a->{inclusive} += $b->{inclusive};
+}
+
+sub _merge_sub_entry {
+    my ($a, $b) = @_;
+
+    $a->{name} = $b->{name} if $a->{name} gt $b->{name};
+
+    $a->{inclusive} += $b->{inclusive};
+    $a->{exclusive} += $b->{exclusive};
+
+    my ($acs, $bcs) = ($a->{call_sites}, $b->{call_sites});
+    for my $key (keys %$bcs) {
+        if (exists $acs->{$key}) {
+            $acs->{$key}{inclusive} += $bcs->{$key}{inclusive};
+            $acs->{$key}{exclusive} += $bcs->{$key}{exclusive};
+        } else {
+            $acs->{$key} = $bcs->{$key};
+        }
+    }
+
+    my ($ac, $bc) = ($a->{callees}, $b->{callees});
+    for my $key (keys %$bc) {
+        if (exists $ac->{$key}) {
+            my ($acl, $bcl) = ($ac->{$key}, $bc->{$key});
+
+            for my $sub (keys %$bcl) {
+                if (exists $acl->{$sub}) {
+                    $acl->{$sub}{inclusive} += $bcl->{$sub}{inclusive};
+                } else {
+                    $acl->{$sub} = $bcl->{$sub};
+                }
+            }
+        } else {
+            $ac->{$key} = $bc->{$key};
+        }
+    }
+}
+
+sub map_source {
+    my ($self) = @_;
+    my $files = $self->{aggregate}{files};
+    my $subs = $self->{aggregate}{subs};
+    my $file_map = $self->{aggregate}{file_map};
+    my %eval_map;
+
+    for my $file (keys %$files) {
+        my $hash = $self->{source}->get_hash_by_name($self->{process_id}, $file);
+
+        $eval_map{$file} = "eval:$hash" if $hash;
+    }
+
+    my @eval_map = sort { length($b) <=> length($a) } keys %eval_map;
+
+    return unless @eval_map;
+
+    my $file_map_rx = '(^|:)(' . join('|', map "\Q$_\E", @eval_map) . ')(:|$)';
+    my $file_map_qr = qr/$file_map_rx/;
+    my $file_repl_sub = sub {
+        $_[0] =~ s/$file_map_qr/$1$eval_map{$2}$3/r
+    };
+
+    for my $package (values %$file_map) {
+        _map_hash_rx($package, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_map_entry);
+    }
+
+    _map_hash_rx($files, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_entry);
+    _map_hash_rx($subs, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_sub_entry);
+
+    for my $sub (values %$subs) {
+        _map_hash_rx($sub->{call_sites}, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_call_sites);
+
+        for my $by_line (values %{$sub->{callees}}) {
+            _map_hash_rx($by_line, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_callees);
+        }
+    }
 }
 
 sub merge {

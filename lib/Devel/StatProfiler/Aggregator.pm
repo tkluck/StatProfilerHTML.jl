@@ -149,13 +149,6 @@ sub merged_report {
         root_directory => $self->{root_dir},
     );
 
-    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, '*')) {
-        my $report = $self->_fresh_report;
-
-        $report->load($file);
-        $res->merge($report);
-    }
-
     for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'genealogy.*')) {
         $res->merge_genealogy(read_data($self->{serializer}, $file));
     }
@@ -169,9 +162,23 @@ sub merged_report {
     }
 
     # TODO fix this incestuous relation
-    %{$self->{genealogy}} = %{$res->{genealogy}};
     $res->{source} = $source;
     $res->{sourcemap} = $sourcemap;
+    %{$self->{genealogy}} = %{$res->{genealogy}};
+
+    # mapping eval source code requires genealogy and source map
+    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, '*')) {
+        my $report = $self->_fresh_report;
+
+        # TODO fix this incestuous relation
+        $report->{source} = $source;
+        $report->{sourcemap} = $sourcemap;
+        $report->{genealogy} = $self->{genealogy};
+
+        $report->load($file);
+        $report->map_source;
+        $res->merge($report);
+    }
 
     return $res;
 }
