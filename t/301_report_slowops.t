@@ -56,7 +56,7 @@ isnt($ftdir_main, $ftdir_so);
 {
     my $cs = $ftdir_so->{call_sites}{"t/lib/Slowops.pm:$slowops_foo_line"};
 
-    is($cs->{caller}, $a->{subs}{'t/lib/Slowops.pm:t::lib::Slowops::foo'});
+    is($cs->{caller}, 't/lib/Slowops.pm:t::lib::Slowops::foo');
     is($cs->{file}, 't/lib/Slowops.pm');
     is($cs->{line}, $slowops_foo_line);
     is($cs->{inclusive}, $cs->{exclusive});
@@ -67,11 +67,10 @@ isnt($ftdir_main, $ftdir_so);
 
 my $slowops_pm = $a->{files}{'t/lib/Slowops.pm'};
 {
-    my @callees = sort { our ($a, $b); $a->{callee}{name} cmp $b->{callee}{name} }
+    my @callees = sort { our ($a, $b); $a->{callee} cmp $b->{callee} }
                        @{$slowops_pm->{lines}{callees}{$slowops_foo_line}};
 
-    is($callees[0]{callee}, $ftdir_so);
-    is($callees[1]{callee}{name}, 'CORE::unstack');
+    is($callees[0]{callee}, $ftdir_so->{uq_name});
 }
 
 ### start checking op-sub is in callees

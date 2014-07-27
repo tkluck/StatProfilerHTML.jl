@@ -12,7 +12,7 @@
         <th>Code</th>
       </tr>
 [% my ($lines, $exclusive, $inclusive, $subs, $callees) = @variables{qw(lines exclusive inclusive subs callees)};
-   my ($sub_link, $file_link) = @variables{qw(sub_link file_link)};
+   my ($sub_link, $file_link, $lookup_sub) = @variables{qw(sub_link file_link lookup_sub)};
    for my $line (1 .. $#$lines) { %]
       <tr>
         <td><a name="L[%= $line %]" />[%= $line %]</td>
@@ -24,7 +24,7 @@
 [%     for my $sub (@$starting_subs) { %]
             [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
 [%       for my $site (sort values %{$sub->{call_sites}}) { %]
-            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $site->{caller}{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
+            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $lookup_sub->($site->{caller})->{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
 [%       } %]
 [%     } %]
           </span>
@@ -32,7 +32,8 @@
 [%   if (my $calls = $callees->{$line}) { %]
           <span class="callees">
 [%     for my $call (@$calls) { %]
-            [%= $call->{inclusive} %] samples in <a href="[%= $sub_link->($call->{callee}) %]">[%= $call->{callee}{name} %]</a><br />
+[%         my $callee = $lookup_sub->($call->{callee}); %]
+            [%= $call->{inclusive} %] samples in <a href="[%= $sub_link->($callee) %]">[%= $callee->{name} %]</a><br />
 [%     } %]
           </span>
 [%   } %]
@@ -54,7 +55,7 @@
           <span class="call-sites">
             [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
 [%   for my $site (sort values %{$sub->{call_sites}}) { %]
-            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $site->{caller}{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
+            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $lookup_sub->($site->{caller})->{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
 [%   } %]
           </span>
 [%   if ($sub->{kind} == 2) { %]

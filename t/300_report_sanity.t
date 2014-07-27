@@ -96,7 +96,7 @@ cmp_ok($usleep->{inclusive}, '==', $usleep->{exclusive});
 eq_or_diff([sort keys %{$usleep->{call_sites}}], ["t/lib/Test.pm:$take_sample_line"]);
 {
     my $cs = $usleep->{call_sites}{"t/lib/Test.pm:$take_sample_line"};
-    is($cs->{caller}, $take_sample);
+    is($cs->{caller}, $take_sample->{uq_name});
     is($cs->{exclusive}, $usleep->{exclusive});
     is($cs->{inclusive}, $usleep->{inclusive});
     is($cs->{file}, 't/lib/Test.pm');
@@ -119,7 +119,7 @@ eq_or_diff([sort keys %{$take_sample->{call_sites}}],
 # Moo::bar call site for take_sample
 {
     my $cs = $take_sample->{call_sites}{__FILE__ . ':' . $l2};
-    is($cs->{caller}, $moo);
+    is($cs->{caller}, $moo->{uq_name});
     cmp_ok($cs->{exclusive}, '<=', 5 / precision_factor);
     cmp_ok($cs->{inclusive}, '>=', 5 / precision_factor);
     is($cs->{file}, __FILE__);
@@ -143,7 +143,7 @@ cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 20 / precision_fac
 
     cmp_ok($ca->{inclusive}, '>=', 20 / precision_factor);
     # WTF cmp_ok($ca->{esclusive}, '<=', 5);
-    is($ca->{callee}, $usleep);
+    is($ca->{callee}, $usleep->{uq_name});
 }
 
 #subs

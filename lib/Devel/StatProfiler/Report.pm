@@ -11,7 +11,6 @@ use File::Basename ();
 use File::Spec::Functions ();
 use File::Which;
 use File::Copy ();
-use Scalar::Util ();
 use Template::Perlish;
 
 my %templates = (
@@ -79,16 +78,11 @@ sub _call_site_id {
     return sprintf '%s:%d', $frame->file, $frame->line;
 }
 
-sub _sub_id {
-    my ($sub) = @_;
-
-    return sprintf '%s:%s', $sub->{name}, $sub->{file};
-}
-
 sub _sub {
     my ($self, $frame) = @_;
     my $file = $frame->file;
-    my $name = $frame->fq_sub_name || $frame->uq_sub_name;
+    my $uq_name = $frame->uq_sub_name;
+    my $name = $frame->fq_sub_name || $uq_name;
 
     # count the number of subroutines of a certain package defined per
     # file, used as an heuristic for where to display xsub time
@@ -96,8 +90,9 @@ sub _sub {
         $self->{aggregate}{file_map}{$frame->package}{$file}++;
     }
 
-    return $self->{aggregate}{subs}{$frame->uq_sub_name} ||= {
+    return $self->{aggregate}{subs}{$uq_name} ||= {
         name       => $name,
+        uq_name    => $uq_name,
         package    => $frame->package,
         file       => $file,
         inclusive  => 0,
@@ -115,12 +110,14 @@ sub _file {
     return $self->{aggregate}{files}{$sub->{file}} ||= {
         name      => $sub->{file},
         basename  => $sub->{file} ? File::Basename::basename($sub->{file}) : '',
-        report    => undef,
         lines     => {
             exclusive       => [],
             inclusive       => [],
+            # filled during finalization
             callees         => {},
         },
+        # filled during finalization
+        report    => undef,
         exclusive => 0,
         subs      => {},
     };
@@ -193,22 +190,20 @@ sub add_trace_file {
                 my $call_site = $frames->[$i + 1];
                 my $caller = $self->_sub($call_site);
                 my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
-                    caller    => $caller,
+                    caller    => $caller->{uq_name},
                     exclusive => 0,
                     inclusive => 0,
                     file      => $call_site->file,
                     line      => $call_site->line,
                 };
-                Scalar::Util::weaken($site->{caller}) unless $site->{inclusive};
 
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{callees}{$site->{line}}{_sub_id($sub)} ||= {
-                    callee    => $sub,
+                my $callee = $caller->{callees}{$site->{line}}{$sub->{uq_name}} ||= {
+                    callee    => $sub->{uq_name},
                     inclusive => 0,
                 };
-                Scalar::Util::weaken($callee->{callee}) unless $callee->{inclusive};
 
                 $callee->{inclusive} += $weight;
             }
@@ -343,6 +338,13 @@ sub output {
             $line;
     };
 
+    my $lookup_sub = sub {
+        my ($name) = @_;
+
+        die "Invalid sub reference '$name'" unless exists $self->{aggregate}{subs}{$name};
+        return $self->{aggregate}{subs}{$name};
+    };
+
     # format files
     for my $file (keys %$files) {
         my $entry = $files->{$file};
@@ -357,6 +359,7 @@ sub output {
             callees     => $entry->{lines}{callees},
             sub_link    => $sub_link,
             file_link   => $file_link,
+            lookup_sub  => $lookup_sub,
         );
 
         $self->_write_template($templates{file}, \%file_data,
