@@ -114,7 +114,7 @@ sub _file {
 
     return $self->{aggregate}{files}{$sub->{file}} ||= {
         name      => $sub->{file},
-        basename  => File::Basename::basename($sub->{file}),
+        basename  => $sub->{file} ? File::Basename::basename($sub->{file}) : '',
         report    => undef,
         lines     => {
             exclusive       => [],
