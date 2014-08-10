@@ -25,7 +25,7 @@ sub new {
 
 sub start_file_mapping {
     my ($self, $physical_file) = @_;
-    die "Causal failure" if $self->{current_map};
+    die "Causal failure for '$physical_file'" if $self->{current_map};
 
     if ($self->{map}{$physical_file}) {
         $self->{ignore_mapping} = 1;
@@ -56,7 +56,7 @@ sub end_file_mapping {
 
 sub add_file_mapping {
     my ($self, $physical_line, $mapped_file, $mapped_line) = @_;
-    die "Causal failure" unless $self->{current_map};
+    die "Causal failure for '$self->{current_file}'" unless $self->{current_map};
 
     return if $self->{ignore_mapping};
 

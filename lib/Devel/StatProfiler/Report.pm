@@ -17,6 +17,8 @@ use File::Copy ();
 use File::Path ();
 use Template::Perlish;
 
+my $no_source = ['Source not available...'];
+
 my %templates = (
     file      => _get_template('file.tmpl'),
     subs      => _get_template('subs.tmpl'),
@@ -129,11 +131,11 @@ sub _sub {
 }
 
 sub _file {
-    my ($self, $sub) = @_;
+    my ($self, $file) = @_;
 
-    return $self->{aggregate}{files}{$sub->{file}} ||= {
-        name      => $sub->{file},
-        basename  => $sub->{file} ? File::Basename::basename($sub->{file}) : '',
+    return $self->{aggregate}{files}{$file} ||= {
+        name      => $file,
+        basename  => $file ? File::Basename::basename($file) : '',
         lines     => {
             exclusive       => [],
             inclusive       => [],
@@ -220,7 +222,7 @@ sub add_trace_file {
             my $frame = $frames->[$i];
             my $line = $frame->line;
             my $sub = $self->_sub($frame);
-            my $file = $line > 0 ? $self->_file($sub) : undef;
+            my $file = $line > 0 ? $self->_file($sub->{file}) : undef;
 
             $sub->{start_line} = $line if $sub->{start_line} > $line;
             $sub->{inclusive} += $weight;
@@ -620,7 +622,7 @@ sub finalize {
 
         # the entry for all files are already there, except for XSUBs
         # that don't have an assigned file yet
-        my $entry = $self->{aggregate}{files}{$sub->{file}} ||= $self->_file($sub);
+        my $entry = $self->{aggregate}{files}{$sub->{file}} ||= $self->_file($sub->{file});
 
         $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal);
         $entry->{exclusive} += $sub->{exclusive};
@@ -644,7 +646,7 @@ sub _fetch_source {
     # temporary
     if (!-f $path) {
         warn "Can't find source for '$path'\n";
-        return ['Eval source not available...'];
+        return $no_source;
     }
 
     open my $fh, '<', $path
