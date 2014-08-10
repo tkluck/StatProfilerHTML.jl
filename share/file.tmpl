@@ -11,11 +11,22 @@
         <th>Inclusive samples</th>
         <th>Code</th>
       </tr>
-[% my ($lines, $exclusive, $inclusive, $subs, $callees) = @variables{qw(lines exclusive inclusive subs callees)};
+[% my ($lines, $exclusive, $inclusive, $subs, $callees, $mapping) = @variables{qw(lines exclusive inclusive subs callees mapping)};
    my ($sub_link, $file_link, $lookup_sub) = @variables{qw(sub_link file_link lookup_sub)};
-   for my $line (1 .. $#$lines) { %]
+   my ($logical_line, $logical_file, $physical_end) = (1, undef, 1);
+   my $map_index = 0;
+
+   for my $line (1 .. $#$lines) {
+     ++$logical_line;
+     if ($line == $mapping->[$map_index][0]) {
+       my $entry = $mapping->[$map_index];
+       $logical_line = $line - $entry->[0] + $entry->[2];
+       $logical_file = $entry->[1];
+       ++$map_index;
+     }
+%]
       <tr>
-        <td><a name="L[%= $line %]" />[%= $line %]</td>
+        <td><a name="L[%= $logical_file %]-[%= $logical_line %]" />[%= $logical_line %]</td>
         <td>[%= $exclusive->[$line] || '' %]</td>
         <td>[%= $inclusive->[$line] || '' %]</td>
         <td>

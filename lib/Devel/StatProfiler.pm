@@ -232,3 +232,12 @@ code) can have confusing results: runloops started afterwards will
 honor the new state, outer runloops will not.
 
 Unfortunately there is no way to detect the situaltion at the moment.
+
+=head2 source code and C<#line> directives
+
+The parsing of C<#line> directive used to map logical lines to
+physical lines uses heuristics, and they can obviously fail.
+
+Files that contain C<#line> directives and have no samples taken in
+the part of the file outside the part mapped by C<#line> directives
+will not be found.

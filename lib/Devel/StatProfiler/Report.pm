@@ -633,6 +633,13 @@ sub finalize {
             push @{$entry->{lines}{callees}{$line}}, values %{$callees->{$line}};
         }
     }
+
+    # in case there are extra file entries without subs (added
+    # manually in order to parse #line directives)
+    for my $entry (values %{$self->{aggregate}{files}}) {
+        $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($entry->{name}), ++$ordinal);
+
+    }
 }
 
 sub _fetch_source {
@@ -650,7 +657,6 @@ sub _fetch_source {
         }
     }
 
-    # temporary
     if (!-f $path) {
         return $no_source;
     }
@@ -676,6 +682,82 @@ sub _fetch_source {
     return ['I hope you never see this...', @lines];
 }
 
+# merges the entries for multiple logical files to match the source
+# code of a physical file
+sub _merged_entry {
+    my ($self, $file, $mapping) = @_;
+    my $base = $self->{aggregate}{files}{$file};
+    my $merged = {
+        name      => $base->{name},
+        basename  => $base->{basename},
+        lines     => {
+            exclusive       => [@{$base->{lines}{exclusive}}],
+            inclusive       => [@{$base->{lines}{inclusive}}],
+            callees         => {%{$base->{lines}{callees}}},
+        },
+        report    => $base->{report},
+        exclusive => $base->{exclusive},
+        subs      => {%{$base->{subs}}},
+    };
+    my %line_ranges;
+
+    for (my $i = 0; $i < $#$mapping; ++$i) {
+        my ($physical_line, $logical_file, $logical_line) = @{$mapping->[$i]};
+        my $physical_end = $mapping->[$i + 1][0];
+
+        push @{$line_ranges{$logical_file}}, [
+            $logical_line,
+            $logical_line + $physical_end - $physical_line,
+            $physical_line,
+            $physical_end,
+        ];
+    }
+
+    for my $key (keys %line_ranges) {
+        next if $key eq $file;
+        my $entry = $self->{aggregate}{files}{$key};
+        my $ranges = $line_ranges{$key};
+        my @subs = sort { $a <=> $b } keys %{$entry->{subs}};
+        my @callees = sort { $a <=> $b } keys %{$entry->{lines}{callees}};
+        my ($sub_index, $callee_index) = (0, 0);
+
+        $merged->{exclusive} += $entry->{exclusive};
+
+        for my $range (@$ranges) {
+            my ($logical_start, $logical_end, $physical_start, $physical_end) =
+                @$range;
+
+            while ($sub_index < @subs && $subs[$sub_index] <= $logical_end) {
+                my $mapped = $subs[$sub_index] - $logical_start + $physical_start;
+
+                $merged->{subs}{$mapped} = $entry->{subs}{$subs[$sub_index]};
+                ++$sub_index;
+            }
+
+            while ($callee_index < @callees && $callees[$callee_index] <= $logical_end) {
+                my $mapped = $callees[$callee_index] - $logical_start + $physical_start;
+
+                $merged->{lines}{callees}{$mapped} = $entry->{lines}{callees}{$callees[$callee_index]};
+                ++$callee_index;
+            }
+
+            for my $logical_line ($logical_start .. $logical_end) {
+                my $physical_line = $logical_line - $logical_start + $physical_start;
+
+                $merged->{lines}{inclusive}[$physical_line] += $entry->{lines}{inclusive}[$logical_line] // 0;
+                $merged->{lines}{exclusive}[$physical_line] += $entry->{lines}{exclusive}[$logical_line] // 0;
+            }
+        }
+
+        die "There are unmapped subs for '$key' in '$file'"
+            unless $sub_index == @subs;
+        die "There are unmapped callees for '$key' in '$file'"
+            unless $callee_index == @callees;
+    }
+
+    return $merged;
+}
+
 sub output {
     my ($self, $directory) = @_;
 
@@ -693,9 +775,10 @@ sub output {
         my ($sub) = @_;
 
         if ($sub->{kind} == 0) {
-            return sprintf '%s#L%d',
-                $self->{aggregate}{files}{$sub->{file}}{report},
-                $sub->{start_line};
+            # see comment in $file_link
+            my $report = $self->{aggregate}{files}{$sub->{file}}{report};
+
+            return sprintf '%s#L%s-%d', $report, $report, $sub->{start_line};
         } else {
             (my $anchor = $sub->{name}) =~ s/\W+/-/g;
             return sprintf '%s#LX%s',
@@ -706,10 +789,11 @@ sub output {
 
     my $file_link = sub {
         my ($file, $line) = @_;
+        my $report = $self->{aggregate}{files}{$file}{report};
 
-        return sprintf '%s#L%d',
-            $self->{aggregate}{files}{$file}{report},
-            $line;
+        # twice, because we have physical files with source code for
+        # multiple logical files (via #line directives)
+        return sprintf '%s#L%s-%d', $report, $report, $line;
     };
 
     my $lookup_sub = sub {
@@ -720,9 +804,16 @@ sub output {
     };
 
     # format files
-    for my $file (keys %$files) {
-        my $entry = $files->{$file};
-        my $code = $self->_fetch_source($file);
+    my @queued_files;
+    my %merged_profiles;
+
+    my $format_file = sub {
+        my ($entry, $code, $mapping) = @_;
+        my $mapping_for_link = [map {
+            [$_->[0],
+             $_->[1] ? $self->{aggregate}{files}{$_->[1]}{report} : undef,
+             $_->[2]]
+        } @$mapping];
 
         my %file_data = (
             name        => $entry->{name},
@@ -734,10 +825,54 @@ sub output {
             sub_link    => $sub_link,
             file_link   => $file_link,
             lookup_sub  => $lookup_sub,
+            mapping     => $mapping_for_link,
         );
 
         $self->_write_template($templates{file}, \%file_data,
                                $directory, $entry->{report});
+    };
+
+    # write reports for physical files
+    for my $file (keys %$files) {
+        my $code = $self->_fetch_source($file);
+
+        if ($code eq $no_source) {
+            # re-process this later, in case the mapping is due to a
+            # #line directive in one of the parsed files
+            push @queued_files, $file;
+        } elsif (my $mapping = $self->{sourcemap}->get_mapping($file)) {
+            my $merged_entry = $self->_merged_entry($file, $mapping);
+
+            $format_file->($merged_entry, $code, $mapping);
+        } else {
+            my $entry = $files->{$file};
+            my $mapping = [
+                [1, $file, 1],
+                [scalar @$code, undef, scalar @$code],
+            ];
+
+            $format_file->($entry, $code, $mapping);
+        }
+    }
+
+    # logical files (just copies the content of the report written by
+    # the loop above
+    for my $file (@queued_files) {
+        # this can only be a mapped copy of an existing file
+        my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
+
+        unless ($reverse_file) {
+            warn "Unable to find source for '$file'";
+            next;
+        }
+
+        my $entry = $files->{$file};
+        my $reverse_entry = $files->{$reverse_file};
+
+        # TODO use symlink/hardlinks where available
+        File::Copy::copy(
+            File::Spec::Functions::catfile($directory, $reverse_entry->{report}),
+            File::Spec::Functions::catfile($directory, $entry->{report}));
     }
 
     # format flame graph

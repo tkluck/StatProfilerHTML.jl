@@ -12,6 +12,7 @@ sub new {
     my ($class, %opts) = @_;
     my $self = bless {
         map             => {},
+        reverse_map     => {},
         current_map     => undef,
         current_file    => undef,
         ignore_mapping  => 0,
@@ -43,6 +44,10 @@ sub end_file_mapping {
     if (my $map = $self->{current_map}) {
         delete $self->{map}{$self->{current_file}}
             if $map->[0] == 1 && $map->[1] eq $self->{current_file} && $map->[2] == 1;
+    }
+
+    for my $entry (@{$self->{map}{$self->{current_file}} || []}) {
+        $self->{reverse_map}{$entry->[1]}{$self->{current_file}} = 1;
     }
 
     # add last line
@@ -112,6 +117,19 @@ sub load_and_merge {
     for my $key (keys %$data) {
         $self->{map}{$key} = $data->{$key};
     }
+}
+
+sub get_mapping {
+    my ($self, $file) = @_;
+
+    return $self->{map}{$file};
+}
+
+sub get_reverse_mapping {
+    my ($self, $file) = @_;
+
+    return unless $self->{reverse_map}{$file};
+    return (keys %{$self->{reverse_map}{$file}})[0];
 }
 
 1;
