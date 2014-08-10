@@ -13,6 +13,7 @@ my $outdir = 'statprof';
 
 my $report = Devel::StatProfiler::Report->new(
     flamegraph => 1,
+    sources    => 1,
     slowops    => [],
 );
 

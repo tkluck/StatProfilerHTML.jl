@@ -643,9 +643,15 @@ sub _fetch_source {
         return ['Dummy file to stick orphan XSUBs in...'];
     }
 
+    # eval source code
+    if ($self->{source} && $path =~ /^eval:([0-9a-fA-F]+)$/) {
+        if (my $source = $self->{source}->get_source_by_hash($1)) {
+            return ['Eval source code...', split /\n/, $source];
+        }
+    }
+
     # temporary
     if (!-f $path) {
-        warn "Can't find source for '$path'\n";
         return $no_source;
     }
 
@@ -672,6 +678,9 @@ sub _fetch_source {
 
 sub output {
     my ($self, $directory) = @_;
+
+    die "Unable to create report without a source map and an eval map"
+        unless $self->{source} and $self->{sourcemap};
 
     File::Path::mkpath([$directory]);
 
