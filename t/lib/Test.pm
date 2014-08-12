@@ -38,6 +38,21 @@ sub import {
     warnings->import;
     feature->import(':5.12');
 
+    if ((grep /^:fork$/, @_) && !$Config{d_fork}) {
+        @_ = ('Test::More', 'skip_all', "fork() not available");
+    }
+    if ((grep /^:threads$/, @_) && !$Config{usethreads}) {
+        @_ = ('Test::More', 'skip_all', "threads not available");
+    }
+    if ((grep /^:spawn$/, @_) && !$Config{usethreads} && !$Config{d_fork}) {
+        @_ = ('Test::More', 'skip_all', "neither fork nor threads available");
+    }
+    if ((grep /^:visual$/, @_) && (!@ARGV || $ARGV[0] ne '-visual')) {
+        @_ = ('Test::More', 'skip_all', "run with perl -Mblib $0 -visual");
+    }
+
+    @_ = grep !/^:(?:fork|threads|spawn|visual)$/, @_;
+
     goto &Test::Builder::Module::import;
 }
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
 
-use if !@ARGV || $ARGV[0] ne '-visual', 'Test::More' => skip_all => "run with perl -Mblib $0 -visual";
-
-use t::lib::Test;
+use t::lib::Test ':visual';
 use t::lib::Slowops;
 
 use Devel::StatProfiler::Report;

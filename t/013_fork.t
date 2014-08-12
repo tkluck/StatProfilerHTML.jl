@@ -1,10 +1,6 @@
 #!/usr/bin/env perl
 
-use Config;
-use if !$Config{d_fork}, 'Test::More' => skip_all =>
-    "fork() not available";
-
-use t::lib::Test tests => 18;
+use t::lib::Test ':fork', tests => 18;
 
 use Devel::StatProfiler::Reader;
 use Time::HiRes qw(usleep);
