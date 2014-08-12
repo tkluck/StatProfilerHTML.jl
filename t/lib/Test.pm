@@ -9,13 +9,24 @@ use Time::HiRes qw(usleep);
 use File::Temp ();
 use File::Spec;
 use Capture::Tiny qw(capture);
+use Config;
+use if $Config{usethreads}, 'threads';
 
 require feature;
 
 our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
-  qw(take_sample get_samples get_sources temp_profile_file temp_profile_dir precision_factor run_ctests)
+  qw(
+        take_sample
+        get_samples
+        get_sources
+        temp_profile_file
+        temp_profile_dir
+        precision_factor
+        run_ctests
+        spawn
+  )
 );
 
 our $TAKE_SAMPLE_LINE;
@@ -116,6 +127,45 @@ sub run_ctests {
     }
 
     done_testing();
+}
+
+sub spawn {
+    my ($sub, @args) = @_;
+
+    if ($Config{usethreads}) {
+        return threads->create($sub);
+    } elsif ($Config{d_fork}) {
+        my $pid = fork();
+
+        if ($pid == -1) {
+            die "Fork failed: $!";
+        } elsif ($pid == 0) {
+            $sub->(@args);
+
+            exit 0;
+        } else {
+            return t::lib::Test::ForkSpawn->new($pid);
+        }
+    } else {
+        die "Neither fork() nor threads available";
+    }
+}
+
+package t::lib::Test::ForkSpawn;
+
+sub new {
+    my ($class, $pid) = @_;
+
+    return bless {
+        pid => $pid,
+    }, $class;
+}
+
+sub join {
+    my ($self) = @_;
+
+    die "waitpid() error: $!"
+        if waitpid($self->{pid}, 0) != $self->{pid};
 }
 
 1;
