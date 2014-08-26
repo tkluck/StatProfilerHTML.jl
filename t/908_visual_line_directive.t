@@ -31,6 +31,20 @@ bar();
 EOT
     ("\n" x 40) x 2;
 
+usleep(50000); # make sure to enter the eval right after taking a sample
+eval sprintf <<'EOT',
+my $x = 1; # intentionally quick
+
+%s#line 400 "inside the second eval"%s
+
+usleep(50000);
+
+%s#line 50 "inside the second eval, later"%s
+
+usleep(50000);
+EOT
+    ("\n" x 40) x 4;
+
 use Test::LineMap;
 
 Devel::StatProfiler::stop_profile();
@@ -65,9 +79,11 @@ __END__
 
 =item A string eval (pointing to a 100-line file, mostly empty)
 
-=item "Inside the eval" (pointing to the same file above)
+=item "inside the eval" (pointing to the same file above)
 
 =item one-file.pm, other-file.pm, pointing to F<t/lib/Test/LineMap.pm>
+
+=item "inside the second eval", "inside the second eval, later"
 
 =back
 
@@ -106,5 +122,16 @@ Click F<one-file.pm> report in the file list
 =item The link works and the lines with samples match the C<usleep()> calls
 
 =back
+
+Click "inside the second eval" in the subroutine list
+
+=over 4
+
+=item The link points in the middle of the file (line number 441)
+
+=item There are no samples for the code above in the same file
+
+=item The link "inside the second eval, later" in the main page points
+to the same file
 
 =back

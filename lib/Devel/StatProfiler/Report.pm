@@ -622,7 +622,7 @@ sub finalize {
 
         # the entry for all files are already there, except for XSUBs
         # that don't have an assigned file yet
-        my $entry = $self->{aggregate}{files}{$sub->{file}} ||= $self->_file($sub->{file});
+        my $entry = $self->_file($sub->{file});
 
         $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal);
         $entry->{exclusive} += $sub->{exclusive};
@@ -635,10 +635,23 @@ sub finalize {
     }
 
     # in case there are extra file entries without subs (added
-    # manually in order to parse #line directives)
+    # manually in order to parse #line directives), and in case
+    # there are files/evals where the "principal" part did not get an entry
+    # because it has no samples, but some of the other parts, mapped by #line
+    # directives got some samples
     for my $entry (values %{$self->{aggregate}{files}}) {
         $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($entry->{name}), ++$ordinal);
 
+        my $reverse_file = $self->{sourcemap} &&
+            $self->{sourcemap}->get_reverse_mapping($entry->{name});
+
+        # ensure the main entry for the file/eval is present
+        if ($reverse_file && !$self->{aggregate}{files}{$reverse_file}) {
+            my $entry = $self->_file($reverse_file);
+
+            $entry->{report} = sprintf('%s-%d-line.html', _fileify($reverse_file), ++$ordinal);
+            $entry->{exclusive} = 0;;
+        }
     }
 }
 
@@ -868,6 +881,11 @@ sub output {
 
         my $entry = $files->{$file};
         my $reverse_entry = $files->{$reverse_file};
+
+        unless ($reverse_entry && $reverse_entry->{report}) {
+            warn "Unable to find source for '$file'";
+            next;
+        }
 
         # TODO use symlink/hardlinks where available
         File::Copy::copy(
