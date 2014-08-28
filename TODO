@@ -55,6 +55,10 @@
     realistic one for release
 - find a solution to correctly report exclusive/inclusive time for XSUBs
   with callbacks (might not be possible)
+- decide what to do for multiple distinct evals mapping to the same
+  logical file (with overlapping and non-overlapping line ranges)
+  (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
+- make scope hooks per-interpreter, and disable them when disabling profiling
 
 - report similar to NYTProf
   - for each line, compute % relative to sub
@@ -81,3 +85,4 @@
 - link source file listings from flame graph
 - set default list of slow opcodes in bin/statprofilehtml
 - file reader: Better error reporting
+- stable internal links in report (replace the ordinal with the hash of the path)
