@@ -22,9 +22,10 @@ my %args = (
 );
 
 my %source_args = (
-    none           => 0,
-    traced_evals   => 1,
-    all_evals      => 2,
+    none                => 0,
+    traced_evals        => 1,
+    all_evals           => 2,
+    all_evals_always    => 3,
 );
 
 sub _croak {
@@ -166,6 +167,11 @@ define subroutines that are sampled after the eval() ends.
 =item all_evals
 
 The source code for all eval()s is saved in the profile file.
+
+=item all_evals_always
+
+The source code for all eval()s is saved in the profile file, even
+when profiling is disabled.
 
 =back
 

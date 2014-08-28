@@ -24,6 +24,7 @@ namespace {
         NONE             = 0,
         TRACED_EVALS     = 1,
         ALL_EVALS        = 2,
+        ALL_EVALS_ALWAYS = 3,
     };
 
     struct Mutex {
@@ -496,7 +497,7 @@ enter_eval_hook(pTHX_ OP *o)
 
     dMY_CXT;
 
-    if (MY_CXT.enabled) {
+    if (MY_CXT.enabled || source_code_kind == ALL_EVALS_ALWAYS) {
         TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
 
         trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, NULL, PL_evalseq);
