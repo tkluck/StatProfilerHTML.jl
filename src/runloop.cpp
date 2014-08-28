@@ -18,7 +18,6 @@ using namespace devel::statprofiler;
 using namespace std;
 
 #define MY_CXT_KEY "Devel::StatProfiler::_guts" XS_VERSION
-#define USE_SCOPE_HOOKS
 
 namespace {
     enum SourceCodeKind {
@@ -76,9 +75,6 @@ namespace {
         unsigned int ordinal, parent_ordinal;
         pid_t pid, tid;
         TraceFileWriter *trace;
-#ifndef USE_SCOPE_HOOKS
-        U32 eval_seq;
-#endif
 
         Cxt();
         Cxt(const Cxt &cxt);
@@ -137,13 +133,9 @@ namespace {
     size_t max_output_file_size = 10 * 1024*1024;
     // which source code needs saving, see StatProfiler.pm
     SourceCodeKind source_code_kind = NONE;
-    // old pp_enterval
-    OP * (*orig_entereval)(pTHX);
     bool seeded = false;
-#ifdef USE_SCOPE_HOOKS
     // hooks for saving eval text
     BHK scope_hooks;
-#endif
 }
 
 static bool
@@ -210,7 +202,6 @@ Cxt::~Cxt() {
     if (outer_runloop)
         Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
     PL_runops = original_runloop;
-    PL_ppaddr[OP_ENTEREVAL] = orig_entereval;
     if (trace && trace->is_valid())
         trace->close(TraceFileWriter::write_end_tag);
     delete trace;
@@ -497,8 +488,6 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
     trace->end_sample();
 }
 
-#ifdef USE_SCOPE_HOOKS
-
 static void
 enter_eval_hook(pTHX_ OP *o)
 {
@@ -514,40 +503,6 @@ enter_eval_hook(pTHX_ OP *o)
     }
 }
 
-#else
-
-static OP *
-save_eval_code(pTHX)
-{
-    dMY_CXT;
-
-    // if the eval runs some code (in a BEGIN/UNITCHECK block) and that code
-    // calls code setting je_mustcatch to TRUE and then does a string eval,
-    // eval_seq will be set again and will end up with the wrong value;
-    // I'm ignoring this case for now
-    if (CATCH_GET)
-        MY_CXT.eval_seq = PL_evalseq + 1;
-
-    U32 eval_seq = PL_evalseq + 1;
-    OP *next = orig_entereval(aTHX);
-
-    // this handles the case where CATCH_GET is false in pp_entereval
-    if (source_code_kind == ALL_EVALS &&
-            next == PL_eval_start &&
-            next->op_type == OP_NEXTSTATE &&
-            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL) {
-        if (MY_CXT.enabled) {
-            TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
-
-            trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, NULL, eval_seq);
-        }
-    }
-
-    return next;
-}
-
-#endif
-
 static int
 runloop(pTHX)
 {
@@ -561,22 +516,6 @@ runloop(pTHX)
 
     if (!trace->is_valid())
         croak("Failed to open trace file");
-
-#ifndef USE_SCOPE_HOOKS
-
-    // this handles the case where CATCH_GET is true in pp_entereval
-    if (source_code_kind == ALL_EVALS &&
-            op == PL_eval_start &&
-            op->op_type == OP_NEXTSTATE &&
-            CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL &&
-            MY_CXT.eval_seq != 0) {
-        // here eval_seq might be set to the wrong value in some
-        // obscure case, see the comment in save_eval_code
-        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, NULL, MY_CXT.eval_seq);
-        MY_CXT.eval_seq = 0;
-    }
-
-#endif
 
     OP_ENTRY_PROBE(OP_NAME(op));
     while ((PL_op = op = op->op_ppaddr(aTHX))) {
@@ -882,13 +821,8 @@ devel::statprofiler::install_runloop()
     MY_CXT.original_runloop = PL_runops;
     PL_runops = trampoline;
 
-#ifdef USE_SCOPE_HOOKS
     BhkENTRY_set(&scope_hooks, bhk_eval, enter_eval_hook);
     Perl_blockhook_register(aTHX_ &scope_hooks);
-#else
-    orig_entereval = PL_ppaddr[OP_ENTEREVAL];
-    PL_ppaddr[OP_ENTEREVAL] = save_eval_code;
-#endif
 }
 
 
