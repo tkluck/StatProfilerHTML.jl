@@ -974,7 +974,9 @@ void
 devel::statprofiler::write_custom_metadata(pTHX_ SV *key, SV *value)
 {
     dMY_CXT;
-    MY_CXT.trace->write_custom_metadata(key, value);
+
+    if (MY_CXT.trace)
+        MY_CXT.trace->write_custom_metadata(key, value);
 }
 
 void
@@ -982,7 +984,8 @@ devel::statprofiler::start_section(pTHX_ SV *section_name)
 {
     dMY_CXT;
 
-    MY_CXT.trace->start_section(section_name);
+    if (MY_CXT.trace)
+        MY_CXT.trace->start_section(section_name);
 }
 
 void
@@ -990,7 +993,8 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
 {
     dMY_CXT;
 
-    MY_CXT.trace->end_section(section_name);
+    if (MY_CXT.trace)
+        MY_CXT.trace->end_section(section_name);
 }
 
 int
@@ -998,7 +1002,8 @@ devel::statprofiler::get_precision()
 {
     timespec res;
 
-    clock_getres(CLOCK_MONOTONIC, &res);
+    if (clock_getres(CLOCK_MONOTONIC, &res))
+        return -1;
 
     return res.tv_sec * 1000000 + res.tv_nsec / 1000;
 }
