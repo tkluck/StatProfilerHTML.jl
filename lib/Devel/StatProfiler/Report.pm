@@ -729,6 +729,10 @@ sub _merged_entry {
     for my $key (keys %line_ranges) {
         next if $key eq $file;
         my $entry = $self->{aggregate}{files}{$key};
+
+        # we have no data for this part of the file
+        next unless $entry;
+
         my $ranges = $line_ranges{$key};
         my @subs = sort { $a <=> $b } keys %{$entry->{subs}};
         my @callees = sort { $a <=> $b } keys %{$entry->{lines}{callees}};
@@ -824,7 +828,9 @@ sub output {
         my ($entry, $code, $mapping) = @_;
         my $mapping_for_link = [map {
             [$_->[0],
-             $_->[1] ? $self->{aggregate}{files}{$_->[1]}{report} : undef,
+             ($_->[1] && $self->{aggregate}{files}{$_->[1]} ?
+                  $self->{aggregate}{files}{$_->[1]}{report} :
+                  undef),
              $_->[2]]
         } @$mapping];
 
