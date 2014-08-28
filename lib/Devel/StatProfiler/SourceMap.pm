@@ -116,6 +116,11 @@ sub load_and_merge {
 
     for my $key (keys %$data) {
         $self->{map}{$key} = $data->{$key};
+
+        for my $entry (@{$data->{$key}}) {
+            $self->{reverse_map}{$entry->[1]}{$key} = 1
+                if $entry->[1]; # skip sentinel entry for last line
+        }
     }
 }
 
