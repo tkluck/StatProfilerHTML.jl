@@ -784,18 +784,19 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
 
 void TraceFileWriter::close(bool write_end_tag)
 {
+    if (!out.is_valid())
+        return;
+
+    string temp = output_file + "_";
+
     out.write_byte(write_end_tag ? TAG_STREAM_END : TAG_FILE_END);
     write_varint(out, 0);
 
     flush();
 
-    if (out.is_valid()) {
-        string temp = output_file + "_";
-
-        out.close();
-        if (!rename(temp.c_str(), output_file.c_str()))
-            unlink(temp.c_str());
-    }
+    out.close();
+    if (!rename(temp.c_str(), output_file.c_str()))
+        unlink(temp.c_str());
 }
 
 void TraceFileWriter::shut()
