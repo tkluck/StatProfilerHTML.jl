@@ -768,9 +768,9 @@ sub _merged_entry {
             }
         }
 
-        die "There are unmapped subs for '$key' in '$file'"
+        warn "There are unmapped subs for '$key' in '$file'"
             unless $sub_index == @subs;
-        die "There are unmapped callees for '$key' in '$file'"
+        warn "There are unmapped callees for '$key' in '$file'"
             unless $callee_index == @callees;
     }
 
