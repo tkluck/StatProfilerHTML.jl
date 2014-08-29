@@ -54,27 +54,28 @@ sub read_data {
 
 sub write_data_part {
     my ($serializer, $dir, $file_base, $data) = @_;
-    my ($fh, $path) = _output_file($dir, $file_base);
+    my ($fh, $tmppath, $path) = _output_file($dir, $file_base);
 
-    _write_and_rename($serializer, $fh, $path, $data);
+    _write_and_rename($serializer, $fh, $tmppath, $path, $data);
 }
 
 sub write_data {
     my ($serializer, $dir, $file, $data) = @_;
+    my $full_tmppath = File::Spec::Functions::catfile($dir, "_$file.tmp");
     my $full_path = File::Spec::Functions::catfile($dir, $file);
-    open my $fh, '>', "$full_path.tmp";
+    open my $fh, '>', $full_tmppath;
 
-    _write_and_rename($serializer, $fh, $full_path, $data);
+    _write_and_rename($serializer, $fh, $full_tmppath, $full_path, $data);
 }
 
 sub write_file {
     my ($dir, $file, $utf8, $data) = @_;
-    my ($fh, $path) = _output_file($dir, $file);
+    my ($fh, $tmppath, undef) = _output_file($dir, $file);
 
     binmode $fh, ':utf8' if $utf8;
     $fh->print($data) or die "Error while writing file data";
     close $fh;
-    rename "$path.tmp", File::Spec::Functions::catfile($dir, $file);
+    rename $tmppath, File::Spec::Functions::catfile($dir, $file);
 }
 
 sub read_file {
@@ -87,7 +88,7 @@ sub read_file {
 }
 
 sub _write_and_rename {
-    my ($serializer, $fh, $path, $data) = @_;
+    my ($serializer, $fh, $tmppath, $path, $data) = @_;
 
     if ($serializer eq 'storable') {
         Storable::nstore_fd($data, $fh)
@@ -100,7 +101,7 @@ sub _write_and_rename {
     }
 
     close $fh;
-    rename "$path.tmp", $path;
+    rename $tmppath, $path;
 }
 
 sub _output_file {
@@ -108,10 +109,11 @@ sub _output_file {
 
     for (;;) {
         my $suffix = int(rand(2 ** 31));
+        my $tmppath = File::Spec::Functions::catfile($dir, "_$file_base.$suffix.tmp");
         my $path = File::Spec::Functions::catfile($dir, "$file_base.$suffix");
 
-        if (sysopen my $fh, "$path.tmp", O_WRONLY|O_CREAT|O_EXCL) {
-            return ($fh, $path);
+        if (sysopen my $fh, $tmppath, O_WRONLY|O_CREAT|O_EXCL) {
+            return ($fh, $tmppath, $path);
         }
         if ($! != Errno::EEXIST) {
             die "Error while opening report file: $!";
