@@ -3,10 +3,9 @@ package Devel::StatProfiler::SourceMap;
 use strict;
 use warnings;
 
-use Devel::StatProfiler::Utils qw(check_serializer read_file read_data write_data_part write_file);
+use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf8_sha1_hex);
 use File::Path;
 use File::Spec::Functions;
-use Digest::SHA qw(sha1_hex);
 
 sub new {
     my ($class, %opts) = @_;
@@ -86,7 +85,7 @@ sub add_sources_from_reader {
     for my $name (keys %$source_code) {
         next unless $source_code->{$name} =~ /^#line\s+\d+\s+/m;
 
-        my $eval_name = 'eval:' . sha1_hex($source_code->{$name});
+        my $eval_name = 'eval:' . utf8_sha1_hex($source_code->{$name});
 
         next if $self->{map}{$eval_name};
 

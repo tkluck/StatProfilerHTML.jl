@@ -8,9 +8,11 @@ use File::Spec::Functions ();
 use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use Errno ();
 use Exporter qw(import);
+use Digest::SHA qw(sha1_hex);
 
 our @EXPORT_OK = qw(
     check_serializer read_data read_file write_data write_data_part write_file
+    utf8_sha1_hex
 );
 
 my ($sereal_encoder, $sereal_decoder);
@@ -66,19 +68,21 @@ sub write_data {
 }
 
 sub write_file {
-    my ($dir, $file, $data) = @_;
+    my ($dir, $file, $utf8, $data) = @_;
     my ($fh, $path) = _output_file($dir, $file);
 
+    binmode $fh, ':utf8' if $utf8;
     $fh->print($data) or die "Error while writing file data";
     close $fh;
     rename "$path.tmp", File::Spec::Functions::catfile($dir, $file);
 }
 
 sub read_file {
-    my ($file) = @_;
+    my ($file, $utf8) = @_;
     local $/;
 
     open my $fh, '<', $file;
+    binmode $fh, ':utf8' if $utf8;
     return readline $fh;
 }
 
@@ -115,6 +119,14 @@ sub _output_file {
     }
 
     die "Can't get here";
+}
+
+sub utf8_sha1_hex {
+    my ($value) = @_;
+
+    utf8::encode($value) if utf8::is_utf8($value);
+
+    return sha1_hex($value);
 }
 
 1;

@@ -3,10 +3,9 @@ package Devel::StatProfiler::EvalSource;
 use strict;
 use warnings;
 
-use Devel::StatProfiler::Utils qw(check_serializer read_file read_data write_data_part write_file);
+use Devel::StatProfiler::Utils qw(check_serializer read_file read_data write_data_part write_file utf8_sha1_hex);
 use File::Path;
 use File::Spec::Functions;
-use Digest::SHA qw(sha1_hex);
 
 sub new {
     my ($class, %opts) = @_;
@@ -30,7 +29,7 @@ sub add_sources_from_reader {
     my ($process_id, $process_ordinal) = @{$r->get_genealogy_info};
     my $source_code = $r->get_source_code;
     for my $name (keys %$source_code) {
-        my $hash = sha1_hex($source_code->{$name});
+        my $hash = utf8_sha1_hex($source_code->{$name});
 
         warn "Duplicate eval STRING source code for eval '$name'"
             if exists $self->{seen_in_process}{$process_id}{$name} &&
@@ -52,7 +51,7 @@ sub save {
     write_data_part($self->{serializer}, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
-        write_file($source_dir, $hash, $self->{hashed}{$hash});
+        write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash});
     }
 }
 
@@ -83,7 +82,8 @@ sub get_source_by_hash {
     my ($self, $hash) = @_;
 
     return $self->{hashed}{$hash} // read_file(
-        File::Spec::Functions::catfile($self->{root_dir}, '__source__', $hash)
+        File::Spec::Functions::catfile($self->{root_dir}, '__source__', $hash),
+        'use_utf8',
     );
 }
 
