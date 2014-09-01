@@ -1,3 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.01      2014-09-01 20:49:35 CEST
+
+    - First public release
