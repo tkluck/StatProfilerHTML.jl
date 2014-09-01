@@ -57,6 +57,7 @@ sub process_trace_files {
             ordinal      => 0,
             report       => undef,
             reader_state => undef,
+            modified     => 0,
         };
         next if $process_ordinal != $state->{ordinal} + 1;
 
@@ -86,6 +87,7 @@ sub process_trace_files {
         }
         $state->{ordinal} = $process_ordinal;
         $state->{reader_state} = $r->get_reader_state;
+        $state->{modified} = 1;
 
         $self->{source}->add_sources_from_reader($r);
         $self->{sourcemap}->add_sources_from_reader($r);
@@ -109,6 +111,7 @@ sub save {
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};
 
+        next unless $processed->{modified};
         write_data($self->{serializer}, $state_dir, "processed.$process_id", $processed);
     }
 
@@ -131,6 +134,7 @@ sub load {
     for my $file (glob File::Spec::Functions::catfile($state, 'processed.*')) {
         my $processed = read_data($self->{serializer}, $file);
 
+        $processed->{modified} = 0;
         $self->{processed}{$processed->{process_id}} = $processed;
     }
 }
