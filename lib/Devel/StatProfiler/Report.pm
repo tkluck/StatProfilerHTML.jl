@@ -17,9 +17,9 @@ use File::Copy ();
 use File::Path ();
 use Template::Perlish;
 
-my $no_source = ['Source not available...'];
+my $NO_SOURCE = ['Source not available...'];
 
-my %templates = (
+my %TEMPLATES = (
     file      => _get_template('file.tmpl'),
     subs      => _get_template('subs.tmpl'),
     index     => _get_template('index.tmpl'),
@@ -673,7 +673,7 @@ sub _fetch_source {
     }
 
     if (!-f $path) {
-        return $no_source;
+        return $NO_SOURCE;
     }
 
     open my $fh, '<', $path
@@ -849,7 +849,7 @@ sub output {
             mapping     => $mapping_for_link,
         );
 
-        $self->_write_template($templates{file}, \%file_data,
+        $self->_write_template($TEMPLATES{file}, \%file_data,
                                $directory, $entry->{report});
     };
 
@@ -857,7 +857,7 @@ sub output {
     for my $file (keys %$files) {
         my $code = $self->_fetch_source($file);
 
-        if ($code eq $no_source) {
+        if ($code eq $NO_SOURCE) {
             # re-process this later, in case the mapping is due to a
             # #line directive in one of the parsed files
             push @queued_files, $file;
@@ -931,7 +931,7 @@ sub output {
         sub_link        => $sub_link,
     );
 
-    $self->_write_template($templates{subs}, \%subs_data,
+    $self->_write_template($TEMPLATES{subs}, \%subs_data,
                            $directory, 'subs.html');
 
     # format index page
@@ -943,7 +943,7 @@ sub output {
         sub_link        => $sub_link,
     );
 
-    $self->_write_template($templates{index}, \%main_data,
+    $self->_write_template($TEMPLATES{index}, \%main_data,
                            $directory, 'index.html');
 
     # copy CSS

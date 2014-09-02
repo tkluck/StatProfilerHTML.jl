@@ -13,7 +13,7 @@ use Devel::StatProfiler::Utils qw(check_serializer read_data write_data write_da
 
 use File::Path ();
 
-my $main_report_id = ['__main__'];
+my $MAIN_REPORT_ID = ['__main__'];
 
 
 sub new {
@@ -210,7 +210,7 @@ sub _fresh_report {
 sub handle_section_change {
     my ($self, $sc, $state) = @_;
 
-    return $main_report_id;
+    return $MAIN_REPORT_ID;
 }
 
 1;

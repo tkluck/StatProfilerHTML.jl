@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
     utf8_sha1_hex
 );
 
-my ($sereal_encoder, $sereal_decoder);
+my ($SEREAL_ENCODER, $SEREAL_DECODER);
 
 sub check_serializer {
     my ($serializer) = @_;
@@ -25,10 +25,10 @@ sub check_serializer {
     } elsif ($serializer eq 'sereal') {
         require Sereal;
 
-        $sereal_encoder = Sereal::Encoder->new({
+        $SEREAL_ENCODER = Sereal::Encoder->new({
             snappy         => 1,
         });
-        $sereal_decoder = Sereal::Decoder->new;
+        $SEREAL_DECODER = Sereal::Decoder->new;
     } else {
         die "Unsupported serializer format '$serializer'";
     }
@@ -46,7 +46,7 @@ sub read_data {
         1 while ($read = $fh->read($data, 256 * 1024, length $data));
         die "Error while reading Sereal-ized data" if !defined $read;
 
-        return $sereal_decoder->decode($data);
+        return $SEREAL_DECODER->decode($data);
     } else {
         die "Unsupported serializer format '$serializer'";
     }
@@ -94,7 +94,7 @@ sub _write_and_rename {
         Storable::nstore_fd($data, $fh)
             or die "Internal error in Storable::nstore_fd"
     } elsif ($serializer eq 'sereal') {
-        $fh->print($sereal_encoder->encode($data))
+        $fh->print($SEREAL_ENCODER->encode($data))
             or die "Error while writing Sereal-ized data";
     } else {
         die "Unsupported serializer format '$serializer'";
