@@ -36,6 +36,7 @@ sub new {
         ),
         mixed_process=> $opts{mixed_process},
         genealogy    => {},
+        fetchers     => $opts{fetchers},
     }, $class;
 
     check_serializer($self->{serializer});
@@ -204,6 +205,7 @@ sub _fresh_report {
         sources        => 0,
         root_directory => $self->{root_dir},
         mixed_process  => $opts{mixed_process} // $self->{mixed_process},
+        fetchers       => $self->{fetchers},
     );
 }
 

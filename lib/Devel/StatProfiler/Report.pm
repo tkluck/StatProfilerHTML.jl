@@ -57,6 +57,7 @@ sub new {
         perl_version  => undef,
         process_id    => $opts{mixed_process} ? 'mixed' : undef,
         serializer    => $opts{serializer} || 'storable',
+        fetchers      => $opts{fetchers} || [[undef, 'fetch_source_from_file']],
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -656,6 +657,12 @@ sub finalize {
     }
 }
 
+sub fetch_source_from_file {
+    my ($self, $path) = @_;
+
+    return -f $path ? $path : undef;
+}
+
 sub _fetch_source {
     my ($self, $path) = @_;
     my @lines;
@@ -671,13 +678,30 @@ sub _fetch_source {
         }
     }
 
-    if (!-f $path) {
-        return $NO_SOURCE;
-    }
+    my ($input, $fh);
+    for my $fetcher (@{$self->{fetchers}}) {
+        my ($prefix, $code) = @$fetcher;
 
-    open my $fh, '<', $path
-        or die "Failed to open source code file '$path', "
-               . "do you have permission to read it? (Reason: $!)";
+        next if $prefix && rindex($path, $prefix, 0) == -1;
+        $input = ref($code) eq 'CODE' ? $code->($path) : $self->$code($path);
+        last if $input;
+    }
+    return $NO_SOURCE unless $input;
+
+    if (my $ref = ref($input)) {
+        if ($ref eq 'SCALAR') {
+            open $fh, '<', $input;
+        } elsif ($ref eq 'GLOB') {
+            $fh = $input;
+        } else {
+            die "Source code fetcher returned reference to '$ref', "
+                . " expected either 'SCALAR' or 'GLOB'";
+        }
+    } else {
+        open $fh, '<', $input
+            or die "Failed to open source code file '$input' for path '$path', "
+                   . "do you have permission to read it? (Reason: $!)";
+    }
 
     $self->{sourcemap}->start_file_mapping($path);
 
