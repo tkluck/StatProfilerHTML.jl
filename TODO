@@ -85,4 +85,3 @@
 - link source file listings from flame graph
 - set default list of slow opcodes in bin/statprofilehtml
 - file reader: Better error reporting
-- stable internal links in report (replace the ordinal with the hash of the path)

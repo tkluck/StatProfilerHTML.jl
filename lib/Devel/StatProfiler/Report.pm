@@ -8,7 +8,7 @@ use autodie qw(open close);
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
-use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part);
+use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf8_sha1_hex);
 use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
@@ -587,9 +587,10 @@ sub _fileify {
     my ($name) = @_;
 
     return 'no-file' unless $name;
-    (my $base = File::Basename::basename($name)) =~ s/\W+/-/g;
+    my $base = File::Basename::basename($name) =~ s/\W+/-/gr;
+    my $id = substr(utf8_sha1_hex($name), 0, 20);
 
-    return $base;
+    return "$base-$id";
 }
 
 sub finalize {
@@ -614,7 +615,6 @@ sub finalize {
         }
     }
 
-    my $ordinal = 0;
     for my $sub (sort { $a->{file} cmp $b->{file} }
                       values %{$self->{aggregate}{subs}}) {
         # set the file for the xsub
@@ -626,7 +626,7 @@ sub finalize {
         # that don't have an assigned file yet
         my $entry = $self->_file($sub->{file});
 
-        $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($sub->{file}), ++$ordinal);
+        $entry->{report} ||= sprintf('%s-line.html', _fileify($sub->{file}));
         $entry->{exclusive} += $sub->{exclusive};
         push @{$entry->{subs}{$sub->{start_line}}}, $sub;
 
@@ -642,7 +642,7 @@ sub finalize {
     # because it has no samples, but some of the other parts, mapped by #line
     # directives got some samples
     for my $entry (values %{$self->{aggregate}{files}}) {
-        $entry->{report} ||= sprintf('%s-%d-line.html', _fileify($entry->{name}), ++$ordinal);
+        $entry->{report} ||= sprintf('%s-line.html', _fileify($entry->{name}));
 
         my $reverse_file = $self->{sourcemap} &&
             $self->{sourcemap}->get_reverse_mapping($entry->{name});
@@ -651,7 +651,7 @@ sub finalize {
         if ($reverse_file && !$self->{aggregate}{files}{$reverse_file}) {
             my $entry = $self->_file($reverse_file);
 
-            $entry->{report} = sprintf('%s-%d-line.html', _fileify($reverse_file), ++$ordinal);
+            $entry->{report} = sprintf('%s-line.html', _fileify($reverse_file));
             $entry->{exclusive} = 0;;
         }
     }
