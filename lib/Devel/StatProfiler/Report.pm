@@ -125,7 +125,7 @@ sub _sub {
         exclusive  => 0,
         callees    => {},
         call_sites => {},
-        start_line => $frame->line,
+        start_line => $frame->first_line,
         kind       => $frame->kind,
     };
 }
@@ -215,6 +215,7 @@ sub add_trace_file {
                 fq_sub_name=> "CORE::$op_name",
                 file       => $frames->[0]->file,
                 line       => -2,
+                first_line => -2,
             }, 'Devel::StatProfiler::StackFrame';
         }
 
@@ -224,7 +225,6 @@ sub add_trace_file {
             my $sub = $self->_sub($frame);
             my $file = $line > 0 ? $self->_file($sub->{file}) : undef;
 
-            $sub->{start_line} = $line if $sub->{start_line} > $line;
             $sub->{inclusive} += $weight;
             $file->{lines}{inclusive}[$line] += $weight if $file;
 
@@ -457,7 +457,6 @@ sub merge {
                 kind       => $other_sub->{kind},
             };
 
-            $my_sub->{start_line} = $other_sub->{start_line} if $my_sub->{start_line} > $other_sub->{start_line};
             $my_sub->{inclusive} += $other_sub->{inclusive};
             $my_sub->{exclusive} += $other_sub->{exclusive};
         }

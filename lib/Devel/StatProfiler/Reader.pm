@@ -30,7 +30,11 @@ sub line { $_[0]->{line} }
 sub package { $_[0]->{package} }
 sub sub_name { $_[0]->{sub_name} }
 sub fq_sub_name { $_[0]->{fq_sub_name} }
-sub uq_sub_name { ($_[0]->{file} || '(unknown)') . ':' . $_[0]->{fq_sub_name} }
+sub uq_sub_name {
+    ($_[0]->{file} || '(unknown)') . ':' .
+    $_[0]->{fq_sub_name} .
+    ($_[0]->{first_line} > 0 ? ':' . $_[0]->{first_line} : '')
+}
 sub first_line { $_[0]->{first_line} }
 sub kind { $_[0]->{line} == -2 ? 2 :
            $_[0]->{line} == -1 ? 1 : # -1 means "XSUB"
@@ -45,6 +49,7 @@ sub package { '' }
 sub sub_name { '' }
 sub fq_sub_name { '' }
 sub uq_sub_name { $_[0]->{file} . ':main' }
+sub first_line { 1 }
 sub kind { 0 }
 
 package Devel::StatProfiler::EvalStackFrame;

@@ -59,6 +59,7 @@
   logical file (with overlapping and non-overlapping line ranges)
   (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
 - make scope hooks per-interpreter, and disable them when disabling profiling
+- test lexical subs in Perl 5.20+
 
 - report similar to NYTProf
   - for each line, compute % relative to sub
@@ -66,6 +67,8 @@
   - for subs, % of samples aggregated by call site
 - add heuristic to detect the real start of the sub (and default to
   first sampled line)
+- use the first line of the sub to uniquely identify anon subs
+  in the flame graph
 - flexible stack frame -> source code mapping
   - allow specifying extra files to load (for on-disk files starting with
     a #line directive)

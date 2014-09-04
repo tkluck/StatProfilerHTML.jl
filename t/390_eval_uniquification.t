@@ -87,9 +87,9 @@ my $a2 = $r2->{aggregate};
     my $s1 = $a1->{subs};
     my $s2 = $a2->{subs};
 
-    my $s1e1foo = $s1->{_e($first_eval_n + 1) . ':main::foo'};
-    my $s1e2foo = $s1->{_e($first_eval_n + 2) . ':main::foo'};
-    my $s2e1foo = $s2->{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo'};
+    my $s1e1foo = $s1->{_e($first_eval_n + 1) . ':main::foo:2'};
+    my $s1e2foo = $s1->{_e($first_eval_n + 2) . ':main::foo:2'};
+    my $s2e1foo = $s2->{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2'};
 
     is($s2e1foo->{exclusive}, $s1e1foo->{exclusive} + $s1e2foo->{exclusive});
     is($s2e1foo->{inclusive}, $s1e1foo->{inclusive} + $s1e2foo->{inclusive});
@@ -133,11 +133,11 @@ my $a2 = $r2->{aggregate};
                $s1e2foo->{call_sites}{'t/390_eval_uniquification.t:33'});
 
     {
-        my $s1c1 = $s1e1foo->{callees}{5}{_e($first_eval_n + 1) . ':main::foo'};
-        my $s1c2 = $s1e2foo->{callees}{5}{_e($first_eval_n + 2) . ':main::foo'};
-        my $s2c = $s2e1foo->{callees}{5}{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo'};
+        my $s1c1 = $s1e1foo->{callees}{5}{_e($first_eval_n + 1) . ':main::foo:2'};
+        my $s1c2 = $s1e2foo->{callees}{5}{_e($first_eval_n + 2) . ':main::foo:2'};
+        my $s2c = $s2e1foo->{callees}{5}{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2'};
 
-        is($s2c->{callee}, 'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo');
+        is($s2c->{callee}, 'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2');
         is($s2c->{inclusive}, $s1c1->{inclusive} + $s1c2->{inclusive});
     }
 }

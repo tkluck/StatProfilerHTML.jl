@@ -62,7 +62,6 @@ my ($usleep) = grep $_->{name} eq 'Time::HiRes::usleep',
 # current file
 my $me = $a->{files}{__FILE__ . ''};
 my $moo = $me->{subs}{$l2}[0];
-use Data::Dumper;
 my ($main) = grep $_->{package} eq '',
              map  @$_,
                   values %{$me->{subs}};
@@ -75,9 +74,9 @@ my $take_sample = $test_pm->{subs}{$take_sample_line}[0];
 ### start all subroutines
 
 # subroutine map
-is($a->{subs}{__FILE__ . ':Moo::bar'}, $moo);
+is($a->{subs}{__FILE__ . ':Moo::bar:24'}, $moo);
 is($a->{subs}{'(unknown):Time::HiRes::usleep'}, $usleep);
-is($a->{subs}{'t/lib/Test.pm:t::lib::Test::take_sample'}, $take_sample);
+is($a->{subs}{'t/lib/Test.pm:t::lib::Test::take_sample:81'}, $take_sample);
 is($a->{subs}{__FILE__ . ':main'}, $main);
 
 ### end all subroutines

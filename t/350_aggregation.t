@@ -71,6 +71,10 @@ my $r3 = $a2->merged_report('__main__');
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
     for $r1, $r2, $r3;
 
+# Storable and number stringification
+map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
+    for $r1, $r2, $r3;
+
 # we test source code in another test
 delete $_->{source} for $r1, $r2, $r3;
 delete $_->{sourcemap} for $r1, $r2, $r3;

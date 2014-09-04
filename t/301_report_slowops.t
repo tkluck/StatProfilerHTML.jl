@@ -56,7 +56,7 @@ isnt($ftdir_main, $ftdir_so);
 {
     my $cs = $ftdir_so->{call_sites}{"t/lib/Slowops.pm:$slowops_foo_line"};
 
-    is($cs->{caller}, 't/lib/Slowops.pm:t::lib::Slowops::foo');
+    is($cs->{caller}, 't/lib/Slowops.pm:t::lib::Slowops::foo:7');
     is($cs->{file}, 't/lib/Slowops.pm');
     is($cs->{line}, $slowops_foo_line);
     is($cs->{inclusive}, $cs->{exclusive});

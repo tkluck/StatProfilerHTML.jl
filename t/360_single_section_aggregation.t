@@ -110,6 +110,12 @@ delete $_->{source}, delete $_->{sourcemap}
         $main2, $content2, $list2,
         $main3, $content3, $list3;
 
+# Storable and number stringification
+map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
+    for $main1, $content1, $list1,
+        $main2, $content2, $list2,
+        $main3, $content3, $list3;
+
 eq_or_diff($main2, $main1);
 eq_or_diff($content2, $content1);
 eq_or_diff($list2, $list1);
