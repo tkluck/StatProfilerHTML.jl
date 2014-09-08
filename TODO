@@ -50,6 +50,8 @@
   - don't assume the metadata is available at the beginning of the request
   ===> Currently supporting a simple notion of sections. Let's see if that's
        good enough.
+  - add global metadata (global to the whole process tree, available
+    after report aggregation)
 - some serious benchmarking
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
