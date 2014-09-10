@@ -15,7 +15,7 @@ use File::Spec::Functions ();
 use File::Which;
 use File::Copy ();
 use File::Path ();
-use Template::Perlish;
+use Text::MicroTemplate;
 
 my $NO_SOURCE = ['Source not available...'];
 
@@ -74,20 +74,13 @@ sub new {
 sub _get_template {
     my ($basename) = @_;
     my $path = File::ShareDir::dist_file('Devel-StatProfiler', $basename);
-    my $tp = Template::Perlish->new;
-    my $tmpl;
-
-    {
+    my $tmpl = do {
         local $/;
-        open my $fh, '<', $path;
-        $tmpl = <$fh>;
-    }
+        open my $fh, '<', $path or die "Unable to open '$path': $!";
+        readline $fh;
+    };
 
-    my $sub = $tp->compile_as_sub($tmpl);
-
-    die "Error while compiling '$basename'" unless $sub;
-
-    return $sub;
+    return Text::MicroTemplate::build_mt($tmpl);
 }
 
 sub _write_template {

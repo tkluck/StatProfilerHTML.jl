@@ -1,3 +1,4 @@
+?  my %variables = %{$_[0]};
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
@@ -11,7 +12,7 @@
         <th>Inclusive samples</th>
         <th>Code</th>
       </tr>
-[% my ($lines, $exclusive, $inclusive, $subs, $callees, $mapping) = @variables{qw(lines exclusive inclusive subs callees mapping)};
+<? my ($lines, $exclusive, $inclusive, $subs, $callees, $mapping) = @variables{qw(lines exclusive inclusive subs callees mapping)};
    my ($sub_link, $file_link, $lookup_sub) = @variables{qw(sub_link file_link lookup_sub)};
    my ($logical_line, $logical_file, $physical_end) = (1, undef, 1);
    my $map_index = 0;
@@ -24,59 +25,60 @@
        $logical_file = $entry->[1];
        ++$map_index;
      }
-%]
+ ?>
       <tr>
-        <td><a name="L[%= $logical_file %]-[%= $logical_line %]" />[%= $logical_line %]</td>
-        <td>[%= $exclusive->[$line] || '' %]</td>
-        <td>[%= $inclusive->[$line] || '' %]</td>
+        <td><a name="L<?= $logical_file ?>-<?= $logical_line ?>" /><?= $logical_line ?></td>
+        <td><?= $exclusive->[$line] || '' ?></td>
+        <td><?= $inclusive->[$line] || '' ?></td>
         <td>
-[%   if (my $starting_subs = $subs->{$line}) { %]
+?    if (my $starting_subs = $subs->{$line}) {
           <span class="call-sites">
-[%     for my $sub (@$starting_subs) { %]
-            [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
-[%       for my $site (sort values %{$sub->{call_sites}}) { %]
-            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $lookup_sub->($site->{caller})->{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
-[%       } %]
-[%     } %]
+?      for my $sub (@$starting_subs) {
+            <?= $sub->{inclusive} ?> samples in <?= $sub->{name} ?><br />
+?        for my $site (sort values %{$sub->{call_sites}}) {
+            <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+?        }
+?      }
           </span>
-[%   } %]
-[%   if (my $calls = $callees->{$line}) { %]
+?    }
+?    if (my $calls = $callees->{$line}) {
           <span class="callees">
-[%     for my $call (@$calls) { %]
-[%         my $callee = $lookup_sub->($call->{callee}); %]
-            [%= $call->{inclusive} %] samples in <a href="[%= $sub_link->($callee) %]">[%= $callee->{name} %]</a><br />
-[%     } %]
+?      for my $call (@$calls) {
+?          my $callee = $lookup_sub->($call->{callee});
+            <?= $call->{inclusive} ?> samples in <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
+?      }
           </span>
-[%   } %]
-          <span class="code">[%= $lines->[$line] %]</span>
+?    }
+          <span class="code"><?= $lines->[$line] ?></span>
         </td>
       </tr>
-[% } %]
-[% my @opcodes = sort { $b->{name} cmp $a->{name} } @{$subs->{'-2'} || []};
+?  }
+<? my @opcodes = sort { $b->{name} cmp $a->{name} } @{$subs->{'-2'} || []};
    my @xsubs = sort { $b->{name} cmp $a->{name} } @{$subs->{'-1'} || []};
    my @special = (@opcodes, @xsubs);
    for my $line (0 .. $#special) {
      my $sub = $special[$line];
-     (my $anchor = $sub->{name}) =~ s/\W+/-/g; %]
+     (my $anchor = $sub->{name}) =~ s/\W+/-/g;
+ ?>
       <tr>
-        <td><a name="LX[%= $anchor %]" /></td>
+        <td><a name="LX<?= $anchor ?>" /></td>
         <td></td>
         <td></td>
         <td>
           <span class="call-sites">
-            [%= $sub->{inclusive} %] samples in [%= $sub->{name} %]<br />
-[%   for my $site (sort values %{$sub->{call_sites}}) { %]
-            [%= $site->{exclusive} %] (ex.), [%= $site->{inclusive} %] (incl.) from [%= $lookup_sub->($site->{caller})->{name} %] <a href="[%= $file_link->($site->{file}, $site->{line}) %]">line [%= $site->{line} %]</a><br />
-[%   } %]
+            <?= $sub->{inclusive} ?> samples in <?= $sub->{name} ?><br />
+?    for my $site (sort values %{$sub->{call_sites}}) {
+            <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+?    }
           </span>
-[%   if ($sub->{kind} == 2) { %]
-          <span class="code">sub [%= $sub->{name} %] # opcode</span>
-[%   } else { %]
-          <span class="code">sub [%= $sub->{name} %] # xsub</span>
-[%   } %]
+?    if ($sub->{kind} == 2) {
+          <span class="code">sub <?= $sub->{name} ?> # opcode</span>
+?    } else {
+          <span class="code">sub <?= $sub->{name} ?> # xsub</span>
+?    }
         </td>
       </tr>
-[% } %]
+?  }
     </table>
   </body>
 </html>

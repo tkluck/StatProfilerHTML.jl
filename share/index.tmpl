@@ -1,13 +1,14 @@
+?  my %variables = %{$_[0]};
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
   </head>
   <body>
-[% if ($variables{flamegraph}) { %]
+?  if ($variables{flamegraph}) {
     <object data="all_stacks_by_time.svg" width="1200" type="image/svg+xml">
         SVG not supported
     </object>
-[% } %]
+?  }
     <br /><br />
     <table>
       <caption>Subroutines, sorted by exclusive sample count</caption>
@@ -16,22 +17,23 @@
         <th>Inclusive samples</td>
         <th>Subroutine</th>
       </tr>
-[% my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
+<? my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
    my $sub_link = $variables{sub_link};
-   for my $sub (@{$variables{subs}}[0..$max - 1]) { %]
+   for my $sub (@{$variables{subs}}[0..$max - 1]) {
+ ?>
       <tr>
-        <td>[%= $sub->{exclusive} %]</td>
-        <td>[%= $sub->{inclusive} %]</td>
+        <td><?= $sub->{exclusive} ?></td>
+        <td><?= $sub->{inclusive} ?></td>
         <td>
-          <a href="[%= $sub_link->($sub) %]">[%= $sub->{name} %]</a>
-[%   if ($sub->{kind} == 2) { %]
+          <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
+?    if ($sub->{kind} == 2) {
             (opcode)
-[%   } elsif ($sub->{kind} == 1) { %]
+?    } elsif ($sub->{kind} == 1) {
             (xsub)
-[%   } %]
+?    }
         </td>
       </tr>
-[% } %]
+?  }
     </table>
     <a href="subs.html">All subs</a>
     <br /><br />
@@ -41,12 +43,12 @@
         <th>Exclusive samples</td>
         <th>Report</th>
       </tr>
-[% for my $file (@{$variables{files}}) { %]
+?  for my $file (@{$variables{files}}) {
       <tr>
-        <td>[%= $file->{exclusive} %]</td>
-        <td><a href="[%= $file->{report} %]">[%= $file->{basename} eq '' ? '(unknown)' : $file->{basename} %]</a></td>
+        <td><?= $file->{exclusive} ?></td>
+        <td><a href="<?= $file->{report} ?>"><?= $file->{basename} eq '' ? '(unknown)' : $file->{basename} ?></a></td>
       </tr>
-[% } %]
+?  }
     </table>
   </body>
 </html>
