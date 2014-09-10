@@ -70,7 +70,7 @@ sub new {
 
     if ($self->{flamegraph}) {
         my $fg = File::Which::which('flamegraph') // File::Which::which('flamegraph.pl');
-        $self->{fg_cmd} = "$fg --nametype=sub --countname=microseconds"
+        $self->{fg_cmd} = "$fg --nametype=sub --countname=samples"
             if $fg;
     }
 
@@ -983,8 +983,7 @@ sub output {
         close $calls_fh;
 
         # TODO links --nameattr=$subattr
-        my $fg_factor = 1000000 / $self->{tick};
-        system("$self->{fg_cmd} --factor=$fg_factor --total=$self->{aggregate}{total} $calls_data > $calls_svg") == 0
+        system("$self->{fg_cmd} --total=$self->{aggregate}{total} $calls_data > $calls_svg") == 0
             or die "Generating $calls_svg failed\n";
     }
 
