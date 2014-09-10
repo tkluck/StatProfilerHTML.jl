@@ -241,3 +241,8 @@ physical lines uses heuristics, and they can obviously fail.
 Files that contain C<#line> directives and have no samples taken in
 the part of the file outside the part mapped by C<#line> directives
 will not be found.
+
+=head2 first line of subs
+
+The first line of subs is found by searching for the sub definition in
+the code. Needless to say, this is fragile.

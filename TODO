@@ -67,8 +67,6 @@
   - for each line, compute % relative to sub
   - for each sub, compute % relative to total
   - for subs, % of samples aggregated by call site
-- add heuristic to detect the real start of the sub (and default to
-  first sampled line)
 - use the first line of the sub to uniquely identify anon subs
   in the flame graph
 - flexible stack frame -> source code mapping

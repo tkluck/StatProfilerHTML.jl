@@ -34,6 +34,7 @@
 ?    if (my $starting_subs = $subs->{$line}) {
           <span class="call-sites">
 ?      for my $sub (@$starting_subs) {
+            <a name="S<?= $sub->{uq_name} =~ s/\W+/-/gr ?>" />
             <?= $sub->{inclusive} ?> samples in <?= $sub->{name} ?><br />
 ?        for my $site (sort values %{$sub->{call_sites}}) {
             <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
@@ -58,10 +59,9 @@
    my @special = (@opcodes, @xsubs);
    for my $line (0 .. $#special) {
      my $sub = $special[$line];
-     (my $anchor = $sub->{name}) =~ s/\W+/-/g;
  ?>
       <tr>
-        <td><a name="LX<?= $anchor ?>" /></td>
+        <td><a name="S<?= $sub->{name} =~ s/\W+/-/gr ?>" /></td>
         <td></td>
         <td></td>
         <td>

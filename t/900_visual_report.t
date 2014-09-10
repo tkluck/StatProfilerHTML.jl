@@ -59,11 +59,17 @@ __END__
 
 =item C<t::lib::Test::take_sample>
 
+The link points to the sub definition line, detailing number of
+samples and list of callers.
+
+=item C<Test::Begin::BEGIN>
+
+The link points to the sub definition line, detailing number of
+samples and list of callers.
+
 =item C<Time::HiRes::usleep>
 
 =item C<CORE::ftdir>
-
-=item C<Test::Begin::BEGIN>
 
 =back
 

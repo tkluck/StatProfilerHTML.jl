@@ -25,6 +25,14 @@ my %TEMPLATES = (
     index     => _get_template('index.tmpl'),
 );
 
+my %SPECIAL_SUBS = map { $_ => 1 } qw(
+    BEGIN
+    UNITCHECK
+    CHECK
+    INIT
+    END
+);
+
 sub new {
     my ($class, %opts) = @_;
     my $genealogy = {};
@@ -810,15 +818,13 @@ sub output {
         my ($sub) = @_;
 
         if ($sub->{kind} == 0) {
-            # see comment in $file_link
-            my $report = $self->{aggregate}{files}{$sub->{file}}{report};
-
-            return sprintf '%s#L%s-%d', $report, $report, $sub->{start_line};
-        } else {
-            (my $anchor = $sub->{name}) =~ s/\W+/-/g;
-            return sprintf '%s#LX%s',
+            return sprintf '%s#S%s',
                 $self->{aggregate}{files}{$sub->{file}}{report},
-                $anchor;
+                $sub->{uq_name} =~ s/\W+/-/gr;
+        } else {
+            return sprintf '%s#S%s',
+                $self->{aggregate}{files}{$sub->{file}}{report},
+                $sub->{name} =~ s/\W+/-/gr;
         }
     };
 
@@ -844,6 +850,8 @@ sub output {
 
     my $format_file = sub {
         my ($entry, $code, $mapping) = @_;
+        # map logical line, physical file, physical line ->
+        #     logical line, HTML report file, physical line
         my $mapping_for_link = [map {
             [$_->[0],
              ($_->[1] && $self->{aggregate}{files}{$_->[1]} ?
@@ -852,10 +860,42 @@ sub output {
              $_->[2]]
         } @$mapping];
 
+        # find actual sub definition by matching source name in code
+        # (yes, fragile, but mostly good enough)
+        my %subs;
+        for my $subs_at_line (values %{$entry->{subs}}) {
+            for my $sub (@$subs_at_line) {
+                my $fq_name = $sub->{name};
+                my $name = $fq_name =~ s{.*::}{}r;
+
+                # finding the start of anonymous subs is way too fragile,
+                # just use the default
+                if ($name eq '__ANON__') {
+                    push @{$subs{$sub->{start_line}}}, $sub;
+                    next;
+                }
+
+                my $match = $SPECIAL_SUBS{$name} ?
+                    qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b|^\s*\Q$name\E\b} :
+                    qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b};
+                my $start_line = $sub->{start_line};
+                for (my $line = $start_line; $line > 0; --$line) {
+                    my $src = $code->[$line];
+
+                    if ($src =~ $match) {
+                        $start_line = $line;
+                        last;
+                    }
+                }
+
+                push @{$subs{$start_line}}, $sub;
+            }
+        }
+
         my %file_data = (
             name        => $entry->{name},
             lines       => $code,
-            subs        => $entry->{subs},
+            subs        => \%subs,
             exclusive   => $entry->{lines}{exclusive},
             inclusive   => $entry->{lines}{inclusive},
             callees     => $entry->{lines}{callees},
