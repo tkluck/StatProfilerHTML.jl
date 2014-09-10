@@ -15,6 +15,10 @@ use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 
 use Test::Begin;
 
+eval <<'EOT'; # extra __END__ token to check source code fetching
+__END__
+EOT
+
 for (my $count = 10000; ; $count *= 2) {
     my $start = time;
     note("Trying with $count iterations");
@@ -92,5 +96,15 @@ Click F<Test.pm> report from the main page, scroll down to C<take_sample>
 =item Three callers and one callee are reported
 
 =item Links to callers and callees work correctly
+
+=back
+
+Click F<t/900_visual_report.t> report from the main page
+
+=over 4
+
+=item Check the source code is not truncated after the C<eval>
+
+=item Check the last line of the source code is the C<__END__> token
 
 =back

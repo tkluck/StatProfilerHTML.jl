@@ -83,8 +83,6 @@
   - maybe do the aggregation directly in the browser, to reduce CPU
     usage on the storage server
 - make aggregation code reusable both as a script and in a web application
-- remove file text after __DATA__/__END__ but check it's not removing
-  source code (use sampled lines)
 - link source file listings from flame graph
 - set default list of slow opcodes in bin/statprofilehtml
 - file reader: Better error reporting

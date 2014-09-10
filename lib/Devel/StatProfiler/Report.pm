@@ -669,13 +669,13 @@ sub _fetch_source {
     my @lines;
 
     if ($path eq '') {
-        return ['Dummy file to stick orphan XSUBs in...'];
+        return [], ['Dummy file to stick orphan XSUBs in...'];
     }
 
     # eval source code
     if ($self->{source} && $path =~ /^eval:([0-9a-fA-F]+)$/) {
         if (my $source = $self->{source}->get_source_by_hash($1)) {
-            return ['Eval source code...', split /\n/, $source];
+            return [], ['Eval source code...', split /\n/, $source];
         }
     }
 
@@ -687,7 +687,7 @@ sub _fetch_source {
         $input = ref($code) eq 'CODE' ? $code->($path) : $self->$code($path);
         last if $input;
     }
-    return $NO_SOURCE unless $input;
+    return [], $NO_SOURCE unless $input;
 
     if (my $ref = ref($input)) {
         if ($ref eq 'SCALAR') {
@@ -706,19 +706,17 @@ sub _fetch_source {
 
     $self->{sourcemap}->start_file_mapping($path);
 
+    my @ends;
     while (defined (my $line = <$fh>)) {
-        # this might match a token inside a string, and does not match
-        # the token on a non-empty line; probably it should double-check
-        # using the range of lines with samples
-        last if $line =~ /^__(?:DATA|END)__\s+$/;
         $self->{sourcemap}->add_file_mapping(@lines + 2, $2, $1)
             if $line =~ /^#line\s+(\d+)\s+(.+)$/;
         push @lines, $line;
+        push @ends, scalar @lines if $line =~ /\b__(?:DATA|END)__\b/;
     }
 
     $self->{sourcemap}->end_file_mapping(scalar @lines);
 
-    return ['I hope you never see this...', @lines];
+    return \@ends, ['I hope you never see this...', @lines];
 }
 
 # merges the entries for multiple logical files to match the source
@@ -849,7 +847,7 @@ sub output {
     my %merged_profiles;
 
     my $format_file = sub {
-        my ($entry, $code, $mapping) = @_;
+        my ($entry, $ends, $code, $mapping) = @_;
         # map logical line, physical file, physical line ->
         #     logical line, HTML report file, physical line
         my $mapping_for_link = [map {
@@ -892,6 +890,15 @@ sub output {
             }
         }
 
+        # remove source after __DATA__/__END__ token, but only if
+        # there are no samples after it (to avoid false positives)
+        for my $end (@$ends) {
+            if ($end >= @{$entry->{lines}{inclusive}} - 1) {
+                splice @$code, $end + 1; # preserve the __DATA__/__END__
+                last;
+            }
+        }
+
         my %file_data = (
             name        => $entry->{name},
             lines       => $code,
@@ -911,7 +918,7 @@ sub output {
 
     # write reports for physical files
     for my $file (keys %$files) {
-        my $code = $self->_fetch_source($file);
+        my ($ends, $code) = $self->_fetch_source($file);
 
         if ($code eq $NO_SOURCE) {
             # re-process this later, in case the mapping is due to a
@@ -920,7 +927,7 @@ sub output {
         } elsif (my $mapping = $self->{sourcemap}->get_mapping($file)) {
             my $merged_entry = $self->_merged_entry($file, $mapping);
 
-            $format_file->($merged_entry, $code, $mapping);
+            $format_file->($merged_entry, $ends, $code, $mapping);
         } else {
             my $entry = $files->{$file};
             my $mapping = [
@@ -928,7 +935,7 @@ sub output {
                 [scalar @$code, undef, scalar @$code],
             ];
 
-            $format_file->($entry, $code, $mapping);
+            $format_file->($entry, $ends, $code, $mapping);
         }
     }
 
