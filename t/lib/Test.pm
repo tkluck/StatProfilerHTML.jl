@@ -9,6 +9,7 @@ use Time::HiRes qw(usleep);
 use File::Temp ();
 use File::Spec;
 use Capture::Tiny qw(capture);
+use Pod::Usage;
 use Config;
 use if $Config{usethreads}, 'threads';
 
@@ -26,6 +27,7 @@ our @EXPORT = (
         precision_factor
         run_ctests
         spawn
+        visual_test
   )
 );
 
@@ -113,6 +115,31 @@ sub precision_factor {
         return 1;
     }
     return int(($precision / 1000) + 0.5) * 2;
+}
+
+sub visual_test {
+    my ($output_dir, $sections) = @_;
+
+    pod2usage(-msg      => "Manual test:\n",
+              -verbose  => 99,
+              -sections => $sections,
+              -exitval  => 'NOEXIT');
+
+    my $report = File::Spec::Functions::catfile($output_dir, 'index.html');
+
+    eval {
+        require Browser::Open;
+
+        print "Report in $output_dir opened in default browser, press return when finished\n\n";
+
+        Browser::Open::open_browser($report);
+
+        1;
+    } or do {
+        print "Open the report $report with a browser, press return when finished\n\n";
+    };
+
+    readline(STDIN);
 }
 
 sub run_ctests {

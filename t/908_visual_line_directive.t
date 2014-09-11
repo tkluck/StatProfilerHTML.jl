@@ -4,7 +4,6 @@ use t::lib::Test ':visual';
 
 use Devel::StatProfiler::Report;
 use Time::HiRes qw(usleep);
-use Pod::Usage;
 
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
@@ -60,12 +59,7 @@ $r->map_source;
 
 $r->output($output_dir);
 
-pod2usage(-msg      => "Open the report at $output_dir with a browser, press return when finished",
-          -verbose  => 99,
-          -sections => ['MAIN PAGE', 'FILE PAGE'],
-          -exitval  => 'NOEXIT');
-
-readline(STDIN);
+visual_test($output_dir, ['MAIN PAGE', 'FILE PAGE']);
 
 __END__
 

@@ -76,7 +76,7 @@ my $take_sample = $test_pm->{subs}{$take_sample_line}[0];
 # subroutine map
 is($a->{subs}{__FILE__ . ':Moo::bar:24'}, $moo);
 is($a->{subs}{'(unknown):Time::HiRes::usleep'}, $usleep);
-is($a->{subs}{'t/lib/Test.pm:t::lib::Test::take_sample:81'}, $take_sample);
+is($a->{subs}{'t/lib/Test.pm:t::lib::Test::take_sample:' . $take_sample_line}, $take_sample);
 is($a->{subs}{__FILE__ . ':main'}, $main);
 
 ### end all subroutines

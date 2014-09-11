@@ -5,7 +5,6 @@ use t::lib::Slowops;
 
 use Devel::StatProfiler::Report;
 use Time::HiRes qw(time);
-use Pod::Usage;
 
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
@@ -38,12 +37,7 @@ $r->add_trace_file($profile_file);
 
 $r->output($output_dir);
 
-pod2usage(-msg      => "Open the report at $output_dir with a browser, press return when finished",
-          -verbose  => 99,
-          -sections => ['MAIN PAGE', 'FILE PAGE', 'FLAME GRAPH'],
-          -exitval  => 'NOEXIT');
-
-readline(STDIN);
+visual_test($output_dir, ['MAIN PAGE', 'FILE PAGE', 'FLAME GRAPH']);
 
 __END__
 
