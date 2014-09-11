@@ -975,6 +975,7 @@ sub output {
         my $flames = $self->{aggregate}{flames};
         my $calls_data = File::Spec::Functions::catfile($directory, 'all_stacks_by_time.calls');
         my $calls_svg = File::Spec::Functions::catfile($directory, $flamegraph_link);
+        my $nameattr = File::Spec::Functions::catfile($directory, 'all_stacks.attrs');
 
         open my $calls_fh, '>', $calls_data;
         for my $key (keys %$flames) {
@@ -982,8 +983,17 @@ sub output {
         }
         close $calls_fh;
 
-        # TODO links --nameattr=$subattr
-        system("$self->{fg_cmd} --total=$self->{aggregate}{total} $calls_data > $calls_svg") == 0
+        open my $attrs_fh, '>', $nameattr;
+        for my $sub (@subs) {
+            print $attrs_fh join(
+                "\t",
+                $sub->{name},
+                "href=" . $sub_link->($sub),
+            ), "\n";
+        }
+        close $attrs_fh;
+
+        system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$nameattr $calls_data > $calls_svg") == 0
             or die "Generating $calls_svg failed\n";
     }
 

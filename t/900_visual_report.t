@@ -115,4 +115,6 @@ Click F<t/900_visual_report.t> report from the main page
 
 =item The flame graph contains a tile for C<t/900_visual_report.t:main>
 
+=item The items in the flame graph are clickable (check the four subs above)
+
 =back

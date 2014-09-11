@@ -83,6 +83,5 @@
   - maybe do the aggregation directly in the browser, to reduce CPU
     usage on the storage server
 - make aggregation code reusable both as a script and in a web application
-- link source file listings from flame graph
 - set default list of slow opcodes in bin/statprofilehtml
 - file reader: Better error reporting
