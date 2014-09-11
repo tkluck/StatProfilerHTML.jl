@@ -12,7 +12,6 @@ use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf
 use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
-use File::Which;
 use File::Copy ();
 use File::Path ();
 use Text::MicroTemplate;
@@ -69,9 +68,8 @@ sub new {
     }, $class;
 
     if ($self->{flamegraph}) {
-        my $fg = File::Which::which('flamegraph') // File::Which::which('flamegraph.pl');
-        $self->{fg_cmd} = "$fg --nametype=sub --countname=samples"
-            if $fg;
+        my $fg = File::ShareDir::dist_file('Devel-StatProfiler', 'flamegraph.pl');
+        $self->{fg_cmd} = "$^X $fg --nametype=sub --countname=samples";
     }
 
     check_serializer($self->{serializer});
@@ -967,9 +965,6 @@ sub output {
     # format flame graph
     my $flamegraph_link;
     if ($self->{flamegraph}) {
-        die "Unable to find flamegraph executable, please install NYTProf"
-            unless $self->{fg_cmd};
-
         $flamegraph_link = 'all_stacks_by_time.svg';
 
         my $flames = $self->{aggregate}{flames};
