@@ -260,7 +260,7 @@ sub add_trace_file {
         }
 
         if ($flames) {
-            my $key = join ';', map { $_->fq_sub_name || 'MAIN' } reverse @$frames;
+            my $key = join ';', map { $_->fq_sub_name || $_->uq_sub_name } reverse @$frames;
 
             $flames->{$key} += $weight;
         }

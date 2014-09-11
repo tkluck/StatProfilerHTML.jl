@@ -153,10 +153,10 @@ is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 ### start flamegraph
 
 my @traces = qw(
-    MAIN;main::foo;t::lib::Test::take_sample;Time::HiRes::usleep
-    MAIN;X::__ANON__;t::lib::Test::take_sample;Time::HiRes::usleep
+    t/300_report_sanity.t:main;main::foo;t::lib::Test::take_sample;Time::HiRes::usleep
+    t/300_report_sanity.t:main;X::__ANON__;t::lib::Test::take_sample;Time::HiRes::usleep
     main::BEGIN;Time::HiRes::sleep
-    MAIN;Moo::bar;t::lib::Test::take_sample;Time::HiRes::usleep
+    t/300_report_sanity.t:main;Moo::bar;t::lib::Test::take_sample;Time::HiRes::usleep
 );
 
 for my $trace (@traces) {

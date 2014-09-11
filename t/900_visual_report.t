@@ -40,7 +40,7 @@ $r->output($output_dir);
 
 pod2usage(-msg      => "Open the report at $output_dir with a browser, press return when finished",
           -verbose  => 99,
-          -sections => ['MAIN PAGE', 'FILE PAGE'],
+          -sections => ['MAIN PAGE', 'FILE PAGE', 'FLAME GRAPH'],
           -exitval  => 'NOEXIT');
 
 readline(STDIN);
@@ -54,8 +54,6 @@ __END__
 =item Subroutine and file list are sorted by exclusive sample count
 
 =item Subroutine list contains opcodes, XSUBs and normal subs
-
-=item In the flame graph, ftdir is reported as called by both main and foo()
 
 =item Subroutine links work
 
@@ -106,5 +104,15 @@ Click F<t/900_visual_report.t> report from the main page
 =item Check the source code is not truncated after the C<eval>
 
 =item Check the last line of the source code is the C<__END__> token
+
+=back
+
+=head1 FLAME GRAPH
+
+=over 4
+
+=item C<CORE::ftdir> is reported as called by both main and foo()
+
+=item The flame graph contains a tile for C<t/900_visual_report.t:main>
 
 =back
