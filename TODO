@@ -85,3 +85,6 @@
 - make aggregation code reusable both as a script and in a web application
 - set default list of slow opcodes in bin/statprofilehtml
 - file reader: Better error reporting
+- the case fixed by 27fb541f0c03c541997604c4118dc82f4d1acec8, the synthetic
+  file entry has the file name "eval:<sha1>"; fix it to display the
+  "natural" name for the eval
