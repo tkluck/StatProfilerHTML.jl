@@ -260,7 +260,7 @@ sub add_trace_file {
         }
 
         if ($flames) {
-            my $key = join ';', map { $_->fq_sub_name || $_->uq_sub_name } reverse @$frames;
+            my $key = join ';', map $_->uq_sub_name, reverse @$frames;
 
             $flames->{$key} += $weight;
         }
@@ -994,8 +994,9 @@ sub output {
         for my $sub (@subs) {
             print $attrs_fh join(
                 "\t",
-                $sub->{name},
+                $sub->{uq_name},
                 "href=" . $sub_link->($sub),
+                "function=" . $sub->{name},
             ), "\n";
         }
         close $attrs_fh;

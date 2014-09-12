@@ -311,6 +311,8 @@ $im->stringTTF($black, $fonttype, $fontsize, 0.0, $xpad, $imageheight - ($ypad2 
 while (my ($id, $node) = each %Node) {
 	my ($func, $depth, $etime) = split ";", $id;
 	my $stime = $node->{stime};
+	my $nameattr = { %{ $nameattr{$func}||{} } }; # shallow clone
+	my $displayfunc = $nameattr->{function} // $func;
 
 	$etime = $timemax if $func eq "" and $depth == 0;
 
@@ -328,14 +330,13 @@ while (my ($id, $node) = each %Node) {
 		$info = "all ($samples_txt $countname, 100%)";
 	} else {
 		my $pct = sprintf "%.2f", ((100 * $samples) / ($timemax * $factor));
-		my $escaped_func = $func;
+		my $escaped_func = $displayfunc;
 		$escaped_func =~ s/&/&amp;/g;
 		$escaped_func =~ s/</&lt;/g;
 		$escaped_func =~ s/>/&gt;/g;
 		$info = "$escaped_func ($samples_txt $countname, $pct%)";
 	}
 
-        my $nameattr = { %{ $nameattr{$func}||{} } }; # shallow clone
         $nameattr->{class}       ||= "func_g";
         $nameattr->{onmouseover} ||= "s('".$info."')";
         $nameattr->{onmouseout}  ||= "c()";
@@ -346,8 +347,8 @@ while (my ($id, $node) = each %Node) {
 
 	my $chars = int( ($x2 - $x1) / ($fontsize * $fontwidth));
 	if ($chars >= 3) { # room for one char plus two dots
-		my $text = substr $func, 0, $chars;
-		substr($text, -2, 2) = ".." if $chars < length $func;
+		my $text = substr $displayfunc, 0, $chars;
+		substr($text, -2, 2) = ".." if $chars < length $displayfunc;
 		$text =~ s/&/&amp;/g;
 		$text =~ s/</&lt;/g;
 		$text =~ s/>/&gt;/g;

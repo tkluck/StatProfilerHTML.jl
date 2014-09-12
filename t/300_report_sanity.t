@@ -149,14 +149,14 @@ is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 ### start flamegraph
 
 my @traces = qw(
-    t/300_report_sanity.t:main;main::foo;t::lib::Test::take_sample;Time::HiRes::usleep
-    t/300_report_sanity.t:main;X::__ANON__;t::lib::Test::take_sample;Time::HiRes::usleep
-    main::BEGIN;Time::HiRes::sleep
-    t/300_report_sanity.t:main;Moo::bar;t::lib::Test::take_sample;Time::HiRes::usleep
+    t/300_report_sanity.t:main;t/300_report_sanity.t:main::foo:28;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
+    t/300_report_sanity.t:main;t/300_report_sanity.t:X::__ANON__:19;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
+    t/300_report_sanity.t:main::BEGIN:13;(unknown):Time::HiRes::sleep
+    t/300_report_sanity.t:main;t/300_report_sanity.t:Moo::bar:24;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
 );
 
 for my $trace (@traces) {
-    ok(exists $a->{flames}{$trace});
+    ok(exists $a->{flames}{$trace}, "present - $trace");
 }
 
 ### end flamegraph
