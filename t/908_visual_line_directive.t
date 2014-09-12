@@ -19,7 +19,7 @@ sub foo {
 }
 
 foo();
-%s#line 400 "inside the eval"%s
+%s#line 20 "inside the eval"%s
 usleep(50000);
 
 sub bar {
@@ -103,9 +103,11 @@ Click C<main::bar> report from the main page
 
 =item It links to a line near the bottom of a ~100 lines file
 
-=item The line number is around 400
+=item The line number is around 60
 
 =item There is a single caller, and the link points to the same file
+
+=item The subroutine summary is displayed on the C<sub bar> line
 
 =back
 

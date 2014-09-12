@@ -880,6 +880,13 @@ sub output {
                     qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b|^\s*\Q$name\E\b} :
                     qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b};
                 my $start_line = $sub->{start_line};
+                for (my $i = 0; $i < @$mapping; ++$i) {
+                    my $entry = $mapping->[$i];
+                    next unless $entry->[1] && $entry->[1] eq $sub->{file};
+                    if ($entry->[2] <= $start_line && ($entry->[2] + ($mapping->[$i + 1][0] - $entry->[0])) > $start_line) {
+                        $start_line = $entry->[0] + $start_line - $entry->[2];
+                    }
+                }
                 for (my $line = $start_line; $line > 0; --$line) {
                     my $src = $code->[$line];
 
