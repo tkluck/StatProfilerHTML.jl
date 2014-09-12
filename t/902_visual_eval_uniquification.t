@@ -62,9 +62,9 @@ __END__
 
 =over 4
 
-=item Subroutine and file list contain only 3 eval entries
+=item Subroutine, file list and flame graph contain only 3 eval entries
 
-=item Both lists contain the same eval entries
+=item All lists contain the same eval entries
 
 =item One of the 3 eval entries has roughly twice the samples as the others
 

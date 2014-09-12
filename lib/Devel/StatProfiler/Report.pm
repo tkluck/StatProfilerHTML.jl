@@ -374,6 +374,7 @@ sub map_source {
     my ($self) = @_;
     my $files = $self->{aggregate}{files};
     my $subs = $self->{aggregate}{subs};
+    my $flames = $self->{aggregate}{flames};
     my $file_map = $self->{aggregate}{file_map};
     my %eval_map;
 
@@ -387,10 +388,10 @@ sub map_source {
 
     return unless @eval_map;
 
-    my $file_map_rx = '(^|:)(' . join('|', map "\Q$_\E", @eval_map) . ')(:|$)';
+    my $file_map_rx = '(^|:|;)(' . join('|', map "\Q$_\E", @eval_map) . ')(:|;|$)';
     my $file_map_qr = qr/$file_map_rx/;
     my $file_repl_sub = sub {
-        $_[0] =~ s/$file_map_qr/$1$eval_map{$2}$3/r
+        $_[0] =~ s/$file_map_qr/$1$eval_map{$2}$3/gr
     };
 
     for my $package (values %$file_map) {
@@ -407,6 +408,8 @@ sub map_source {
             _map_hash_rx($by_line, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_callees);
         }
     }
+
+    _map_hash_rx($flames, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_map_entry);
 }
 
 sub merge {

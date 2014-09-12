@@ -155,4 +155,18 @@ my $a2 = $r2->{aggregate};
        $f1->{main}{_e($first_eval_n + 1)} + $f1->{main}{_e($first_eval_n + 2)});
 }
 
+## test flames
+
+{
+    my ($merged, @src) = map "t/390_eval_uniquification.t:main;$_:eval;$_:main::foo:2;(unknown):Time::HiRes::usleep",
+        'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8',
+        _e($first_eval_n + 1), _e($first_eval_n + 2);
+
+    my $f1 = $a1->{flames};
+    my $f2 = $a2->{flames};
+
+    is($f2->{$merged},
+       $f1->{$src[0]} + $f1->{$src[1]});
+}
+
 done_testing();
