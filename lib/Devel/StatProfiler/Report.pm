@@ -127,6 +127,8 @@ sub _sub {
         call_sites => {},
         start_line => $frame->first_line,
         kind       => $frame->kind,
+        is_main    => $frame->is_main,
+        is_eval    => $frame->is_eval,
     };
 }
 
@@ -455,6 +457,8 @@ sub merge {
                 start_line => $other_sub->{start_line},
                 uq_name    => $other_sub->{uq_name},
                 kind       => $other_sub->{kind},
+                is_main    => $other_sub->{is_main},
+                is_eval    => $other_sub->{is_eval},
             };
 
             $my_sub->{inclusive} += $other_sub->{inclusive};
@@ -627,7 +631,8 @@ sub finalize {
 
         $entry->{report} ||= sprintf('%s-line.html', _fileify($sub->{file}));
         $entry->{exclusive} += $sub->{exclusive};
-        push @{$entry->{subs}{$sub->{start_line}}}, $sub;
+        push @{$entry->{subs}{$sub->{start_line}}}, $sub
+            if !$sub->{is_main} && !$sub->{is_eval};
 
         my $callees = $sub->{callees};
         for my $line (keys %$callees) {

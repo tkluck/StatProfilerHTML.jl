@@ -39,6 +39,8 @@ sub first_line { $_[0]->{first_line} }
 sub kind { $_[0]->{line} == -2 ? 2 :
            $_[0]->{line} == -1 ? 1 : # -1 means "XSUB"
                                  0 }
+sub is_main { 0 }
+sub is_eval { 0 }
 
 package Devel::StatProfiler::MainStackFrame;
 
@@ -51,12 +53,16 @@ sub fq_sub_name { '' }
 sub uq_sub_name { $_[0]->{file} . ':main' }
 sub first_line { 1 }
 sub kind { 0 }
+sub is_main { 1 }
+sub is_eval { 0 }
 
 package Devel::StatProfiler::EvalStackFrame;
 
 our @ISA = qw(Devel::StatProfiler::MainStackFrame);
 
 sub uq_sub_name { $_[0]->{file} . ':eval' }
+sub is_main { 0 }
+sub is_eval { 1 }
 
 package Devel::StatProfiler::StackTrace;
 
