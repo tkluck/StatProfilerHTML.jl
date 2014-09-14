@@ -1,17 +1,22 @@
 ?  my %variables = %{$_[0]};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
+    <title>StatProfiler: <?= $variables{basename} ?></title>
   </head>
   <body>
-    <table>
-      <caption>File source code</caption>
-      <tr>
-        <th>Line</td>
-        <th>Exclusive samples</th>
-        <th>Inclusive samples</th>
-        <th>Code</th>
-      </tr>
+?= $variables{include}->('header', $_[0])
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
 <? my ($lines, $exclusive, $inclusive, $subs, $callees, $mapping) = @variables{qw(lines exclusive inclusive subs callees mapping)};
    my ($sub_link, $file_link, $lookup_sub) = @variables{qw(sub_link file_link lookup_sub)};
    my ($logical_line, $logical_file, $physical_end) = (1, undef, 1);
@@ -26,33 +31,33 @@
        ++$map_index;
      }
  ?>
-      <tr>
-        <td><a name="L<?= $logical_file ?>-<?= $logical_line ?>" /><?= $logical_line ?></td>
-        <td><?= $exclusive->[$line] || '' ?></td>
-        <td><?= $inclusive->[$line] || '' ?></td>
-        <td>
+        <tr>
+          <td><a name="L<?= $logical_file ?>-<?= $logical_line ?>"></a><?= $logical_line ?></td>
+          <td><?= $exclusive->[$line] || '' ?></td>
+          <td><?= $inclusive->[$line] || '' ?></td>
+          <td>
 ?    if (my $starting_subs = $subs->{$line}) {
-          <span class="call-sites">
+            <div class="call-sites">
 ?      for my $sub (@$starting_subs) {
-            <a name="S<?= $sub->{uq_name} =~ s/\W+/-/gr ?>" />
-            <?= $sub->{inclusive} ?> samples in <?= $sub->{name} ?><br />
+              <a name="S<?= $sub->{uq_name} =~ s/\W+/-/gr ?>"></a>
+              <?= $sub->{inclusive} ?> samples spent in <?= $sub->{name} ?><br />
 ?        for my $site (sort values %{$sub->{call_sites}}) {
-            <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+              <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) when called from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?        }
 ?      }
-          </span>
+            </div>
 ?    }
 ?    if (my $calls = $callees->{$line}) {
-          <span class="callees">
+            <div class="callees">
 ?      for my $call (@$calls) {
 ?          my $callee = $lookup_sub->($call->{callee});
-            <?= $call->{inclusive} ?> samples in <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
+              <?= $call->{inclusive} ?> samples spent calling <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
 ?      }
-          </span>
+            </div>
 ?    }
-          <span class="code"><?= $lines->[$line] ?></span>
-        </td>
-      </tr>
+            <span class="code"><?= $lines->[$line] ?></span>
+          </td>
+        </tr>
 ?  }
 <? my @opcodes = sort { $b->{name} cmp $a->{name} } @{$subs->{'-2'} || []};
    my @xsubs = sort { $b->{name} cmp $a->{name} } @{$subs->{'-1'} || []};
@@ -60,25 +65,26 @@
    for my $line (0 .. $#special) {
      my $sub = $special[$line];
  ?>
-      <tr>
-        <td><a name="S<?= $sub->{name} =~ s/\W+/-/gr ?>" /></td>
-        <td></td>
-        <td></td>
-        <td>
-          <span class="call-sites">
-            <?= $sub->{inclusive} ?> samples in <?= $sub->{name} ?><br />
+        <tr>
+          <td><a name="S<?= $sub->{name} =~ s/\W+/-/gr ?>"></a></td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <?= $sub->{inclusive} ?> samples spent in <?= $sub->{name} ?><br />
 ?    for my $site (sort values %{$sub->{call_sites}}) {
-            <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+              <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) when called from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?    }
-          </span>
+            </div>
 ?    if ($sub->{kind} == 2) {
-          <span class="code">sub <?= $sub->{name} ?> # opcode</span>
+            <span class="code">sub <?= $sub->{name} ?> # opcode</span>
 ?    } else {
-          <span class="code">sub <?= $sub->{name} ?> # xsub</span>
+            <span class="code">sub <?= $sub->{name} ?> # xsub</span>
 ?    }
-        </td>
-      </tr>
+          </td>
+        </tr>
 ?  }
-    </table>
+      </table>
+    </div>
   </body>
 </html>

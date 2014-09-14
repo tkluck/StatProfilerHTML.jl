@@ -1,32 +1,38 @@
 ?  my %variables = %{$_[0]};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
+    <title>StatProfiler: subroutine list</title>
   </head>
   <body>
-    <table>
-      <caption>Subroutines, sorted by exclusive sample count</caption>
-      <tr>
-        <th>Exclusive samples</td>
-        <th>Inclusive samples</td>
-        <th>Subroutine</th>
-      </tr>
+?= $variables{include}->('header', $_[0])
+    <div id="body-content">
+      <table>
+        <caption>Subroutines, sorted by exclusive sample count</caption>
+        <tr>
+          <th>Exclusive</td>
+          <th>Inclusive</td>
+          <th>Subroutine</th>
+        </tr>
 <? my $sub_link = $variables{sub_link};
    for my $sub (@{$variables{subs}}) {
  ?>
-      <tr>
-        <td><?= $sub->{exclusive} ?></td>
-        <td><?= $sub->{inclusive} ?></td>
-        <td>
-          <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
+        <tr>
+          <td><?= $sub->{exclusive} ?></td>
+          <td><?= $sub->{inclusive} ?></td>
+          <td>
+            <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
 ?    if ($sub->{kind} == 2) {
             (opcode)
 ?    } elsif ($sub->{kind} == 1) {
             (xsub)
 ?    }
-        </td>
-      </tr>
+          </td>
+        </tr>
 ?  }
+      </div>
     </table>
   </body>
 </html>

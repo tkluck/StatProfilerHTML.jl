@@ -1,54 +1,60 @@
 ?  my %variables = %{$_[0]};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
+    <title>StatProfiler: main report</title>
   </head>
   <body>
+?= $variables{include}->('header', $_[0])
+    <div id="body-content">
 ?  if ($variables{flamegraph}) {
-    <object data="all_stacks_by_time.svg" width="1200" type="image/svg+xml">
+      <object data="all_stacks_by_time.svg" width="1200" type="image/svg+xml">
         SVG not supported
-    </object>
+      </object>
 ?  }
-    <br /><br />
-    <table>
-      <caption>Subroutines, sorted by exclusive sample count</caption>
-      <tr>
-        <th>Exclusive samples</td>
-        <th>Inclusive samples</td>
-        <th>Subroutine</th>
-      </tr>
+      <br /><br />
+      <table>
+        <caption>Subroutines, sorted by exclusive sample count</caption>
+        <tr>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Subroutine</th>
+        </tr>
 <? my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
    my $sub_link = $variables{sub_link};
    for my $sub (@{$variables{subs}}[0..$max - 1]) {
  ?>
-      <tr>
-        <td><?= $sub->{exclusive} ?></td>
-        <td><?= $sub->{inclusive} ?></td>
-        <td>
-          <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
+        <tr>
+          <td><?= $sub->{exclusive} ?></td>
+          <td><?= $sub->{inclusive} ?></td>
+          <td>
+            <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
 ?    if ($sub->{kind} == 2) {
             (opcode)
 ?    } elsif ($sub->{kind} == 1) {
             (xsub)
 ?    }
-        </td>
-      </tr>
+          </td>
+        </tr>
 ?  }
-    </table>
-    <a href="subs.html">All subs</a>
-    <br /><br />
-    <table>
-      <caption>Files, sorted by exclusive sample count</caption>
-      <tr>
-        <th>Exclusive samples</td>
-        <th>Report</th>
-      </tr>
+      </table>
+      <a href="subs.html">All subroutines</a>
+      <br /><br />
+      <table>
+        <caption>Files, sorted by exclusive sample count</caption>
+        <tr>
+          <th>Exclusive</th>
+          <th>Report</th>
+        </tr>
 ?  for my $file (@{$variables{files}}) {
-      <tr>
-        <td><?= $file->{exclusive} ?></td>
-        <td><a href="<?= $file->{report} ?>"><?= $file->{basename} eq '' ? '(unknown)' : $file->{basename} ?></a></td>
-      </tr>
+        <tr>
+          <td><?= $file->{exclusive} ?></td>
+          <td><a href="<?= $file->{report} ?>"><?= $file->{name} eq '' ? '(unknown)' : $file->{name} ?></a></td>
+        </tr>
 ?  }
-    </table>
+      </table>
+    </div>
   </body>
 </html>

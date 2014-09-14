@@ -15,6 +15,7 @@ use File::Spec::Functions ();
 use File::Copy ();
 use File::Path ();
 use Text::MicroTemplate;
+use POSIX ();
 
 my $NO_SOURCE = ['Source not available...'];
 
@@ -22,6 +23,7 @@ my %TEMPLATES = (
     file      => _get_template('file.tmpl'),
     subs      => _get_template('subs.tmpl'),
     index     => _get_template('index.tmpl'),
+    header    => _get_template('header.tmpl'),
 );
 
 my %SPECIAL_SUBS = map { $_ => 1 } qw(
@@ -818,6 +820,11 @@ sub output {
     my @subs = sort { $b->{exclusive} <=> $a->{exclusive} }
                     values %{$self->{aggregate}{subs}};
 
+    my $date = POSIX::strftime('%c', localtime(time));
+    my $include = sub {
+        $TEMPLATES{$_[0]}->($_[1]);
+    };
+
     my $sub_link = sub {
         my ($sub) = @_;
 
@@ -913,7 +920,10 @@ sub output {
         }
 
         my %file_data = (
+            include     => $include,
+            date        => $date,
             name        => $entry->{name},
+            basename    => $entry->{basename},
             lines       => $code,
             subs        => \%subs,
             exclusive   => $entry->{lines}{exclusive},
@@ -1010,6 +1020,8 @@ sub output {
 
     # format subs page
     my %subs_data = (
+        include         => $include,
+        date            => $date,
         subs            => \@subs,
         sub_link        => $sub_link,
     );
@@ -1019,6 +1031,8 @@ sub output {
 
     # format index page
     my %main_data = (
+        include         => $include,
+        date            => $date,
         files           => [sort { $b->{exclusive} <=> $a->{exclusive} }
                                  values %$files],
         subs            => \@subs,
