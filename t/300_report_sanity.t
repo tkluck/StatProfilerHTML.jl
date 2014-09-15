@@ -52,6 +52,9 @@ eq_or_diff(\%file_map, {
 eq_or_diff([sort grep !m{^/}, keys $a->{files}],
            ['', __FILE__, 't/lib/Test.pm']);
 
+my $total; $total += $_->{exclusive} for values %{$a->{files}};
+is($a->{total}, $total);
+
 ### start setup
 
 # Time::HiRes
@@ -145,7 +148,6 @@ cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 20 / precision_fac
 is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 
 ### end file attributes
-
 ### start flamegraph
 
 my @traces = qw(
