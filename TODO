@@ -63,10 +63,6 @@
 - make scope hooks per-interpreter, and disable them when disabling profiling
 - test lexical subs in Perl 5.20+
 
-- report similar to NYTProf
-  - for each line, compute % relative to sub
-  - for each sub, compute % relative to total
-  - for subs, % of samples aggregated by call site
 - flexible stack frame -> source code mapping
   - allow specifying extra files to load (for on-disk files starting with
     a #line directive)

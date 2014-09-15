@@ -807,6 +807,23 @@ sub _merged_entry {
     return $merged;
 }
 
+sub _format_ratio {
+    my ($value, $total, $empty) = @_;
+    $value //= 0, $total //= 0;
+
+    return '' if $empty && $value == 0;
+    return '0' if $value == 0 && $total == 0;
+
+    my $perc = $value / $total * 100;
+    if ($perc >= 0.01) {
+        return sprintf '%d (%.02f%%)', $value, $perc;
+    } elsif ($perc >= 0.0001) {
+        return sprintf '%d (%.04f%%)', $value, $perc;
+    } else {
+        return '%d', $value;
+    }
+}
+
 sub output {
     my ($self, $directory) = @_;
 
@@ -854,6 +871,12 @@ sub output {
 
         die "Invalid sub reference '$name'" unless exists $self->{aggregate}{subs}{$name};
         return $self->{aggregate}{subs}{$name};
+    };
+
+    my $format_total_samples = sub {
+        my ($samples, $empty) = @_;
+
+        return _format_ratio($samples, $self->{aggregate}{total}, $empty);
     };
 
     # format files
@@ -921,19 +944,21 @@ sub output {
         }
 
         my %file_data = (
-            include     => $include,
-            date        => $date,
-            name        => $entry->{name},
-            basename    => $entry->{basename},
-            lines       => $code,
-            subs        => \%subs,
-            exclusive   => $entry->{lines}{exclusive},
-            inclusive   => $entry->{lines}{inclusive},
-            callees     => $entry->{lines}{callees},
-            sub_link    => $sub_link,
-            file_link   => $file_link,
-            lookup_sub  => $lookup_sub,
-            mapping     => $mapping_for_link,
+            include                 => $include,
+            date                    => $date,
+            name                    => $entry->{name},
+            basename                => $entry->{basename},
+            lines                   => $code,
+            subs                    => \%subs,
+            exclusive               => $entry->{lines}{exclusive},
+            inclusive               => $entry->{lines}{inclusive},
+            callees                 => $entry->{lines}{callees},
+            sub_link                => $sub_link,
+            file_link               => $file_link,
+            format_total_ratio      => $format_total_samples,
+            format_ratio            => \&_format_ratio,
+            lookup_sub              => $lookup_sub,
+            mapping                 => $mapping_for_link,
         );
 
         $self->_write_template($TEMPLATES{file}, \%file_data,
@@ -1021,10 +1046,11 @@ sub output {
 
     # format subs page
     my %subs_data = (
-        include         => $include,
-        date            => $date,
-        subs            => \@subs,
-        sub_link        => $sub_link,
+        include             => $include,
+        date                => $date,
+        subs                => \@subs,
+        sub_link            => $sub_link,
+        format_total_ratio  => $format_total_samples,
     );
 
     $self->_write_template($TEMPLATES{subs}, \%subs_data,
@@ -1032,13 +1058,14 @@ sub output {
 
     # format index page
     my %main_data = (
-        include         => $include,
-        date            => $date,
-        files           => [sort { $b->{exclusive} <=> $a->{exclusive} }
-                                 values %$files],
-        subs            => \@subs,
-        flamegraph      => $flamegraph_link,
-        sub_link        => $sub_link,
+        include             => $include,
+        date                => $date,
+        files               => [sort { $b->{exclusive} <=> $a->{exclusive} }
+                                     values %$files],
+        subs                => \@subs,
+        flamegraph          => $flamegraph_link,
+        sub_link            => $sub_link,
+        format_total_ratio  => $format_total_samples,
     );
 
     $self->_write_template($TEMPLATES{index}, \%main_data,
