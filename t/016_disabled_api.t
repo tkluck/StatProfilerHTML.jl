@@ -21,8 +21,7 @@ ok(1, "not crashed");
 
 cmp_ok(Devel::StatProfiler::get_precision(), ">=", 0, "not crashed");
 
-# retrurns true because it's using the trampoline
-ok(Devel::StatProfiler::is_running(), "not crashed");
+ok(!Devel::StatProfiler::is_running(), "not crashed");
 
 ok(!-f $profile_file, "did not create the profile file");
 

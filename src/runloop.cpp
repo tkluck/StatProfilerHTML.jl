@@ -820,7 +820,8 @@ devel::statprofiler::install_runloop()
     dMY_CXT;
 
     MY_CXT.original_runloop = PL_runops;
-    PL_runops = trampoline;
+    if (MY_CXT.enabled) // for the -nostart case
+        PL_runops = trampoline;
 
     BhkENTRY_set(&scope_hooks, bhk_eval, enter_eval_hook);
     Perl_blockhook_register(aTHX_ &scope_hooks);
