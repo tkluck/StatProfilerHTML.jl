@@ -42,7 +42,11 @@
               <a name="S<?= $sub->{uq_name} =~ s/\W+/-/gr ?>"></a>
               <?= $sub->{inclusive} ?> samples spent in <?= $sub->{name} ?><br />
 ?        for my $site (sort values %{$sub->{call_sites}}) {
-              <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) when called from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+              <?= $site->{exclusive} ?> (ex.),
+              <?= $site->{inclusive} ?> (incl.)
+              when called from
+              <?= $lookup_sub->($site->{caller})->{name} ?>
+              <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?        }
 ?      }
             </div>
@@ -51,7 +55,9 @@
             <div class="callees">
 ?      for my $call (@$calls) {
 ?          my $callee = $lookup_sub->($call->{callee});
-              <?= $call->{inclusive} ?> samples spent calling <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
+              <?= $call->{inclusive} ?>
+              samples spent calling
+              <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
 ?      }
             </div>
 ?    }
@@ -73,7 +79,11 @@
             <div class="call-sites">
               <?= $sub->{inclusive} ?> samples spent in <?= $sub->{name} ?><br />
 ?    for my $site (sort values %{$sub->{call_sites}}) {
-              <?= $site->{exclusive} ?> (ex.), <?= $site->{inclusive} ?> (incl.) when called from <?= $lookup_sub->($site->{caller})->{name} ?> <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
+              <?= $site->{exclusive} ?> (ex.),
+              <?= $site->{inclusive} ?> (incl.)
+              when called from
+              <?= $lookup_sub->($site->{caller})->{name} ?>
+              <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?    }
             </div>
 ?    if ($sub->{kind} == 2) {
