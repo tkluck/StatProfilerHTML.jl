@@ -817,7 +817,8 @@ sub output {
 
     $self->finalize;
     my $files = $self->{aggregate}{files};
-    my @subs = sort { $b->{exclusive} <=> $a->{exclusive} }
+    my @subs = sort { $b->{exclusive} <=> $a->{exclusive} ||
+                      $b->{inclusive} <=> $a->{inclusive} }
                     values %{$self->{aggregate}{subs}};
 
     my $date = POSIX::strftime('%c', localtime(time));
