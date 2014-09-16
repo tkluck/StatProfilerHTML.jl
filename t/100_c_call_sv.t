@@ -19,9 +19,10 @@ EOT
     },
     {
         name   => 'exit called - no trampoline',
-        start  => 1,
+        start  => 0,
         source => <<'EOT',
 sub test {
+    Devel::StatProfiler::enable_profile();
     print "ok 1\n";
     exit 72;
 }
@@ -49,9 +50,10 @@ EOT
     },
     {
         name   => 'exit called - no trampoline',
-        start  => 1,
+        start  => 0,
         source => <<'EOT',
 sub test {
+    Devel::StatProfiler::enable_profile();
     eval {
         print "ok 1\n";
         exit 72;
