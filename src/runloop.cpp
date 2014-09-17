@@ -104,6 +104,12 @@ namespace {
 
 typedef struct Cxt my_cxt_t;
 
+// real and test versions
+static void *
+increment_counter(void *arg);
+static void *
+test_increment_counter(void *arg);
+
 START_MY_CXT;
 
 namespace {
@@ -137,6 +143,11 @@ namespace {
     bool seeded = false;
     // hooks for saving eval text
     BHK scope_hooks;
+
+    // used for testing, but so small we always allocate them
+    Mutex test_counter_increment_mutex;
+    unsigned int test_counter_increment = 0;
+    void * (* increment_counter_function)(void *arg) = &increment_counter;
 }
 
 static bool
@@ -369,7 +380,7 @@ start_counter_thread(bool **terminate)
     *terminate = &cxt->terminate;
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
     ok = ok && !pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    ok = ok && !pthread_create(&thread, &attr, &increment_counter, cxt);
+    ok = ok && !pthread_create(&thread, &attr, increment_counter_function, cxt);
 
     int old_errno = errno;
     pthread_attr_destroy(&attr);
@@ -936,6 +947,9 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
 int
 devel::statprofiler::get_precision()
 {
+    if (increment_counter_function = &test_increment_counter)
+        return 1;
+
     timespec res;
 
     if (clock_getres(CLOCK_MONOTONIC, &res))
@@ -951,4 +965,175 @@ devel::statprofiler::is_running()
     dMY_CXT;
 
     return MY_CXT.is_running();
+}
+
+// disgusting test hackery
+//
+// overrides Time::HiRes::{usleep,sleep,time}, OP_FTDIR, OP_UNSTACK,
+// OP_NEXTSTATE and the counter thread to simulate a controlled
+// version of time, to make the tests less sensitive to system load
+//
+// enable with Devel::StatProfiler::Test::test_enable()
+
+// fake opcode implementation for ftdir/unstack/nextstate
+static Perl_ppaddr_t orig_ftdir, orig_unstack, orig_nextstate;
+
+static OP *
+test_ftdir(pTHX)
+{
+    test_force_sample(79);
+
+    return orig_ftdir(aTHX);
+}
+
+static OP *
+test_unstack(pTHX)
+{
+    test_force_sample(23);
+
+    return orig_unstack(aTHX);
+}
+
+static OP *
+test_nextstate(pTHX)
+{
+    test_force_sample(13);
+
+    return orig_nextstate(aTHX);
+}
+
+// overrides the XS implementation for Time::HiRes functions using the
+// one provided below
+static void
+fake_hires_function(const char *name)
+{
+    dTHX;
+
+    char src[100], dst[100];
+
+    strcpy(src, "Devel::StatProfiler::Test::test_hires_");
+    strcat(src, name);
+
+    strcpy(dst, "Time::HiRes::");
+    strcat(dst, name);
+
+    CV *src_cv = get_cv(src, 0);
+    if (!src_cv)
+        croak("Unable to get source XSUB for '%s'", src);
+
+    CV *dst_cv = get_cv(dst, 0);
+    if (!dst_cv)
+        croak("Unable to get source XSUB for '%s'", dst);
+
+    CvXSUB(dst_cv) = CvXSUB(src_cv);
+}
+
+void
+devel::statprofiler::test_enable()
+{
+    increment_counter_function = &test_increment_counter;
+
+    fake_hires_function("usleep");
+    fake_hires_function("sleep");
+    fake_hires_function("time");
+
+    orig_ftdir = PL_ppaddr[OP_FTDIR];
+    orig_unstack = PL_ppaddr[OP_UNSTACK];
+    orig_nextstate = PL_ppaddr[OP_NEXTSTATE];
+
+    PL_ppaddr[OP_FTDIR] = test_ftdir;
+    PL_ppaddr[OP_UNSTACK] = test_unstack;
+    PL_ppaddr[OP_NEXTSTATE] = test_nextstate;
+}
+
+double
+devel::statprofiler::test_hires_usleep(unsigned int usec)
+{
+    test_force_sample(usec);
+
+    return usec;
+}
+
+double
+devel::statprofiler::test_hires_sleep(double sleep)
+{
+    test_hires_usleep(sleep * 1000000);
+
+    return sleep;
+}
+
+double
+devel::statprofiler::test_hires_time()
+{
+    return 1234567890 + counter * (sampling_interval / 1000000.0);
+}
+
+void
+devel::statprofiler::test_force_sample(unsigned int increment)
+{
+    dTHX;
+    dMY_CXT;
+
+    static unsigned int seed = rand_seed();
+
+    // we could just increment the counter by increment and be done
+    // with it, but this way the test is more realistic (the counter
+    // is incremented by a separate thread, and we test the thread is
+    // running)
+    rand(&seed);
+
+    test_counter_increment_mutex.lock();
+    test_counter_increment += increment + (seed % increment) / 5;
+    if (test_counter_increment < sampling_interval) {
+        test_counter_increment_mutex.unlock();
+        return;
+    }
+    test_counter_increment_mutex.unlock();
+
+    // ugly and inefficient, but good enough for testing
+    for (;MY_CXT.outer_runloop;) {
+        test_counter_increment_mutex.lock();
+        if (test_counter_increment < sampling_interval) {
+            test_counter_increment_mutex.unlock();
+            break;
+        }
+        test_counter_increment_mutex.unlock();
+
+        timespec sleep = {0, 100000};
+        while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
+            ;
+    }
+
+    if (!MY_CXT.outer_runloop) {
+        test_counter_increment_mutex.lock();
+        counter += test_counter_increment / sampling_interval;
+        test_counter_increment %= sampling_interval;
+        test_counter_increment_mutex.unlock();
+    }
+}
+
+static void *
+test_increment_counter(void *arg)
+{
+    CounterCxt *cxt = static_cast<CounterCxt *>(arg);
+    bool *terminate = &cxt->terminate;
+
+    while (!*terminate) {
+        timespec sleep = {0, 100000};
+        while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
+            ;
+
+        test_counter_increment_mutex.lock();
+        if (test_counter_increment >= sampling_interval) {
+            counter += test_counter_increment / sampling_interval;
+            test_counter_increment %= sampling_interval;
+        }
+        test_counter_increment_mutex.unlock();
+
+        if (*terminate)
+            break;
+    }
+    delete cxt;
+
+    return NULL;
 }

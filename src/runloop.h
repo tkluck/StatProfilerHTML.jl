@@ -24,6 +24,12 @@ namespace devel {
         bool is_running();
 
         int get_precision();
+
+        void test_enable();
+        double test_hires_usleep(unsigned int usec);
+        double test_hires_sleep(double sleep);
+        double test_hires_time();
+        void test_force_sample(unsigned int increment);
     }
 }
 

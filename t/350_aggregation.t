@@ -11,7 +11,7 @@ BEGIN { ($profile_dir, $template) = temp_profile_dir(); }
 
 use Devel::StatProfiler -template => $template, -interval => 1000;
 
-for (my $count = 10000; ; $count *= 2) {
+for (my $count = 1000; ; $count *= 2) {
     my $start = time;
     note("Trying with $count iterations");
     t::lib::Slowops::foo($count);

@@ -27,6 +27,15 @@ void end_section(SV *section_name)
 int get_precision();
 bool is_running();
 
+%package{Devel::StatProfiler::Test};
+
+void test_enable();
+void test_force_sample(unsigned int increment);
+
+double test_hires_usleep(unsigned usec);
+double test_hires_sleep(double sleep);
+double test_hires_time();
+
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {
     TraceFileReader(SV *path)

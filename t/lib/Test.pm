@@ -83,6 +83,13 @@ sub take_sample {
     usleep(10000); BEGIN { $TAKE_SAMPLE_LINE = __LINE__ }
 }
 
+my $IS_DISTRIBUTION = $ENV{IS_DISTRIBUTION} // -f 'META.json';
+if ($IS_DISTRIBUTION) {
+    require Devel::StatProfiler;
+
+    Devel::StatProfiler::Test::test_enable();
+}
+
 sub get_samples {
     my ($file) = @_;
     my $r = Devel::StatProfiler::Reader->new($file);
