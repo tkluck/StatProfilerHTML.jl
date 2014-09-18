@@ -9,6 +9,7 @@ use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf8_sha1_hex);
+use Devel::StatProfiler::Slowops;
 use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
@@ -60,7 +61,7 @@ sub new {
         ),
         genealogy     => $genealogy,
         flamegraph    => $opts{flamegraph} || 0,
-        slowops       => {map { $_ => 1 } @{$opts{slowops} || []}},
+        slowops       => {map { $_ => 1 } @{$opts{slowops} || \@Devel::StatProfiler::Slowops::OPS}},
         tick          => 0,
         stack_depth   => 0,
         perl_version  => undef,

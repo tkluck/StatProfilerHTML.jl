@@ -11,6 +11,7 @@
 /pod2htm?.tmp
 /t/callsv*
 /t/xsinit.c
+/lib/Devel/StatProfiler/Slowops.pm
 *.o
 *.obj
 .*.sw*
