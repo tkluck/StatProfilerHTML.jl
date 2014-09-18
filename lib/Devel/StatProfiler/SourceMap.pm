@@ -96,7 +96,9 @@ sub add_sources_from_reader {
             $self->add_file_mapping($line + 2, $2, $1);
         }
 
-        $self->end_file_mapping($source_code->{$name} =~ tr/\n/\n/);
+        # a\nb\n -> 2 newlines, 2 lines, a\nb -> 1 newline, still 2 lines
+        $self->end_file_mapping($source_code->{$name} =~ tr/\n/\n/ +
+                                    (substr($source_code->{$name}, -1) ne "\n"));
     }
 }
 
