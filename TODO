@@ -25,7 +25,6 @@
 - test various interesting cases
   - do ""
   - sort {}/map {}
-- test under debugger
 - differentiate BEGIN blocks/evals in profile visualization
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
@@ -63,11 +62,6 @@
 - make scope hooks per-interpreter, and disable them when disabling profiling
 - test lexical subs in Perl 5.20+
 
-- flexible stack frame -> source code mapping
-  - allow specifying extra files to load (for on-disk files starting with
-    a #line directive)
-  - for Git repositories, fetch it from Git
-  - for generated code, allow some custom mapping
 - detect multiple evals with the same #line directive and different source code
 - closure aggregation
 - recursive sub aggregation
