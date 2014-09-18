@@ -373,15 +373,16 @@ sub _merge_sub_entry {
 }
 
 sub map_source {
-    my ($self) = @_;
+    my ($self, $process_id) = @_;
     my $files = $self->{aggregate}{files};
     my $subs = $self->{aggregate}{subs};
     my $flames = $self->{aggregate}{flames};
     my $file_map = $self->{aggregate}{file_map};
     my %eval_map;
+    $process_id ||= $self->{process_id};
 
     for my $file (keys %$files) {
-        my $hash = $self->{source}->get_hash_by_name($self->{process_id}, $file);
+        my $hash = $self->{source}->get_hash_by_name($process_id, $file);
 
         $eval_map{$file} = "eval:$hash" if $hash;
     }

@@ -12,9 +12,9 @@ my @files = @ARGV;
 my $outdir = 'statprof';
 
 my $report = Devel::StatProfiler::Report->new(
-    flamegraph => 1,
-    sources    => 1,
-    slowops    => [],
+    flamegraph      => 1,
+    sources         => 1,
+    mixed_process   => 1,
 );
 
 @files = glob('statprof.out.*')
@@ -25,7 +25,9 @@ die "Missing input files (via ARGV or 'statprof.out.*' or 'statprof.out'\n"
     if not @files;
 
 for my $f (@files) {
-    $report->add_trace_file($f);
+    my $r = Devel::StatProfiler::Reader->new($f);
+    $report->add_trace_file($r);
+    $report->map_source($r->get_genealogy_info->[0]);
 }
 
 $report->output($outdir);
