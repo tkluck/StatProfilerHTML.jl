@@ -133,10 +133,10 @@ namespace {
 typedef struct Cxt my_cxt_t;
 
 // real and test versions
-static void *
-increment_counter(void *arg);
-static void *
-test_increment_counter(void *arg);
+static void
+increment_counter(CounterCxt *arg);
+static void
+test_increment_counter(CounterCxt *arg);
 
 START_MY_CXT;
 
@@ -174,7 +174,7 @@ namespace {
     // used for testing, but so small we always allocate them
     Mutex test_counter_increment_mutex;
     unsigned int test_counter_increment = 0;
-    void * (* increment_counter_function)(void *arg) = &increment_counter;
+    void (* increment_counter_function)(CounterCxt *cxt) = &increment_counter;
 }
 
 static bool
@@ -357,10 +357,9 @@ reopen_output_file(pTHX_ pMY_CXT)
 }
 
 
-static void *
-increment_counter(void *arg)
+static void
+increment_counter(CounterCxt *cxt)
 {
-    CounterCxt *cxt = static_cast<CounterCxt *>(arg);
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
     int countdown = 0;
@@ -391,7 +390,7 @@ increment_counter(void *arg)
                     --refcount;
                     refcount_mutex.unlock();
 
-                    return NULL;
+                    return;
                 } else {
                     // fall through and keep running
                     refcount_mutex.unlock();
@@ -402,16 +401,34 @@ increment_counter(void *arg)
             countdown = sampling_interval > 1000000 ? 1 : 1000000 / sampling_interval;
         }
     }
+}
+
+
+#if defined(_WIN32)
+
+DWORD WINAPI
+thread_function(LPVOID arg)
+{
+    increment_counter_function(static_cast<CounterCxt *>(arg));
+
+    return 0;
+}
+
+#else
+
+static void *
+thread_function(void *arg)
+{
+    increment_counter_function(static_cast<CounterCxt *>(arg));
 
     return NULL;
 }
 
+#endif
 
 static bool
 start_counter_thread()
 {
-    pthread_attr_t attr;
-    pthread_t thread;
     bool ok = true;
 
     // init random seed
@@ -422,15 +439,22 @@ start_counter_thread()
 
     rand(&random_start);
 
+#if !defined(_WIN32)
+    pthread_attr_t attr;
     if (pthread_attr_init(&attr))
         return false;
+#endif
 
     // discard low-order bits (they tend to be less random and we
     // don't need them anyway)
     CounterCxt *cxt = new CounterCxt((random_start >> 8) % sampling_interval);
+
+#if !defined(_WIN32)
+    pthread_t thread;
+
     ok = ok && !pthread_attr_setstacksize(&attr, 65536);
     ok = ok && !pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    ok = ok && !pthread_create(&thread, &attr, increment_counter_function, cxt);
+    ok = ok && !pthread_create(&thread, &attr, thread_function, cxt);
 
     int old_errno = errno;
     pthread_attr_destroy(&attr);
@@ -439,6 +463,24 @@ start_counter_thread()
         delete cxt;
         errno = old_errno;
     }
+#else
+    HANDLE thread = CreateThread(
+        NULL,
+        65536,
+        thread_function,
+        cxt,
+        STACK_SIZE_PARAM_IS_A_RESERVATION,
+        NULL
+    );
+
+    // detach
+    if (thread)
+        CloseHandle(thread);
+    else
+        delete cxt;
+
+    ok = !!thread;
+#endif
 
     // implicit reference held by the counter thread
     ++refcount;
@@ -1177,10 +1219,9 @@ devel::statprofiler::test_force_sample(unsigned int increment)
     }
 }
 
-static void *
-test_increment_counter(void *arg)
+static void
+test_increment_counter(CounterCxt *cxt)
 {
-    CounterCxt *cxt = static_cast<CounterCxt *>(arg);
 
     delete cxt;
 
@@ -1204,12 +1245,10 @@ test_increment_counter(void *arg)
                 --refcount;
                 refcount_mutex.unlock();
 
-                return NULL;
+                return;
             } else {
                 refcount_mutex.unlock();
             }
         }
     }
-
-    return NULL;
 }
