@@ -31,6 +31,30 @@ namespace {
         ALL_EVALS_ALWAYS = 3,
     };
 
+#if defined(_WIN32)
+    struct Mutex {
+        Mutex() {
+            BOOL ok = InitializeCriticalSectionAndSpinCount(&critical_section, 3000);
+
+            if (!ok)
+                Perl_croak_nocontext("Devel::StatProfiler: error %d initializing critical section", GetLastError());
+        }
+
+        ~Mutex() {
+            DeleteCriticalSection(&critical_section);
+        }
+
+        void lock() {
+            EnterCriticalSection(&critical_section);
+        }
+
+        void unlock() {
+            LeaveCriticalSection(&critical_section);
+        }
+    private:
+        CRITICAL_SECTION critical_section;
+    };
+#else
     struct Mutex {
         Mutex() {
             reinit();
@@ -68,6 +92,7 @@ namespace {
     private:
         pthread_mutex_t mutex;
     };
+#endif
 
     struct Cxt {
         string filename;
