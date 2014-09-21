@@ -4,6 +4,8 @@
 #include <time.h>
 #include <pthread.h>
 
+#include <new> // for placement new
+
 #include "tracecollector.h"
 #include "tracefile.h"
 #include "rand.h"
