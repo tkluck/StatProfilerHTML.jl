@@ -976,7 +976,7 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
 int
 devel::statprofiler::get_precision()
 {
-    if (increment_counter_function = &test_increment_counter)
+    if (increment_counter_function == &test_increment_counter)
         return 1;
 
     timespec res;
