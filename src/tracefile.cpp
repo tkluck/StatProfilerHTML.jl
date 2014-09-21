@@ -434,7 +434,7 @@ void TraceFileReader::open(const std::string &path)
     SvREFCNT_dec(sections);
     sections = newHV();
     close();
-    in.open(fopen(path.c_str(), "r"));
+    in.open(fopen(path.c_str(), "rb"));
     read_header();
 }
 
@@ -742,7 +742,7 @@ int TraceFileWriter::open(const std::string &path, bool is_template, uint32_t id
 
     string temp = output_file + "_";
 
-    out.open(fopen(temp.c_str(), "w"));
+    out.open(fopen(temp.c_str(), "wb"));
     if (!out.is_valid())
         return 1;
 
