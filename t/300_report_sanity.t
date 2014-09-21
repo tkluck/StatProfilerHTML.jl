@@ -41,7 +41,7 @@ $r->add_trace_file($profile_file);
 $r->finalize;
 
 # sanity checking
-my %file_map = map { $_ => [keys $a->{file_map}{$_}] }
+my %file_map = map { $_ => [keys %{$a->{file_map}{$_}}] }
                    qw(main X Moo t::lib::Test);
 eq_or_diff(\%file_map, {
     'main'         => [__FILE__],
@@ -49,7 +49,7 @@ eq_or_diff(\%file_map, {
     'Moo'          => [__FILE__],
     't::lib::Test' => ['t/lib/Test.pm'],
 });
-eq_or_diff([sort grep !m{^/}, keys $a->{files}],
+eq_or_diff([sort grep !m{^/}, keys %{$a->{files}}],
            ['', __FILE__, 't/lib/Test.pm']);
 
 my $total; $total += $_->{exclusive} for values %{$a->{files}};
