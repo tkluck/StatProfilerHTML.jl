@@ -361,6 +361,7 @@ reopen_output_file(pTHX_ pMY_CXT)
 }
 
 
+// #define DEBUG_INCREMENT_COUNTER
 static void
 increment_counter(CounterCxt *cxt)
 {
@@ -369,6 +370,11 @@ increment_counter(CounterCxt *cxt)
     LONGLONG previous_tick, current_tick;
 
     QueryPerformanceCounter((LARGE_INTEGER *) &previous_tick);
+
+#ifdef DEBUG_INCREMENT_COUNTER
+    DWORD debug_start = GetTickCount(), debug_end;
+    unsigned int counter_start = counter;
+#endif
 #else
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
@@ -429,6 +435,21 @@ increment_counter(CounterCxt *cxt)
         } else if (refcount == 1) {
             // count down for 1 second or 1 interval (whatever is smaller)
             countdown = sampling_interval > 1000000 ? 1 : 1000000 / sampling_interval;
+
+#ifdef DEBUG_INCREMENT_COUNTER
+            unsigned int increments = counter - counter_start;
+            if (increments) {
+#ifdef _WIN32
+                debug_end = GetTickCount();
+
+                printf("Counter ticks: %lu, Interval: %ld\n", increments, (debug_end - debug_start) * 1000 / increments);
+#else
+                gettimeofday(&debug_end, NULL);
+
+                printf("Counter ticks: %u, Interval: %ld\n\n", increments, ((debug_end.tv_sec - debug_start.tv_sec) * 1000000 + debug_end.tv_usec - debug_start.tv_usec) / increments);
+#endif
+            }
+#endif
         }
     }
 }
