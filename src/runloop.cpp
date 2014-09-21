@@ -157,6 +157,10 @@ namespace {
 #endif
     // global counter, written by increment_counter(), read by the runloops
     unsigned int counter = 0;
+    unsigned int counter_fraction = 0;
+#if defined(_WIN32)
+    LONGLONG performance_counter_frequency;
+#endif
     // sampling interval, in microseconds
     unsigned int sampling_interval = 10000;
     // random start delay, to improve distribution
@@ -360,19 +364,38 @@ reopen_output_file(pTHX_ pMY_CXT)
 static void
 increment_counter(CounterCxt *cxt)
 {
+#if defined(_WIN32)
+    unsigned int delay_msec = cxt->start_delay / 1000;
+    LONGLONG previous_tick, current_tick;
+
+    QueryPerformanceCounter((LARGE_INTEGER *) &previous_tick);
+#else
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
+#endif
     int countdown = 0;
 
     delete cxt;
 
     for (;;) {
+#if defined(_WIN32)
+        Sleep(delay_msec ? delay_msec : 1);
+        QueryPerformanceCounter((LARGE_INTEGER *) &current_tick);
+
+        LONGLONG delta = ((current_tick - previous_tick) * 1000000) / performance_counter_frequency;
+        counter_fraction += delta % sampling_interval;
+        counter += delta / sampling_interval + counter_fraction / sampling_interval;
+        counter_fraction %= sampling_interval;
+        previous_tick = current_tick;
+        delay_msec = sampling_interval / 1000;
+#else
         timespec sleep = {delay_sec, delay_nsec};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
         delay_sec = sampling_interval / 1000000;
         delay_nsec = sampling_interval % 1000000 * 1000;
         ++counter;
+#endif
 
         // we only synchronize when checking whether the thread needs
         // to really terminate, but there is no need to lock around
@@ -895,6 +918,10 @@ devel::statprofiler::init_runloop(pTHX)
     pthread_once(&call_atfork, init_atfork);
 #endif
 
+#if defined(_WIN32)
+    QueryPerformanceFrequency((LARGE_INTEGER *) &performance_counter_frequency);
+#endif
+
     CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
 
     for (OP *o = CvSTART(enable_profiler); o; o = o->op_next) {
@@ -1057,12 +1084,18 @@ devel::statprofiler::get_precision()
     if (increment_counter_function == &test_increment_counter)
         return 1;
 
+#if defined(_WIN32)
+    // the actual clock might have been set to be more accurate by
+    // some program (e.g. Chrome) but it's better to assume the worst
+    return 15600;
+#else
     timespec res;
 
     if (clock_getres(CLOCK_MONOTONIC, &res))
         return -1;
 
     return res.tv_sec * 1000000 + res.tv_nsec / 1000;
+#endif
 }
 
 bool
@@ -1175,6 +1208,22 @@ devel::statprofiler::test_hires_time()
     return 1234567890 + counter * (sampling_interval / 1000000.0);
 }
 
+#if defined(_WIN32)
+
+static void
+win32_nanosleep_busywait(unsigned nsec) {
+    LONGLONG current, wanted;
+
+    QueryPerformanceCounter((LARGE_INTEGER *) &wanted);
+    wanted += nsec * performance_counter_frequency / 1000000000;
+
+    do {
+        QueryPerformanceCounter((LARGE_INTEGER *) &current);
+    } while (current < wanted);
+}
+
+#endif
+
 void
 devel::statprofiler::test_force_sample(unsigned int increment)
 {
@@ -1206,9 +1255,13 @@ devel::statprofiler::test_force_sample(unsigned int increment)
         }
         test_counter_increment_mutex.unlock();
 
+#if defined(_WIN32)
+        win32_nanosleep_busywait(100000);
+#else
         timespec sleep = {0, 100000};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
+#endif
     }
 
     if (!MY_CXT.outer_runloop) {
@@ -1222,13 +1275,16 @@ devel::statprofiler::test_force_sample(unsigned int increment)
 static void
 test_increment_counter(CounterCxt *cxt)
 {
-
     delete cxt;
 
     for (;;) {
+#if defined(_WIN32)
+        win32_nanosleep_busywait(100000);
+#else
         timespec sleep = {0, 100000};
         while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
             ;
+#endif
 
         test_counter_increment_mutex.lock();
         if (test_counter_increment >= sampling_interval) {
