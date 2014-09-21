@@ -147,7 +147,8 @@ call C<enable_profile()>.
 
 =head3 -interval <microsecs> (default 10000)
 
-Sets the sampling interval, in microseconds.
+Sets the sampling interval, in microseconds (accuracy varies depending
+on OS/hardware).
 
 =head3 -maxsize <size> (default 10MB)
 
@@ -252,3 +253,10 @@ will not be found.
 
 The first line of subs is found by searching for the sub definition in
 the code. Needless to say, this is fragile.
+
+=head2 sampling accuracy
+
+Since the profiler uses C<nanosleep>/C<Sleep> between samples,
+accuracy is at the mercy of the OS scheduler.  In particular, under
+Windows the default system timer has an accuracy of about 15.6
+milliseconds.
