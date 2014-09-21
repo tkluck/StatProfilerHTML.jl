@@ -18,16 +18,30 @@ die "OS unsupported"
 
 sub new {
     my ($class, %args) = @_;
+    my $debug_flag = $DEBUG ? ' -g' : '';
     my @extra_libs;
 
     if ($^O eq 'linux') {
         @extra_libs = qw(-lrt);
+    } elsif ($^O eq 'MSWin32') {
+        if ($DEBUG) {
+            # TODO add the MSVC equivalent
+            my ($ccflags, $lddlflags, $optimize) = map {
+                s{(^|\s)-s(\s|$)}{$1$2}r
+            } @Config{qw(ccflags lddlflags optimize)};
+
+            $args{config} = {
+                ccflags     => $ccflags,
+                lddlflags   => $lddlflags,
+                optimize    => $optimize,
+            };
+        }
     }
 
     return $class->SUPER::new(
         %args,
         share_dir          => 'share',
-        extra_compiler_flags => '-DSNAPPY=1 -DPERL_NO_GET_CONTEXT' . ($DEBUG ? ' -g' : ''),
+        extra_compiler_flags => '-DSNAPPY=1 -DPERL_NO_GET_CONTEXT' . $debug_flag,
         extra_linker_flags => [@extra_libs],
     );
 }
