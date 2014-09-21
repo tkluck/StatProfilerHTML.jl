@@ -85,6 +85,12 @@ sub enable_profile  { _set_profiler_state(1) }
 sub restart_profile { _set_profiler_state(2) }
 sub stop_profile    { _set_profiler_state(3) }
 
+sub save_source {
+  my ($value) = @_;
+  _croak("Invalid value for save_source option") unless exists $source_args{$value};
+  set_save_source($source_args{$value});
+}
+
 sub guarded_section {
   my ($section_name) = @_;
   require Devel::StatProfiler::SectionGuard;

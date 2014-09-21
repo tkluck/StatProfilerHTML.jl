@@ -28,6 +28,7 @@ EOT
 eval $eval_with_hash_line;
 
 Devel::StatProfiler::stop_profile(); # closes the trace file
+Devel::StatProfiler::save_source('none');
 
 my $source = get_sources($profile_file);
 my %count;
