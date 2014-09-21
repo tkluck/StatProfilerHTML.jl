@@ -1,7 +1,7 @@
 #include "runloop.h"
 #include "ppport.h"
 
-#ifndef _WIN32
+#if !defined(_WIN32)
 #include <time.h>
 #include <pthread.h>
 #endif
@@ -141,8 +141,10 @@ test_increment_counter(void *arg);
 START_MY_CXT;
 
 namespace {
+#if !defined(_WIN32)
     // call pthread_atfork once
     pthread_once_t call_atfork = PTHREAD_ONCE_INIT;
+#endif
     // global refcount for the counter thread
     volatile int refcount = 0;
     // hold this mutex before reading/writing refcount
@@ -776,6 +778,8 @@ cleanup_runloop(pTHX_ void *ptr)
 }
 
 
+#if !defined(_WIN32)
+
 static void
 prepare_fork()
 {
@@ -835,6 +839,8 @@ init_atfork()
     pthread_atfork(prepare_fork, parent_after_fork, child_after_fork);
 }
 
+#endif
+
 
 void
 devel::statprofiler::init_runloop(pTHX)
@@ -843,8 +849,9 @@ devel::statprofiler::init_runloop(pTHX)
     new(&MY_CXT) Cxt();
 
     Perl_call_atexit(aTHX_ cleanup_runloop, NULL);
-
+#if !defined(_WIN32)
     pthread_once(&call_atfork, init_atfork);
+#endif
 
     CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
 
