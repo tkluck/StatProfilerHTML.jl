@@ -12,14 +12,23 @@ GetOptions(
     'g'         => \my $DEBUG,
 );
 
+die "OS unsupported"
+    unless $^O eq 'linux' ||
+           $^O eq 'MSWin32';
+
 sub new {
     my ($class, %args) = @_;
+    my @extra_libs;
+
+    if ($^O eq 'linux') {
+        @extra_libs = qw(-lrt);
+    }
 
     return $class->SUPER::new(
         %args,
         share_dir          => 'share',
         extra_compiler_flags => '-DSNAPPY=1 -DPERL_NO_GET_CONTEXT' . ($DEBUG ? ' -g' : ''),
-        extra_linker_flags => [qw(-lrt)],
+        extra_linker_flags => [@extra_libs],
     );
 }
 
