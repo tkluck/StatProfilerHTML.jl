@@ -1116,7 +1116,7 @@ devel::statprofiler::is_running()
 // enable with Devel::StatProfiler::Test::test_enable()
 
 // fake opcode implementation for ftdir/unstack/nextstate
-static Perl_ppaddr_t orig_ftdir, orig_unstack, orig_nextstate;
+static Perl_ppaddr_t orig_ftdir, orig_unstack, orig_subst, orig_nextstate;
 
 static OP *
 test_ftdir(pTHX)
@@ -1132,6 +1132,14 @@ test_unstack(pTHX)
     test_force_sample(23);
 
     return orig_unstack(aTHX);
+}
+
+static OP *
+test_subst(pTHX)
+{
+    test_force_sample(29);
+
+    return orig_subst(aTHX);
 }
 
 static OP *
@@ -1179,10 +1187,12 @@ devel::statprofiler::test_enable()
 
     orig_ftdir = PL_ppaddr[OP_FTDIR];
     orig_unstack = PL_ppaddr[OP_UNSTACK];
+    orig_subst = PL_ppaddr[OP_SUBST];
     orig_nextstate = PL_ppaddr[OP_NEXTSTATE];
 
     PL_ppaddr[OP_FTDIR] = test_ftdir;
     PL_ppaddr[OP_UNSTACK] = test_unstack;
+    PL_ppaddr[OP_SUBST] = test_subst;
     PL_ppaddr[OP_NEXTSTATE] = test_nextstate;
 }
 

@@ -16,8 +16,8 @@ sub _e { sprintf '(eval %d)', $_[0] }
 
 for (1..4) {
     eval "take_sample(); take_sample()";
-    eval "Time::HiRes::sleep(0.000001)";
-    eval "Time::HiRes::sleep(0.000001)";
+    eval "Time::HiRes::sleep(0.000002)";
+    eval "Time::HiRes::sleep(0.000002)";
 }
 
 my $eval_with_hash_line = <<EOT;
@@ -49,7 +49,7 @@ diag("Strange eval source '$_'") for @strange;
 $count{$_}++ for values %$source;
 
 is_deeply(\%count, {
-    'Time::HiRes::sleep(0.000001)' => 8,
+    'Time::HiRes::sleep(0.000002)' => 8,
     'take_sample(); take_sample()' => 4,
     $eval_with_hash_line           => 1,
     'sub f { (caller 0)[1] } f()'  => 1,
@@ -58,8 +58,8 @@ is_deeply(\%count, {
 # check source is associated with the correct (eval ...) string
 is($source->{_e($first_eval_n     )}, 'sub f { (caller 0)[1] } f()');
 is($source->{_e($first_eval_n + 10)}, 'take_sample(); take_sample()');
-is($source->{_e($first_eval_n + 11)}, 'Time::HiRes::sleep(0.000001)');
-is($source->{_e($first_eval_n + 12)}, 'Time::HiRes::sleep(0.000001)');
+is($source->{_e($first_eval_n + 11)}, 'Time::HiRes::sleep(0.000002)');
+is($source->{_e($first_eval_n + 12)}, 'Time::HiRes::sleep(0.000002)');
 is($source->{_e($first_eval_n + 13)}, $eval_with_hash_line);
 
 done_testing();

@@ -13,9 +13,9 @@ my ($traced, $not_traced);
 
 for (1..100) {
     Devel::StatProfiler::disable_profile();
-    usleep(10000); BEGIN { $not_traced = __LINE__ }
+    usleep(50000); BEGIN { $not_traced = __LINE__ }
     Devel::StatProfiler::enable_profile();
-    usleep(10000); BEGIN { $traced = __LINE__ }
+    usleep(50000); BEGIN { $traced = __LINE__ }
 }
 
 Devel::StatProfiler::stop_profile();

@@ -11,8 +11,8 @@ use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 't
 
 for (1..4) {
     eval "take_sample(); take_sample();";
-    eval "Time::HiRes::sleep(0.000001);";
-    eval "Time::HiRes::sleep(0.000001);";
+    eval "Time::HiRes::sleep(0.000002);";
+    eval "Time::HiRes::sleep(0.000002);";
 }
 
 Devel::StatProfiler::stop_profile();

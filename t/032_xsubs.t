@@ -43,14 +43,14 @@ my $tie;
 
 # tries to exercise the major branches in get_cv_from_sv
 tie $tie, 'Tied';
-usleep(10000); BEGIN { $l1 = __LINE__ }
-$ref->(10000); BEGIN { $l2 = __LINE__ }
+usleep(50000); BEGIN { $l1 = __LINE__ }
+$ref->(50000); BEGIN { $l2 = __LINE__ }
 {
     no strict 'refs';
-    &{"usleep"}(10000); BEGIN { $l3 = __LINE__ }
+    &{"usleep"}(50000); BEGIN { $l3 = __LINE__ }
 }
-$tie->(10000); BEGIN { $l4 = __LINE__ }
-$overload->(10000); BEGIN { $l5 = __LINE__; }
+$tie->(50000); BEGIN { $l4 = __LINE__ }
+$overload->(50000); BEGIN { $l5 = __LINE__; }
 
 Devel::StatProfiler::stop_profile();
 

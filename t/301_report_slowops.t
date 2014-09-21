@@ -9,22 +9,24 @@ use Time::HiRes qw(time);
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
 
+my $LONG_STR = " X" x 1000000;
+
 use Devel::StatProfiler -file => $profile_file, -interval => 1000;
 my ($l1);
 
-for (my $count = 10000; ; $count *= 2) {
+for (my $count = precision_factor == 1 ? 10000 : 20000; ; $count *= 2) {
     my $start = time;
     note("Trying with $count iterations");
     t::lib::Slowops::foo($count);
-    -d '.' for 1..$count;   BEGIN { $l1 = __LINE__ + 0 }
+    -d '.' && $LONG_STR =~ s/ $// for 1..$count; BEGIN { $l1 = __LINE__ + 0 }
     last if time - $start >= 0.5;
 }
 
 Devel::StatProfiler::stop_profile();
 
-my $slowops_foo_line = 7;
+my $slowops_foo_line = 9;
 my $r = Devel::StatProfiler::Report->new(
-    slowops => [qw(ftdir unstack)],
+    slowops => [qw(ftdir subst)],
 );
 my $a = $r->{aggregate};
 $r->add_trace_file($profile_file);
@@ -32,9 +34,10 @@ $r->finalize;
 
 # sanity checking
 ok($a->{subs}{__FILE__ . ':CORE::ftdir'});
-ok($a->{subs}{__FILE__ . ':CORE::unstack'});
+ok($a->{subs}{__FILE__ . ':CORE::subst'});
 ok($a->{subs}{'t/lib/Slowops.pm:CORE::ftdir'});
-ok($a->{subs}{'t/lib/Slowops.pm:CORE::unstack'});
+ok($a->{subs}{'t/lib/Slowops.pm:CORE::subst'});
+
 ok(!exists $a->{file_map}{CORE});
 
 ### start checking we have one ftdir instance per file
@@ -56,7 +59,7 @@ isnt($ftdir_main, $ftdir_so);
 {
     my $cs = $ftdir_so->{call_sites}{"t/lib/Slowops.pm:$slowops_foo_line"};
 
-    is($cs->{caller}, 't/lib/Slowops.pm:t::lib::Slowops::foo:7');
+    is($cs->{caller}, 't/lib/Slowops.pm:t::lib::Slowops::foo:' . $slowops_foo_line);
     is($cs->{file}, 't/lib/Slowops.pm');
     is($cs->{line}, $slowops_foo_line);
     is($cs->{inclusive}, $cs->{exclusive});

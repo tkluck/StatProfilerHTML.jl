@@ -10,7 +10,7 @@ BEGIN { ($profile_dir, $template) = temp_profile_dir(); }
 use Devel::StatProfiler -template => $template, -interval => 1000, -source => 'all_evals', -maxsize => 300;
 
 for (1..10) {
-  usleep(10000); # 10ms
+  usleep(50000); # 50ms
   Devel::StatProfiler::write_custom_metadata(foo => "bar") if $_ == 3;
 }
 

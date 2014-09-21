@@ -25,10 +25,10 @@ if (precision_factor == 1) {
     ($s_100, $s_500, $s_200) = ($s_100_a, $s_500_a, $s_200_a);
 } else {
     my ($s_100_b, $s_500_b, $s_200_b);
-    for (1..300 * precision_factor) {
-        sleepy(3000); BEGIN { $s_100_b = __LINE__ }
-        sleepy(5000); BEGIN { $s_500_b = __LINE__ }
-        sleepy(2000); BEGIN { $s_200_b = __LINE__ }
+    for (1..30) {
+        sleepy(3000 * precision_factor); BEGIN { $s_100_b = __LINE__ }
+        sleepy(5000 * precision_factor); BEGIN { $s_500_b = __LINE__ }
+        sleepy(2000 * precision_factor); BEGIN { $s_200_b = __LINE__ }
     }
     ($s_100, $s_500, $s_200) = ($s_100_b, $s_500_b, $s_200_b);
 }
@@ -62,8 +62,13 @@ sub cmp_ratio {
     }
 }
 
-cmp_ok($total, '>=', 3200, 'total sample count is in a sane range');
-cmp_ok($total, '<=', 3800, 'total sample count is in a sane range');
+if (precision_factor == 1) {
+    cmp_ok($total, '>=', 2900, 'total sample count is in a sane range');
+    cmp_ok($total, '<=', 3800, 'total sample count is in a sane range');
+} else {
+    cmp_ok($total, '>=', 290 * precision_factor, 'total sample count is in a sane range');
+    cmp_ok($total, '<=', 380 * precision_factor, 'total sample count is in a sane range');
+}
 
 cmp_ratio($sleep_pattern{$sleepy}, $total, 1, .10);
 cmp_ratio($sleep_pattern{$s_100}, $total, 3/10, .15);

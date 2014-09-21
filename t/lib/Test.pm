@@ -79,8 +79,7 @@ sub temp_profile_dir {
 }
 
 sub take_sample {
-    # tests run with 1ms sample, use 10 times that
-    usleep(10000); BEGIN { $TAKE_SAMPLE_LINE = __LINE__ }
+    usleep(5000 * precision_factor()); BEGIN { $TAKE_SAMPLE_LINE = __LINE__ }
 }
 
 my $IS_DISTRIBUTION = $ENV{IS_DISTRIBUTION} // -f 'META.json';
