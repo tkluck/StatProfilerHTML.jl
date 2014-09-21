@@ -40,7 +40,7 @@ ok(!exists $a->{file_map}{CORE});
 ### start checking we have one ftdir instance per file
 
 my ($ftdir_main) = grep $_->{name} eq 'CORE::ftdir',
-                        @{$a->{files}{'t/301_report_slowops.t'}{subs}{-2}};
+                        @{$a->{files}{+__FILE__}{subs}{-2}};
 my ($ftdir_so)   = grep $_->{name} eq 'CORE::ftdir',
                         @{$a->{files}{'t/lib/Slowops.pm'}{subs}{-2}};
 

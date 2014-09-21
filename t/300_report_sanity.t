@@ -50,7 +50,8 @@ eq_or_diff(\%file_map, {
     't::lib::Test' => ['t/lib/Test.pm'],
 });
 eq_or_diff([sort grep !m{^/}, keys %{$a->{files}}],
-           ['', __FILE__, 't/lib/Test.pm']);
+           # need to sort this because of / vs. \ in __FILE__
+           [sort '', __FILE__, 't/lib/Test.pm']);
 
 my $total; $total += $_->{exclusive} for values %{$a->{files}};
 is($a->{total}, $total);
@@ -150,11 +151,11 @@ is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 ### end file attributes
 ### start flamegraph
 
-my @traces = qw(
-    t/300_report_sanity.t:main;t/300_report_sanity.t:main::foo:28;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
-    t/300_report_sanity.t:main;t/300_report_sanity.t:X::__ANON__:19;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
-    t/300_report_sanity.t:main::BEGIN:13;(unknown):Time::HiRes::sleep
-    t/300_report_sanity.t:main;t/300_report_sanity.t:Moo::bar:24;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
+my @traces = map { s{__FILE__}{__FILE__}reg } qw(
+    __FILE__:main;__FILE__:main::foo:28;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
+    __FILE__:main;__FILE__:X::__ANON__:19;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
+    __FILE__:main::BEGIN:13;(unknown):Time::HiRes::sleep
+    __FILE__:main;__FILE__:Moo::bar:24;t/lib/Test.pm:t::lib::Test::take_sample:83;(unknown):Time::HiRes::usleep
 );
 
 for my $trace (@traces) {

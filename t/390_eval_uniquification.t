@@ -125,12 +125,12 @@ my $a2 = $r2->{aggregate};
     is($s2e1foo->{exclusive}, $s1e1foo->{exclusive} + $s1e2foo->{exclusive});
     is($s2e1foo->{inclusive}, $s1e1foo->{inclusive} + $s1e2foo->{inclusive});
 
-    ok($s1e1foo->{call_sites}{'t/390_eval_uniquification.t:25'});
-    ok($s1e2foo->{call_sites}{'t/390_eval_uniquification.t:33'});
-    eq_or_diff($s2e1foo->{call_sites}{'t/390_eval_uniquification.t:25'},
-               $s1e1foo->{call_sites}{'t/390_eval_uniquification.t:25'});
-    eq_or_diff($s2e1foo->{call_sites}{'t/390_eval_uniquification.t:33'},
-               $s1e2foo->{call_sites}{'t/390_eval_uniquification.t:33'});
+    ok($s1e1foo->{call_sites}{__FILE__ . ':25'});
+    ok($s1e2foo->{call_sites}{__FILE__ . ':33'});
+    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':25'},
+               $s1e1foo->{call_sites}{__FILE__ . ':25'});
+    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':33'},
+               $s1e2foo->{call_sites}{__FILE__ . ':33'});
 
     {
         my $s1c1 = $s1e1foo->{callees}{5}{_e($first_eval_n + 1) . ':main::foo:2'};
@@ -158,7 +158,7 @@ my $a2 = $r2->{aggregate};
 ## test flames
 
 {
-    my ($merged, @src) = map "t/390_eval_uniquification.t:main;$_:eval;$_:main::foo:2;(unknown):Time::HiRes::usleep",
+    my ($merged, @src) = map __FILE__ . ":main;$_:eval;$_:main::foo:2;(unknown):Time::HiRes::usleep",
         'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8',
         _e($first_eval_n + 1), _e($first_eval_n + 2);
 
