@@ -46,6 +46,7 @@ double test_hires_time();
           RETVAL = new TraceFileReader(aTHX);
           RETVAL->open(pathstr);
       %};
+    ~TraceFileReader();
 
     SV *read_trace();
 
