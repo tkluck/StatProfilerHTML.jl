@@ -14,6 +14,7 @@ GetOptions(
 
 die "OS unsupported"
     unless $^O eq 'linux' ||
+           $^O eq 'darwin' ||
            $^O eq 'MSWin32';
 
 sub new {

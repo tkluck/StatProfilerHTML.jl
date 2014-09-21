@@ -372,6 +372,13 @@ increment_counter(CounterCxt *cxt)
 #else
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
+
+#ifdef DEBUG_INCREMENT_COUNTER
+    struct timeval debug_start, debug_end;
+    unsigned int counter_start = counter;
+
+    gettimeofday(&debug_start, NULL);
+#endif
 #endif
     int countdown = 0;
 
@@ -390,7 +397,7 @@ increment_counter(CounterCxt *cxt)
         delay_msec = sampling_interval / 1000;
 #else
         timespec sleep = {delay_sec, delay_nsec};
-        while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
+        while (nanosleep(&sleep, &sleep) == EINTR)
             ;
         delay_sec = sampling_interval / 1000000;
         delay_nsec = sampling_interval % 1000000 * 1000;
@@ -1088,10 +1095,13 @@ devel::statprofiler::get_precision()
     // the actual clock might have been set to be more accurate by
     // some program (e.g. Chrome) but it's better to assume the worst
     return 15600;
+#elif defined(__APPLE__)
+    // actually, it seems to be accurate to the microsecond
+    return 100;
 #else
     timespec res;
 
-    if (clock_getres(CLOCK_MONOTONIC, &res))
+    if (clock_getres(CLOCK_REALTIME, &res))
         return -1;
 
     return res.tv_sec * 1000000 + res.tv_nsec / 1000;
@@ -1269,7 +1279,7 @@ devel::statprofiler::test_force_sample(unsigned int increment)
         win32_nanosleep_busywait(100000);
 #else
         timespec sleep = {0, 100000};
-        while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
+        while (nanosleep(&sleep, &sleep) == EINTR)
             ;
 #endif
     }
@@ -1292,7 +1302,7 @@ test_increment_counter(CounterCxt *cxt)
         win32_nanosleep_busywait(100000);
 #else
         timespec sleep = {0, 100000};
-        while (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &sleep) == EINTR)
+        while (nanosleep(&sleep, &sleep) == EINTR)
             ;
 #endif
 
