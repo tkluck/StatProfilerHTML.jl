@@ -1,8 +1,11 @@
 #ifndef _DEVEL_STATPROFILER_RUNLOOP
 #define _DEVEL_STATPROFILER_RUNLOOP
 
+// required because win32_async_check() is not declared as extern "C"
+extern "C" {
 #include "EXTERN.h"
 #include "perl.h"
+}
 
 namespace devel {
     namespace statprofiler {

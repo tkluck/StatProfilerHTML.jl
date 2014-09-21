@@ -5,7 +5,10 @@
 #include "perl.h"
 
 #include <string>
-#include <vector>
+#if defined(_WIN32)
+#include "wincompat.h"
+#endif
+
 #include <cstdio>
 
 #include "thx_member.h"

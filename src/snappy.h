@@ -4,6 +4,10 @@
 #include <EXTERN.h>
 #include <perl.h>
 
+#if defined(_WIN32)
+#include "wincompat.h"
+#endif
+
 #include <snappy/csnappy.h>
 
 #include <cstdio>

@@ -1,8 +1,10 @@
 #include "runloop.h"
 #include "ppport.h"
 
+#ifndef _WIN32
 #include <time.h>
 #include <pthread.h>
+#endif
 
 #include <new> // for placement new
 
