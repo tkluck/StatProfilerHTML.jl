@@ -6,6 +6,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef __APPLE__
+#include <mach/mach_time.h>
+#endif
+
 #include <new> // for placement new
 
 #include "tracecollector.h"
@@ -160,6 +164,8 @@ namespace {
     unsigned int counter_fraction = 0;
 #if defined(_WIN32)
     LONGLONG performance_counter_frequency;
+#elif defined(__APPLE__)
+    mach_timebase_info_data_t monotonic_clock_info;
 #endif
     // sampling interval, in microseconds
     unsigned int sampling_interval = 10000;
@@ -383,6 +389,10 @@ increment_counter(CounterCxt *cxt)
     struct timespec previous_tick, current_tick;
 
     clock_gettime(CLOCK_MONOTONIC, &previous_tick);
+#elif defined(__APPLE__)
+    uint64_t previous_tick, current_tick;
+
+    previous_tick = mach_absolute_time();
 #endif
 
 #ifdef DEBUG_INCREMENT_COUNTER
@@ -415,6 +425,14 @@ increment_counter(CounterCxt *cxt)
         clock_gettime(CLOCK_MONOTONIC, &current_tick);
 
         unsigned int delta = (current_tick.tv_sec - previous_tick.tv_sec) * 1000000 + (current_tick.tv_nsec - previous_tick.tv_nsec) / 1000;
+        counter_fraction += delta % sampling_interval;
+        counter += delta / sampling_interval + counter_fraction / sampling_interval;
+        counter_fraction %= sampling_interval;
+        previous_tick = current_tick;
+#elif defined(__APPLE__)
+        current_tick = mach_absolute_time();
+
+        uint64_t delta = (current_tick - previous_tick) * monotonic_clock_info.numer / (monotonic_clock_info.denom * 1000);
         counter_fraction += delta % sampling_interval;
         counter += delta / sampling_interval + counter_fraction / sampling_interval;
         counter_fraction %= sampling_interval;
@@ -965,6 +983,8 @@ devel::statprofiler::init_runloop(pTHX)
 
 #if defined(_WIN32)
     QueryPerformanceFrequency((LARGE_INTEGER *) &performance_counter_frequency);
+#elif defined(__APPLE__)
+    mach_timebase_info(&monotonic_clock_info);
 #endif
 
     CV *enable_profiler = get_cv("Devel::StatProfiler::_set_profiler_state", 0);
