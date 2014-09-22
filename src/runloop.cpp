@@ -366,6 +366,11 @@ reopen_output_file(pTHX_ pMY_CXT)
     // XXX check if we need to write other metadata
 }
 
+#define INCREMENT_COUNTER() \
+    counter_fraction += delta % sampling_interval; \
+    counter += delta / sampling_interval + counter_fraction / sampling_interval; \
+    counter_fraction %= sampling_interval; \
+    previous_tick = current_tick
 
 // #define DEBUG_INCREMENT_COUNTER
 static void
@@ -412,10 +417,7 @@ increment_counter(CounterCxt *cxt)
         QueryPerformanceCounter((LARGE_INTEGER *) &current_tick);
 
         LONGLONG delta = ((current_tick - previous_tick) * 1000000) / performance_counter_frequency;
-        counter_fraction += delta % sampling_interval;
-        counter += delta / sampling_interval + counter_fraction / sampling_interval;
-        counter_fraction %= sampling_interval;
-        previous_tick = current_tick;
+        INCREMENT_COUNTER();
         delay_msec = sampling_interval / 1000;
 #else
         timespec sleep = {delay_sec, delay_nsec};
@@ -425,18 +427,12 @@ increment_counter(CounterCxt *cxt)
         clock_gettime(CLOCK_MONOTONIC, &current_tick);
 
         unsigned int delta = (current_tick.tv_sec - previous_tick.tv_sec) * 1000000 + (current_tick.tv_nsec - previous_tick.tv_nsec) / 1000;
-        counter_fraction += delta % sampling_interval;
-        counter += delta / sampling_interval + counter_fraction / sampling_interval;
-        counter_fraction %= sampling_interval;
-        previous_tick = current_tick;
+        INCREMENT_COUNTER();
 #elif defined(__APPLE__)
         current_tick = mach_absolute_time();
 
         uint64_t delta = (current_tick - previous_tick) * monotonic_clock_info.numer / (monotonic_clock_info.denom * 1000);
-        counter_fraction += delta % sampling_interval;
-        counter += delta / sampling_interval + counter_fraction / sampling_interval;
-        counter_fraction %= sampling_interval;
-        previous_tick = current_tick;
+        INCREMENT_COUNTER();
 #else
         ++counter;
 #endif
