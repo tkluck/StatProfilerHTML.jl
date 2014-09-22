@@ -379,6 +379,12 @@ increment_counter(CounterCxt *cxt)
     unsigned int delay_sec = cxt->start_delay / 1000000,
                  delay_nsec = cxt->start_delay % 1000000 * 1000;
 
+#if defined(__linux__)
+    struct timespec previous_tick, current_tick;
+
+    clock_gettime(CLOCK_MONOTONIC, &previous_tick);
+#endif
+
 #ifdef DEBUG_INCREMENT_COUNTER
     struct timeval debug_start, debug_end;
     unsigned int counter_start = counter;
@@ -405,9 +411,20 @@ increment_counter(CounterCxt *cxt)
         timespec sleep = {delay_sec, delay_nsec};
         while (nanosleep(&sleep, &sleep) == EINTR)
             ;
+#if defined(__linux__)
+        clock_gettime(CLOCK_MONOTONIC, &current_tick);
+
+        unsigned int delta = (current_tick.tv_sec - previous_tick.tv_sec) * 1000000 + (current_tick.tv_nsec - previous_tick.tv_nsec) / 1000;
+        counter_fraction += delta % sampling_interval;
+        counter += delta / sampling_interval + counter_fraction / sampling_interval;
+        counter_fraction %= sampling_interval;
+        previous_tick = current_tick;
+#else
+        ++counter;
+#endif
+
         delay_sec = sampling_interval / 1000000;
         delay_nsec = sampling_interval % 1000000 * 1000;
-        ++counter;
 #endif
 
         // we only synchronize when checking whether the thread needs
