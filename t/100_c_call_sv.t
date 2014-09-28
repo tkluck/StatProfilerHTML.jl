@@ -85,6 +85,7 @@ EOT
 ok 1
 ok 2
 ok 3
+RES=1
 EOT
     },
     {
@@ -104,6 +105,7 @@ EOT
         stdout => <<'EOT',
 ok 1
 ok 2
+RES=1
 EOT
     },
     {
@@ -128,6 +130,7 @@ EOT
 ok 1
 ok 2
 ok 3
+RES=1
 EOT
     },
     {
@@ -149,6 +152,7 @@ EOT
         stdout => <<'EOT',
 ok 1
 ok 2
+RES=1
 EOT
     },
     {
@@ -169,6 +173,7 @@ EOT
         stdout => <<'EOT',
 ok 1
 ok 2
+RES=1
 EOT
     },
     {
@@ -190,6 +195,42 @@ EOT
         stdout => <<'EOT',
 ok 1
 ok 2
+RES=1
+RES=0
+EOT
+    },
+    {
+        name   => 'trampoline - return value',
+        start  => 1,
+        tests  => ['test1'],
+        source => <<'EOT',
+sub test1 {
+    Devel::StatProfiler::enable_profile();
+    print "ok 1\n";
+    44;
+}
+EOT
+        exit   => 0,
+        stdout => <<'EOT',
+ok 1
+RES=44
+EOT
+    },
+    {
+        name   => 'no trampoline - return value',
+        start  => 0,
+        tests  => ['test1'],
+        source => <<'EOT',
+sub test1 {
+    Devel::StatProfiler::enable_profile();
+    print "ok 1\n";
+    44;
+}
+EOT
+        exit   => 0,
+        stdout => <<'EOT',
+ok 1
+RES=44
 EOT
     },
 );

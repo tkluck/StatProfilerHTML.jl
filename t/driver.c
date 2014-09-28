@@ -25,7 +25,14 @@ int main(int argc, char **argv, char **env)
     for (i = 0; i <= av_len(plargv); ++i) {
         SV **item = av_fetch(plargv, i, 0);
 
-        call_argv(SvPV_nolen(*item), G_DISCARD | G_NOARGS, args);
+        call_argv(SvPV_nolen(*item), G_SCALAR | G_NOARGS, args);
+
+        {
+            dSP;
+            SV *res = POPs;
+
+            printf("RES=%s\n", SvOK(res) ? SvPV_nolen(res) : "undef");
+        }
     }
 
     exitstatus = perl_destruct(my_perl);
