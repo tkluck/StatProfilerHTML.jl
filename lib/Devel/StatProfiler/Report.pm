@@ -726,6 +726,7 @@ sub _fetch_source {
 
     $self->{sourcemap}->end_file_mapping(scalar @lines);
 
+    return [], $NO_SOURCE unless @lines;
     return \@ends, ['I hope you never see this...', @lines];
 }
 
