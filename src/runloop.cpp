@@ -1117,7 +1117,7 @@ devel::statprofiler::write_custom_metadata(pTHX_ SV *key, SV *value)
 {
     dMY_CXT;
 
-    if (MY_CXT.trace)
+    if (MY_CXT.enabled)
         MY_CXT.trace->write_custom_metadata(key, value);
 }
 
@@ -1126,7 +1126,7 @@ devel::statprofiler::start_section(pTHX_ SV *section_name)
 {
     dMY_CXT;
 
-    if (MY_CXT.trace)
+    if (MY_CXT.enabled)
         MY_CXT.trace->start_section(section_name);
 }
 
@@ -1135,7 +1135,7 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
 {
     dMY_CXT;
 
-    if (MY_CXT.trace)
+    if (MY_CXT.enabled)
         MY_CXT.trace->end_section(section_name);
 }
 
