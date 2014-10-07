@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.02      2014-10-07 08:46:13 CEST
+
+    - Uniquely identify BEGIN blocks and anonymous subs
+    - Made the reportmore complete, more usable, less hideous
+    - Windows/Mac OS X portability
     - Switch to Text::MicroTemplate
 
 0.01      2014-09-01 20:49:35 CEST
