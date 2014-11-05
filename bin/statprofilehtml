@@ -30,4 +30,8 @@ for my $f (@files) {
     $report->map_source($r->get_genealogy_info->[0]);
 }
 
-$report->output($outdir);
+my $diagnostics = $report->output($outdir);
+
+for my $diagnostic (@$diagnostics) {
+    print STDERR $diagnostic, "\n";
+}

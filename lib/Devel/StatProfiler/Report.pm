@@ -829,6 +829,7 @@ sub _format_ratio {
 
 sub output {
     my ($self, $directory) = @_;
+    my @diagnostics;
 
     die "Unable to create report without a source map and an eval map"
         unless $self->{source} and $self->{sourcemap};
@@ -998,7 +999,7 @@ sub output {
         my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
 
         unless ($reverse_file) {
-            warn "Unable to find source for '$file'";
+            push @diagnostics, "Unable to find source for '$file'";
             next;
         }
 
@@ -1006,7 +1007,7 @@ sub output {
         my $reverse_entry = $files->{$reverse_file};
 
         unless ($reverse_entry && $reverse_entry->{report}) {
-            warn "Unable to find source for '$file'";
+            push @diagnostics, "Unable to find source for '$file'";
             next;
         }
 
@@ -1078,6 +1079,8 @@ sub output {
     File::Copy::copy(
         File::ShareDir::dist_file('Devel-StatProfiler', 'statprofiler.css'),
         File::Spec::Functions::catfile($directory, 'statprofiler.css'));
+
+    return \@diagnostics;
 }
 
 1;
