@@ -32,7 +32,11 @@
      }
  ?>
         <tr>
+?    if ($logical_file) {
           <td><a name="L<?= $logical_file ?>-<?= $logical_line ?>"></a><?= $logical_line ?></td>
+?    } else {
+          <td><?= $logical_line ?></td>
+?    }
           <td><?= $format_total_ratio->($exclusive->[$line], 'empty') ?></td>
           <td><?= $format_total_ratio->($inclusive->[$line], 'empty') ?></td>
           <td>
