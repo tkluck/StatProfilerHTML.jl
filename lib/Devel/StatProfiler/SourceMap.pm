@@ -8,7 +8,7 @@ use Devel::StatProfiler::Utils qw(
     read_data
     state_dir
     utf8_sha1_hex
-    write_data_part
+    write_data_any
 );
 use File::Path;
 use File::Spec::Functions;
@@ -108,14 +108,17 @@ sub add_sources_from_reader {
     }
 }
 
-sub save {
-    my ($self, $root_dir) = @_;
-    my $state_dir = state_dir($root_dir);
+sub _save {
+    my ($self, $root_dir, $is_part) = @_;
+    my $state_dir = state_dir($root_dir, $is_part);
 
     File::Path::mkpath($state_dir);
 
-    write_data_part($self->{serializer}, $state_dir, 'sourcemap', $self->{map});
+    write_data_any($is_part, $self->{serializer}, $state_dir, 'sourcemap', $self->{map});
 }
+
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_merged { $_[0]->_save($_[1], 0) }
 
 sub load_and_merge {
     my ($self, $file) = @_;

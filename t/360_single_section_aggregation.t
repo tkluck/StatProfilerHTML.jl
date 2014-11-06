@@ -71,8 +71,8 @@ for my $file (@files) {
         last if $sr->done;
     }
 }
-$a1->save;
-my ($main2, $content2, $list2) = map $a1->merged_report($_), qw(
+$a1->save_part;
+my ($main2, $content2, $list2) = map $a1->merge_report($_), qw(
     __main__ content list
 );
 # no need to finalize the report for comparison
@@ -86,26 +86,20 @@ for my $file (@files) {
         );
         $a->load;
         $a->process_trace_files($sr);
-        $a->save;
+        $a->save_part;
         last if $sr->done;
     }
 }
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
 );
-my ($main3, $content3, $list3) = map $a2->merged_report($_), qw(
+my ($main3, $content3, $list3) = map $a2->merge_report($_), qw(
     __main__ content list
 );
 # no need to finalize the report for comparison
 
-# we fake the ordinals in t::lib::Test::SingleReader
-$_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
-    for $main1, $content1, $list1,
-        $main2, $content2, $list2,
-        $main3, $content3, $list3;
-
 # we test source code in another test
-delete $_->{source}, delete $_->{sourcemap}
+delete $_->{source}, delete $_->{sourcemap}, delete $_->{genealogy}
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;

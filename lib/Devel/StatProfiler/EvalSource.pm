@@ -9,7 +9,7 @@ use Devel::StatProfiler::Utils qw(
     read_file
     state_dir
     utf8_sha1_hex
-    write_data_part
+    write_data_any
     write_file
 );
 use File::Path;
@@ -48,20 +48,23 @@ sub add_sources_from_reader {
     }
 }
 
-sub save {
-    my ($self, $root_dir) = @_;
-    my $state_dir = state_dir($root_dir);
+sub _save {
+    my ($self, $root_dir, $is_part) = @_;
+    my $state_dir = state_dir($root_dir, $is_part);
     my $source_dir = File::Spec::Functions::catdir($root_dir, '__source__');
 
     File::Path::mkpath([$state_dir, $source_dir]);
 
     # $self->{seen_in_process} can be reconstructed fomr $self->{all}
-    write_data_part($self->{serializer}, $state_dir, 'source', $self->{all});
+    write_data_any($is_part, $self->{serializer}, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
         write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash});
     }
 }
+
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_merged { $_[0]->_save($_[1], 0) }
 
 sub _merge_source {
     my ($self, $all) = @_;

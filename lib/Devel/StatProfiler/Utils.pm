@@ -18,6 +18,7 @@ our @EXPORT_OK = qw(
     state_file
     utf8_sha1_hex
     write_data
+    write_data_any
     write_data_part
     write_file
 );
@@ -25,15 +26,15 @@ our @EXPORT_OK = qw(
 my ($SEREAL_ENCODER, $SEREAL_DECODER);
 
 sub state_dir {
-    my ($root_dir) = @_;
+    my ($root_dir, $is_part) = @_;
 
-    File::Spec::Functions::catdir($root_dir, '__state__');
+    File::Spec::Functions::catdir($root_dir, '__state__', ('parts') x !!$is_part);
 }
 
 sub state_file {
-    my ($root_dir, $file) = @_;
+    my ($root_dir, $is_part, $file) = @_;
 
-    File::Spec::Functions::catfile($root_dir, '__state__', $file);
+    File::Spec::Functions::catfile($root_dir, '__state__', ('parts') x !!$is_part, $file);
 }
 
 sub check_serializer {
@@ -68,6 +69,14 @@ sub read_data {
         return $SEREAL_DECODER->decode($data);
     } else {
         die "Unsupported serializer format '$serializer'";
+    }
+}
+
+sub write_data_any {
+    if (shift) {
+        write_data_part(@_);
+    } else {
+        write_data(@_);
     }
 }
 

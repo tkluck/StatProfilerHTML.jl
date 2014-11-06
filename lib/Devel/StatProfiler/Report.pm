@@ -13,7 +13,7 @@ use Devel::StatProfiler::Utils qw(
     read_data
     state_dir
     utf8_sha1_hex
-    write_data_part
+    write_data_any
 );
 use Devel::StatProfiler::Slowops;
 use File::ShareDir;
@@ -556,27 +556,20 @@ sub merge {
     }
 }
 
-sub merge_genealogy {
-    my ($self, $genealogy) = @_;
-
-    for my $process_id (keys %$genealogy) {
-        my $item = $genealogy->{$process_id};
-
-        @{$self->{genealogy}{$process_id}}{keys %$item} = values %$item;
-    }
-}
-
-sub save {
-    my ($self, $root_dir, $report_dir) = @_;
-    my $state_dir = state_dir($root_dir);
-    my $report_base = sprintf('report.%s', $self->{process_id} // 'aggregate');
+sub _save {
+    my ($self, $root_dir, $report_dir, $is_part) = @_;
+    my $state_dir = state_dir($root_dir, $is_part);
+    my $report_base = $is_part ? sprintf('report.%s', $self->{process_id}) : 'report';
 
     File::Path::mkpath([$state_dir, $report_dir]);
 
-    write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
-    $self->{source}->save($root_dir) if $self->{source};
-
-    write_data_part($self->{serializer}, $report_dir, $report_base, [
+    write_data_any($is_part, $self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+    if ($is_part) {
+        $self->{source}->save_part($root_dir) if $self->{source};
+    } else {
+        $self->{source}->save_merged($root_dir) if $self->{source};
+    }
+    write_data_any($is_part, $self->{serializer}, $report_dir, $report_base, [
         $self->{tick},
         $self->{stack_depth},
         $self->{perl_version},
@@ -584,6 +577,9 @@ sub save {
         $self->{aggregate}
     ]);
 }
+
+sub save_part { $_[0]->_save($_[1], $_[2], 1) }
+sub save_aggregate { $_[0]->_save($_[1], $_[2], 0) }
 
 sub load {
     my ($self, $report) = @_;

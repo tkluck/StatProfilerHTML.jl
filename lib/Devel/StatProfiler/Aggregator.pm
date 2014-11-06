@@ -25,6 +25,7 @@ my $MAIN_REPORT_ID = ['__main__'];
 
 sub new {
     my ($class, %opts) = @_;
+    my $genealogy = {};
     my $self = bless {
         root_dir     => $opts{root_directory},
         slowops      => $opts{slowops},
@@ -36,13 +37,15 @@ sub new {
         source       => Devel::StatProfiler::EvalSource->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
+            genealogy      => $genealogy,
         ),
         sourcemap    => Devel::StatProfiler::SourceMap->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
         ),
         mixed_process=> $opts{mixed_process},
-        genealogy    => {},
+        genealogy    => $genealogy,
+        parts        => [],
         fetchers     => $opts{fetchers},
     }, $class;
 
@@ -102,7 +105,7 @@ sub process_trace_files {
     }
 }
 
-sub save {
+sub save_part {
     my ($self) = @_;
 
     for my $entry (values %{$self->{partial}}) {
@@ -112,9 +115,10 @@ sub save {
     }
 
     my $state_dir = state_dir($self->{root_dir});
-    File::Path::mkpath($state_dir);
+    my $parts_dir = state_dir($self->{root_dir}, 1);
+    File::Path::mkpath([$state_dir, $parts_dir]);
 
-    write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+    write_data_part($self->{serializer}, $parts_dir, 'genealogy', $self->{genealogy});
 
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};
@@ -123,14 +127,16 @@ sub save {
         write_data($self->{serializer}, $state_dir, "processed.$process_id", $processed);
     }
 
-    for my $key (keys %{$self->{reports}}) {
-        my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $key);
-        # writes some genealogy and source data twice, but it's OK for now
-        $self->{reports}{$key}->save($self->{root_dir}, $report_dir);
-    }
+    $self->{source}->save_part($self->{root_dir});
+    $self->{sourcemap}->save_part($self->{root_dir});
 
-    $self->{source}->save($self->{root_dir});
-    $self->{sourcemap}->save($self->{root_dir});
+    for my $key (keys %{$self->{reports}}) {
+        my $report_dir = File::Spec::Functions::catdir(
+            $self->{root_dir}, $key, 'parts',
+        );
+        # writes some genealogy and source data twice, but it's OK for now
+        $self->{reports}{$key}->save_part($self->{root_dir}, $report_dir);
+    }
 }
 
 sub load {
@@ -138,7 +144,7 @@ sub load {
 
     return unless -d $self->{root_dir};
 
-    for my $file (glob state_file($self->{root_dir}, 'processed.*')) {
+    for my $file (glob state_file($self->{root_dir}, 0, 'processed.*')) {
         my $processed = read_data($self->{serializer}, $file);
 
         $processed->{modified} = 0;
@@ -146,50 +152,114 @@ sub load {
     }
 }
 
-sub merged_report {
-    my ($self, $report_id) = @_;
+sub _merge_genealogy {
+    my ($self, $genealogy) = @_;
 
-    my $res = $self->_fresh_report(mixed_process => 1);
-    my $source = Devel::StatProfiler::EvalSource->new(
+    for my $process_id (keys %$genealogy) {
+        my $item = $genealogy->{$process_id};
+
+        @{$self->{genealogy}{$process_id}}{keys %$item} = values %$item;
+    }
+}
+
+sub _prepare_merge {
+    my ($self) = @_;
+
+    return if %{$self->{genealogy}};
+
+    my $source = $self->{source} = Devel::StatProfiler::EvalSource->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
         genealogy      => $self->{genealogy},
     );
-    my $sourcemap = Devel::StatProfiler::SourceMap->new(
+    my $sourcemap = $self->{sourcemap} = Devel::StatProfiler::SourceMap->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
     );
 
-    for my $file (glob state_file($self->{root_dir}, 'genealogy.*')) {
-        $res->merge_genealogy(read_data($self->{serializer}, $file));
+    my $genealogy_merged = state_file($self->{root_dir}, 0, 'genealogy');
+    my $source_merged = state_file($self->{root_dir}, 0, 'source');
+    my $sourcemap_merged = state_file($self->{root_dir}, 0, 'sourcemap');
+
+    my @genealogy_parts = glob state_file($self->{root_dir}, 1, 'genealogy.*');
+    my @source_parts = glob state_file($self->{root_dir}, 1, 'source.*');
+    my @sourcemap_parts = glob state_file($self->{root_dir}, 1, 'sourcemap.*');
+
+    for my $file (@genealogy_parts, ($genealogy_merged) x !!-f $genealogy_merged) {
+        $self->_merge_genealogy(read_data($self->{serializer}, $file));
     }
 
-    for my $file (glob state_file($self->{root_dir}, 'source.*')) {
+    for my $file (@source_parts, ($source_merged) x !!-f $source_merged) {
         $source->load_and_merge($file);
     }
 
-    for my $file (glob state_file($self->{root_dir}, 'sourcemap.*')) {
+    for my $file (@sourcemap_parts, ($sourcemap_merged) x !!-f $sourcemap_merged) {
         $sourcemap->load_and_merge($file);
     }
 
-    # TODO fix this incestuous relation
-    $res->{source} = $source;
-    $res->{sourcemap} = $sourcemap;
-    %{$self->{genealogy}} = %{$res->{genealogy}};
+    push @{$self->{parts}}, @genealogy_parts, @source_parts, @sourcemap_parts;
+}
 
-    # mapping eval source code requires genealogy and source map
-    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, '*')) {
+sub merge_metadata {
+    my ($self) = @_;
+
+    $self->_prepare_merge;
+
+    write_data($self->{serializer}, state_dir($self->{root_dir}), 'genealogy', $self->{genealogy});
+    $self->{source}->save_merged($self->{root_dir});
+    $self->{sourcemap}->save_merged($self->{root_dir});
+
+    for my $part (@{$self->{parts}}) {
+        unlink $part;
+    }
+}
+
+sub merge_report {
+    my ($self, $report_id) = @_;
+
+    $self->_prepare_merge;
+
+    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', '*');
+    my $res = $self->_fresh_report(mixed_process => 1);
+
+    # TODO fix this incestuous relation
+    $res->{source} = $self->{source};
+    $res->{sourcemap} = $self->{sourcemap};
+    $res->{genealogy} = $self->{genealogy};
+
+    for my $file (@parts) {
         my $report = $self->_fresh_report;
 
-        # TODO fix this incestuous relation
-        $report->{source} = $source;
-        $report->{sourcemap} = $sourcemap;
-        $report->{genealogy} = $self->{genealogy};
-
         $report->load($file);
-        $report->map_source;
         $res->merge($report);
     }
+
+    my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
+    $res->save_aggregate($self->{root_dir}, $report_dir);
+
+    for my $part (@parts) {
+        unlink $part;
+    }
+
+    return $res;
+}
+
+sub merged_report {
+    my ($self, $report_id) = @_;
+
+    $self->_prepare_merge;
+
+    my $res = $self->_fresh_report(mixed_process => 1);
+
+    # TODO fix this incestuous relation
+    $res->{source} = $self->{source};
+    $res->{sourcemap} = $self->{sourcemap};
+    $res->{genealogy} = $self->{genealogy};
+
+    my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'report');
+
+    $res->load($file);
+    $res->map_source;
 
     return $res;
 }

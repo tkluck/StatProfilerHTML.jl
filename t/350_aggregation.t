@@ -43,8 +43,8 @@ for my $file (@files) {
         last if $sr->done;
     }
 }
-$a1->save;
-my $r2 = $a1->merged_report('__main__');
+$a1->save_part;
+my $r2 = $a1->merge_report('__main__');
 # no need to finalize the report for comparison
 
 for my $file (@files) {
@@ -56,7 +56,7 @@ for my $file (@files) {
             slowops => [qw(ftdir unstack)],
         );
         $a->process_trace_files($sr);
-        $a->save;
+        $a->save_part;
         last if $sr->done;
     }
 }
@@ -64,22 +64,32 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
     slowops => [qw(ftdir unstack)],
 );
-my $r3 = $a2->merged_report('__main__');
+$a2->merge_metadata;
+my $r3 = $a2->merge_report('__main__');
+# no need to finalize the report for comparison
+
+my $a3 = Devel::StatProfiler::Aggregator->new(
+    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    slowops => [qw(ftdir unstack)],
+);
+my $r4 = $a3->merged_report('__main__');
 # no need to finalize the report for comparison
 
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
-    for $r1, $r2, $r3;
+    for $r1, $r2, $r3, $r4;
 
 # Storable and number stringification
 map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
-    for $r1, $r2, $r3;
+    for $r1, $r2, $r3, $r4;
 
 # we test source code in another test
-delete $_->{source} for $r1, $r2, $r3;
-delete $_->{sourcemap} for $r1, $r2, $r3;
-delete $_->{process_id} for $r1, $r2, $r3;
+delete $_->{source} for $r1, $r2, $r3, $r4;
+delete $_->{sourcemap} for $r1, $r2, $r3, $r4;
+delete $_->{process_id} for $r1, $r2, $r3, $r4;
+delete $_->{genealogy} for $r1, $r2, $r3, $r4;
 
 eq_or_diff($r2, $r1);
 eq_or_diff($r3, $r1);
+eq_or_diff($r4, $r1);
 done_testing();
