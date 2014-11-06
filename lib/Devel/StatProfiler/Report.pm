@@ -768,14 +768,14 @@ sub _merged_entry {
         # we have no data for this part of the file
         next unless $entry;
 
-        my $ranges = $line_ranges{$key};
+        my @ranges = sort { $a->[1] <=> $b->[1] } @{$line_ranges{$key}};
         my @subs = sort { $a <=> $b } keys %{$entry->{subs}};
         my @callees = sort { $a <=> $b } keys %{$entry->{lines}{callees}};
         my ($sub_index, $callee_index) = (0, 0);
 
         $merged->{exclusive} += $entry->{exclusive};
 
-        for my $range (@$ranges) {
+        for my $range (@ranges) {
             my ($logical_start, $logical_end, $physical_start, $physical_end) =
                 @$range;
 
@@ -816,6 +816,7 @@ sub _format_ratio {
 
     return '' if $empty && $value == 0;
     return '0' if $value == 0 && $total == 0;
+    return '? (?%)' if $value != 0 && $total == 0;
 
     my $perc = $value / $total * 100;
     if ($perc >= 0.01) {
@@ -823,7 +824,7 @@ sub _format_ratio {
     } elsif ($perc >= 0.0001) {
         return sprintf '%d (%.04f%%)', $value, $perc;
     } else {
-        return '%d', $value;
+        return sprintf '%d', $value;
     }
 }
 
@@ -925,7 +926,7 @@ sub output {
                         $start_line = $entry->[0] + $start_line - $entry->[2];
                     }
                 }
-                for (my $line = $start_line; $line > 0; --$line) {
+                for (my $line = $start_line; $line > 0 && $line < @$code; --$line) {
                     my $src = $code->[$line];
 
                     if ($src =~ $match) {
