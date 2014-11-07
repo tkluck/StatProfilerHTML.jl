@@ -12,6 +12,8 @@ use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
+    state_dir
+    state_file
     write_data
     write_data_part
 );
@@ -109,7 +111,7 @@ sub save {
         }
     }
 
-    my $state_dir = File::Spec::Functions::catdir($self->{root_dir}, '__state__');
+    my $state_dir = state_dir($self->{root_dir});
     File::Path::mkpath($state_dir);
 
     write_data_part($self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
@@ -135,9 +137,8 @@ sub load {
     my ($self) = @_;
 
     return unless -d $self->{root_dir};
-    my $state = File::Spec::Functions::catdir($self->{root_dir}, '__state__');
 
-    for my $file (glob File::Spec::Functions::catfile($state, 'processed.*')) {
+    for my $file (glob state_file($self->{root_dir}, 'processed.*')) {
         my $processed = read_data($self->{serializer}, $file);
 
         $processed->{modified} = 0;
@@ -159,15 +160,15 @@ sub merged_report {
         root_directory => $self->{root_dir},
     );
 
-    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'genealogy.*')) {
+    for my $file (glob state_file($self->{root_dir}, 'genealogy.*')) {
         $res->merge_genealogy(read_data($self->{serializer}, $file));
     }
 
-    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'source.*')) {
+    for my $file (glob state_file($self->{root_dir}, 'source.*')) {
         $source->load_and_merge($file);
     }
 
-    for my $file (glob File::Spec::Functions::catfile($self->{root_dir}, '__state__', 'sourcemap.*')) {
+    for my $file (glob state_file($self->{root_dir}, 'sourcemap.*')) {
         $sourcemap->load_and_merge($file);
     }
 

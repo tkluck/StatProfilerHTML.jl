@@ -14,6 +14,8 @@ our @EXPORT_OK = qw(
     check_serializer
     read_data
     read_file
+    state_dir
+    state_file
     utf8_sha1_hex
     write_data
     write_data_part
@@ -21,6 +23,18 @@ our @EXPORT_OK = qw(
 );
 
 my ($SEREAL_ENCODER, $SEREAL_DECODER);
+
+sub state_dir {
+    my ($root_dir) = @_;
+
+    File::Spec::Functions::catdir($root_dir, '__state__');
+}
+
+sub state_file {
+    my ($root_dir, $file) = @_;
+
+    File::Spec::Functions::catfile($root_dir, '__state__', $file);
+}
 
 sub check_serializer {
     my ($serializer) = @_;

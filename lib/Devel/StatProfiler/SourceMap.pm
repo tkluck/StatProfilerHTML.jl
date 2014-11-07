@@ -6,6 +6,7 @@ use warnings;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
+    state_dir
     utf8_sha1_hex
     write_data_part
 );
@@ -109,7 +110,7 @@ sub add_sources_from_reader {
 
 sub save {
     my ($self, $root_dir) = @_;
-    my $state_dir = File::Spec::Functions::catdir($root_dir, '__state__');
+    my $state_dir = state_dir($root_dir);
 
     File::Path::mkpath($state_dir);
 

@@ -11,6 +11,7 @@ use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
+    state_dir
     utf8_sha1_hex
     write_data_part
 );
@@ -567,7 +568,7 @@ sub merge_genealogy {
 
 sub save {
     my ($self, $root_dir, $report_dir) = @_;
-    my $state_dir = File::Spec::Functions::catdir($root_dir, '__state__');
+    my $state_dir = state_dir($root_dir);
     my $report_base = sprintf('report.%s', $self->{process_id} // 'aggregate');
 
     File::Path::mkpath([$state_dir, $report_dir]);
