@@ -3,7 +3,14 @@ package Devel::StatProfiler::EvalSource;
 use strict;
 use warnings;
 
-use Devel::StatProfiler::Utils qw(check_serializer read_file read_data write_data_part write_file utf8_sha1_hex);
+use Devel::StatProfiler::Utils qw(
+    check_serializer
+    read_data
+    read_file
+    utf8_sha1_hex
+    write_data_part
+    write_file
+);
 use File::Path;
 use File::Spec::Functions;
 

@@ -11,8 +11,13 @@ use Exporter qw(import);
 use Digest::SHA qw(sha1_hex);
 
 our @EXPORT_OK = qw(
-    check_serializer read_data read_file write_data write_data_part write_file
+    check_serializer
+    read_data
+    read_file
     utf8_sha1_hex
+    write_data
+    write_data_part
+    write_file
 );
 
 my ($SEREAL_ENCODER, $SEREAL_DECODER);

@@ -3,7 +3,12 @@ package Devel::StatProfiler::SourceMap;
 use strict;
 use warnings;
 
-use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf8_sha1_hex);
+use Devel::StatProfiler::Utils qw(
+    check_serializer
+    read_data
+    utf8_sha1_hex
+    write_data_part
+);
 use File::Path;
 use File::Spec::Functions;
 

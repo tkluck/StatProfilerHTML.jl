@@ -8,7 +8,12 @@ use autodie qw(open close);
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
-use Devel::StatProfiler::Utils qw(check_serializer read_data write_data_part utf8_sha1_hex);
+use Devel::StatProfiler::Utils qw(
+    check_serializer
+    read_data
+    utf8_sha1_hex
+    write_data_part
+);
 use Devel::StatProfiler::Slowops;
 use File::ShareDir;
 use File::Basename ();

@@ -9,7 +9,12 @@ use Devel::StatProfiler::SectionChangeReader;
 use Devel::StatProfiler::Report;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
-use Devel::StatProfiler::Utils qw(check_serializer read_data write_data write_data_part);
+use Devel::StatProfiler::Utils qw(
+    check_serializer
+    read_data
+    write_data
+    write_data_part
+);
 
 use File::Path ();
 
