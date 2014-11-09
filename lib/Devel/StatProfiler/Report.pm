@@ -563,11 +563,10 @@ sub _save {
 
     File::Path::mkpath([$state_dir, $report_dir]);
 
-    write_data_any($is_part, $self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+    # the merged metadata is saved separately
     if ($is_part) {
+        write_data_any($is_part, $self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
         $self->{source}->save_part($root_dir) if $self->{source};
-    } else {
-        $self->{source}->save_merged($root_dir) if $self->{source};
     }
     write_data_any($is_part, $self->{serializer}, $report_dir, $report_base, [
         $self->{tick},
