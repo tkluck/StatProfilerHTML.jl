@@ -1022,7 +1022,7 @@ sub output {
 
     # format flame graph
     my $flamegraph_link;
-    if ($self->{flamegraph}) {
+    if ($self->{flamegraph} && %{$self->{aggregate}{flames}}) {
         $flamegraph_link = 'all_stacks_by_time.svg';
 
         my $flames = $self->{aggregate}{flames};
