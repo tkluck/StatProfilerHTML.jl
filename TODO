@@ -75,4 +75,6 @@
 - the case fixed by 27fb541f0c03c541997604c4118dc82f4d1acec8, the synthetic
   file entry has the file name "eval:<sha1>"; fix it to display the
   "natural" name for the eval
+- test case for 9d4110d016a72fabfb5cd45c4ae97468c9070f51
+- test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
 - move finalize() work earlier during aggregation
