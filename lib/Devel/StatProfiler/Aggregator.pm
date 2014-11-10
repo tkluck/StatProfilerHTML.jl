@@ -258,8 +258,10 @@ sub merged_report {
 
     my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'report');
 
-    $res->load($file);
-    $res->map_source;
+    if (-f $file) {
+        $res->load($file);
+        $res->map_source;
+    }
 
     return $res;
 }
