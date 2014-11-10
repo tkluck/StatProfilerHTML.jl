@@ -59,7 +59,8 @@ sub _save {
     write_data_any($is_part, $self->{serializer}, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
-        write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash});
+        write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash})
+            unless -e File::Spec::Functions::catfile($source_dir, $hash);
     }
 }
 
