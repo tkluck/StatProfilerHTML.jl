@@ -61,6 +61,7 @@ $list1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'list')) for @files
 
 my $a1 = TestAggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
 );
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
@@ -83,6 +84,7 @@ for my $file (@files) {
         my $sr = t::lib::Test::SingleReader->new($r);
         my $a = TestAggregator->new(
             root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+            shard          => 'shard1',
         );
         $a->load;
         $a->process_trace_files($sr);
@@ -92,6 +94,7 @@ for my $file (@files) {
 }
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    shard          => 'shard1',
 );
 my ($main3, $content3, $list3) = map $a2->merge_report($_), qw(
     __main__ content list
@@ -99,7 +102,7 @@ my ($main3, $content3, $list3) = map $a2->merge_report($_), qw(
 # no need to finalize the report for comparison
 
 # we test source code in another test
-delete $_->{source}, delete $_->{sourcemap}, delete $_->{genealogy}, delete $_->{root_dir}
+delete $_->{source}, delete $_->{sourcemap}, delete $_->{genealogy}, delete $_->{root_dir}, delete $_->{shard}
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;

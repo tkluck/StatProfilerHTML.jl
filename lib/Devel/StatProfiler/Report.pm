@@ -58,10 +58,12 @@ sub new {
                 serializer     => $opts{serializer},
                 genealogy      => $genealogy,
                 root_dir       => $opts{root_directory},
+                shard          => $opts{shard},
             ),
             sourcemap => Devel::StatProfiler::SourceMap->new(
                 serializer     => $opts{serializer},
                 root_dir       => $opts{root_directory},
+                shard          => $opts{shard},
             ),
         ) : (
             source    => undef,
@@ -76,7 +78,9 @@ sub new {
         process_id    => $opts{mixed_process} ? 'mixed' : undef,
         serializer    => $opts{serializer} || 'storable',
         fetchers      => $opts{fetchers} || [[undef, 'fetch_source_from_file']],
+        shard         => $opts{shard},
         root_dir      => $opts{root_directory},
+        shard         => $opts{shard},
     }, $class;
 
     if ($self->{flamegraph}) {

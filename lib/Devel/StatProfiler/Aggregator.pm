@@ -28,6 +28,7 @@ sub new {
     my $genealogy = {};
     my $self = bless {
         root_dir     => $opts{root_directory},
+        shard        => $opts{shard},
         slowops      => $opts{slowops},
         flamegraph   => $opts{flamegraph},
         serializer   => $opts{serializer} || 'storable',
@@ -37,11 +38,13 @@ sub new {
         source       => Devel::StatProfiler::EvalSource->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
+            shard          => $opts{shard},
             genealogy      => $genealogy,
         ),
         sourcemap    => Devel::StatProfiler::SourceMap->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
+            shard          => $opts{shard},
         ),
         mixed_process=> $opts{mixed_process},
         genealogy    => $genealogy,
@@ -146,8 +149,9 @@ sub load {
     my ($self) = @_;
 
     return unless -d $self->{root_dir};
+    my $processed_glob = state_file($self, 0, 'processed.%') =~ s{%}{*}r;
 
-    for my $file (glob state_file($self, 0, 'processed.*')) {
+    for my $file (glob $processed_glob) {
         my $processed = read_data($self->{serializer}, $file);
 
         $processed->{modified} = 0;
@@ -173,11 +177,13 @@ sub _prepare_merge {
     my $source = $self->{source} = Devel::StatProfiler::EvalSource->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
+        shard          => $self->{shard},
         genealogy      => $self->{genealogy},
     );
     my $sourcemap = $self->{sourcemap} = Devel::StatProfiler::SourceMap->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
+        shard          => $self->{shard},
     );
 
     my $genealogy_merged = state_file($self, 0, 'genealogy');
@@ -222,7 +228,7 @@ sub merge_report {
 
     $self->_prepare_merge;
 
-    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', '*');
+    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "*.$self->{shard}.*");
     my $res = $self->_fresh_report(mixed_process => 1);
 
     # TODO fix this incestuous relation
@@ -248,7 +254,7 @@ sub merge_report {
 }
 
 sub merged_report {
-    my ($self, $report_id) = @_;
+    my ($self, $report_id, $map_source) = @_;
 
     $self->_prepare_merge;
 
@@ -259,11 +265,11 @@ sub merged_report {
     $res->{sourcemap} = $self->{sourcemap};
     $res->{genealogy} = $self->{genealogy};
 
-    my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'report');
+    my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
 
     if (-f $file) {
         $res->load($file);
-        $res->map_source;
+        $res->map_source if $map_source;
     }
 
     return $res;
@@ -285,6 +291,7 @@ sub _fresh_report {
         serializer     => $self->{serializer},
         sources        => 0,
         root_directory => $self->{root_dir},
+        shard          => $self->{shard},
         mixed_process  => $opts{mixed_process} // $self->{mixed_process},
         fetchers       => $self->{fetchers},
     );

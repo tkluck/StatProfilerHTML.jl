@@ -16,6 +16,7 @@ our @EXPORT_OK = qw(
     read_file
     state_dir
     state_file
+    state_file_shard
     utf8_sha1_hex
     write_data
     write_data_any
@@ -34,13 +35,25 @@ sub state_dir {
     File::Spec::Functions::catdir($obj->{root_dir}, '__state__', ('parts') x !!$is_part);
 }
 
-sub state_file {
+sub _state_file {
     my ($obj, $is_part, $file) = @_;
     die "first parameter of state_file() must be an object" unless ref $obj;
     die ref($obj), " passed to state_file() is missing the root_dir attribute"
         unless $obj->{root_dir};
 
     File::Spec::Functions::catfile($obj->{root_dir}, '__state__', ('parts') x !!$is_part, $file);
+}
+
+sub state_file {
+    my ($obj, $is_part, $file) = @_;
+    die "first parameter of state_file() must be an object" unless ref $obj;
+    die ref($obj), " passed to state_file() is missing the root_dir attribute"
+        unless $obj->{root_dir};
+    die ref($obj), " passed to state_file() is missing the shard attribute"
+        unless $obj->{shard};
+
+    my $file_base = $file =~ s/\.\*$// ? "$file.$obj->{shard}.*" : "$file.$obj->{shard}";
+    File::Spec::Functions::catfile($obj->{root_dir}, '__state__', ('parts') x !!$is_part, $file_base);
 }
 
 sub check_serializer {
@@ -91,8 +104,10 @@ sub write_data_part {
     die "first parameter of write_data_part() must be an object" unless ref $obj;
     die ref($obj), " passed to write_data_part() is missing the serializer attribute"
         unless $obj->{serializer};
+    die ref($obj), " passed to write_data_part() is missing the shard attribute"
+        unless $obj->{shard};
 
-    my ($fh, $tmppath, $path) = _output_file($dir, $file_base);
+    my ($fh, $tmppath, $path) = _output_file($dir, "$file_base.$obj->{shard}");
 
     _write_and_rename($obj->{serializer}, $fh, $tmppath, $path, $data);
 }
@@ -102,9 +117,12 @@ sub write_data {
     die "first parameter of write_data() must be an object" unless ref $obj;
     die ref($obj), " passed to write_data() is missing the serializer attribute"
         unless $obj->{serializer};
+    die ref($obj), " passed to write_data() is missing the shard attribute"
+        unless $obj->{shard};
 
-    my $full_tmppath = File::Spec::Functions::catfile($dir, "_$file.tmp");
-    my $full_path = File::Spec::Functions::catfile($dir, $file);
+    my $file_base = "$file.$obj->{shard}";
+    my $full_tmppath = File::Spec::Functions::catfile($dir, "_$file_base.tmp");
+    my $full_path = File::Spec::Functions::catfile($dir, $file_base);
     open my $fh, '>', $full_tmppath;
 
     _write_and_rename($obj->{serializer}, $fh, $full_tmppath, $full_path, $data);

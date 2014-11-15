@@ -43,6 +43,7 @@ $r2->add_trace_file($profile_file);
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
 );
 $a1->process_trace_files($profile_file);
 $a1->save_part;
@@ -51,6 +52,7 @@ my $r3 = $a1->merge_report('__main__');
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
 );
 $a2->merge_metadata;
 my $r4 = $a2->merge_report('__main__');
@@ -58,8 +60,9 @@ my $r4 = $a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
 );
-my $r5 = $a3->merged_report('__main__');
+my $r5 = $a3->merged_report('__main__', 'map_source');
 # no need to finalize the report for comparison
 
 my %eval_map = (

@@ -40,6 +40,7 @@ $r1->add_trace_file($_) for @files;
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
     mixed_process  => 1,
 );
 $a1->process_trace_files(@files);
@@ -49,6 +50,7 @@ my $r2 = $a1->merge_report('__main__');
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    shard          => 'shard1',
 );
 my $r3 = $a2->merge_report('__main__');
 # no need to finalize the report for comparison

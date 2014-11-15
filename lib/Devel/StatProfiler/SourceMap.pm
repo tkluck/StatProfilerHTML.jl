@@ -22,6 +22,7 @@ sub new {
         current_file    => undef,
         ignore_mapping  => 0,
         root_dir        => $opts{root_directory},
+        shard           => $opts{shard},
         serializer      => $opts{serializer} || 'storable',
     }, $class;
 

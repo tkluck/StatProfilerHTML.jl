@@ -23,6 +23,7 @@ sub new {
         hashed          => {},
         serializer      => $opts{serializer} || 'storable',
         root_dir        => $opts{root_directory},
+        shard           => $opts{shard},
         genealogy       => $opts{genealogy},
     }, $class;
 
