@@ -240,6 +240,7 @@ sub clear_custom_metadata { $_[0]->{reader}->clear_custom_metadata }
 sub get_source_code { $_[0]->{reader}->get_source_code }
 sub get_reader_state { $_[0]->{reader}->get_reader_state }
 sub set_reader_state { $_[0]->{reader}->set_reader_state($_[1]) }
+sub is_stream_ended { $_[0]->{reader}->is_stream_ended }
 
 sub done { !$_[0]->{trace} }
 

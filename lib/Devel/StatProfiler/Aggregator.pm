@@ -69,6 +69,7 @@ sub process_trace_files {
             report       => undef,
             reader_state => undef,
             modified     => 0,
+            ended        => 0,
         };
         next if $process_ordinal != $state->{ordinal} + 1;
 
@@ -99,6 +100,7 @@ sub process_trace_files {
         $state->{ordinal} = $process_ordinal;
         $state->{reader_state} = $r->get_reader_state;
         $state->{modified} = 1;
+        $state->{ended} = $r->is_stream_ended;
 
         $self->{source}->add_sources_from_reader($r);
         $self->{sourcemap}->add_sources_from_reader($r);
