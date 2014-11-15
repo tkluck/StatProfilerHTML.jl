@@ -111,7 +111,7 @@ sub add_sources_from_reader {
 
 sub _save {
     my ($self, $is_part) = @_;
-    my $state_dir = state_dir($self->{root_dir}, $is_part);
+    my $state_dir = state_dir($self, $is_part);
 
     File::Path::mkpath($state_dir);
 

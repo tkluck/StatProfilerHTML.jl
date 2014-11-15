@@ -50,7 +50,7 @@ sub add_sources_from_reader {
 
 sub _save {
     my ($self, $is_part) = @_;
-    my $state_dir = state_dir($self->{root_dir}, $is_part);
+    my $state_dir = state_dir($self, $is_part);
     my $source_dir = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
 
     File::Path::mkpath([$state_dir, $source_dir]);

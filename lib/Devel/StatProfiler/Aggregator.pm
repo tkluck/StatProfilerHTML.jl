@@ -117,8 +117,8 @@ sub save_part {
         }
     }
 
-    my $state_dir = state_dir($self->{root_dir});
-    my $parts_dir = state_dir($self->{root_dir}, 1);
+    my $state_dir = state_dir($self);
+    my $parts_dir = state_dir($self, 1);
     File::Path::mkpath([$state_dir, $parts_dir]);
 
     write_data_part($self->{serializer}, $parts_dir, 'genealogy', $self->{genealogy});
@@ -147,7 +147,7 @@ sub load {
 
     return unless -d $self->{root_dir};
 
-    for my $file (glob state_file($self->{root_dir}, 0, 'processed.*')) {
+    for my $file (glob state_file($self, 0, 'processed.*')) {
         my $processed = read_data($self->{serializer}, $file);
 
         $processed->{modified} = 0;
@@ -180,13 +180,13 @@ sub _prepare_merge {
         root_directory => $self->{root_dir},
     );
 
-    my $genealogy_merged = state_file($self->{root_dir}, 0, 'genealogy');
-    my $source_merged = state_file($self->{root_dir}, 0, 'source');
-    my $sourcemap_merged = state_file($self->{root_dir}, 0, 'sourcemap');
+    my $genealogy_merged = state_file($self, 0, 'genealogy');
+    my $source_merged = state_file($self, 0, 'source');
+    my $sourcemap_merged = state_file($self, 0, 'sourcemap');
 
-    my @genealogy_parts = glob state_file($self->{root_dir}, 1, 'genealogy.*');
-    my @source_parts = glob state_file($self->{root_dir}, 1, 'source.*');
-    my @sourcemap_parts = glob state_file($self->{root_dir}, 1, 'sourcemap.*');
+    my @genealogy_parts = glob state_file($self, 1, 'genealogy.*');
+    my @source_parts = glob state_file($self, 1, 'source.*');
+    my @sourcemap_parts = glob state_file($self, 1, 'sourcemap.*');
 
     for my $file (@genealogy_parts, ($genealogy_merged) x !!-f $genealogy_merged) {
         $self->_merge_genealogy(read_data($self->{serializer}, $file));
@@ -208,7 +208,7 @@ sub merge_metadata {
 
     $self->_prepare_merge;
 
-    write_data($self->{serializer}, state_dir($self->{root_dir}), 'genealogy', $self->{genealogy});
+    write_data($self->{serializer}, state_dir($self), 'genealogy', $self->{genealogy});
     $self->{source}->save_merged;
     $self->{sourcemap}->save_merged;
 

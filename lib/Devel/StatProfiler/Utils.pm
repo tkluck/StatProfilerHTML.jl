@@ -26,15 +26,21 @@ our @EXPORT_OK = qw(
 my ($SEREAL_ENCODER, $SEREAL_DECODER);
 
 sub state_dir {
-    my ($root_dir, $is_part) = @_;
+    my ($obj, $is_part) = @_;
+    die "first parameter of state_dir() must be an object" unless ref $obj;
+    die ref($obj), " passed to state_dir() is missing the root_dir attribute"
+        unless $obj->{root_dir};
 
-    File::Spec::Functions::catdir($root_dir, '__state__', ('parts') x !!$is_part);
+    File::Spec::Functions::catdir($obj->{root_dir}, '__state__', ('parts') x !!$is_part);
 }
 
 sub state_file {
-    my ($root_dir, $is_part, $file) = @_;
+    my ($obj, $is_part, $file) = @_;
+    die "first parameter of state_file() must be an object" unless ref $obj;
+    die ref($obj), " passed to state_file() is missing the root_dir attribute"
+        unless $obj->{root_dir};
 
-    File::Spec::Functions::catfile($root_dir, '__state__', ('parts') x !!$is_part, $file);
+    File::Spec::Functions::catfile($obj->{root_dir}, '__state__', ('parts') x !!$is_part, $file);
 }
 
 sub check_serializer {

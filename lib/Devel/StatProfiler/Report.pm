@@ -561,7 +561,7 @@ sub merge {
 
 sub _save {
     my ($self, $report_dir, $is_part) = @_;
-    my $state_dir = state_dir($self->{root_dir}, $is_part);
+    my $state_dir = state_dir($self, $is_part);
     my $report_base = $is_part ? sprintf('report.%s', $self->{process_id}) : 'report';
 
     File::Path::mkpath([$state_dir, $report_dir]);
