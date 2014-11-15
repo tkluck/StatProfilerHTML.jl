@@ -21,6 +21,7 @@ sub new {
         current_map     => undef,
         current_file    => undef,
         ignore_mapping  => 0,
+        root_dir        => $opts{root_directory},
         serializer      => $opts{serializer} || 'storable',
     }, $class;
 
@@ -109,16 +110,16 @@ sub add_sources_from_reader {
 }
 
 sub _save {
-    my ($self, $root_dir, $is_part) = @_;
-    my $state_dir = state_dir($root_dir, $is_part);
+    my ($self, $is_part) = @_;
+    my $state_dir = state_dir($self->{root_dir}, $is_part);
 
     File::Path::mkpath($state_dir);
 
     write_data_any($is_part, $self->{serializer}, $state_dir, 'sourcemap', $self->{map});
 }
 
-sub save_part { $_[0]->_save($_[1], 1) }
-sub save_merged { $_[0]->_save($_[1], 0) }
+sub save_part { $_[0]->_save(1) }
+sub save_merged { $_[0]->_save(0) }
 
 sub load_and_merge {
     my ($self, $file) = @_;

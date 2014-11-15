@@ -57,9 +57,11 @@ sub new {
             source    => Devel::StatProfiler::EvalSource->new(
                 serializer     => $opts{serializer},
                 genealogy      => $genealogy,
+                root_dir       => $opts{root_directory},
             ),
             sourcemap => Devel::StatProfiler::SourceMap->new(
                 serializer     => $opts{serializer},
+                root_dir       => $opts{root_directory},
             ),
         ) : (
             source    => undef,
@@ -74,6 +76,7 @@ sub new {
         process_id    => $opts{mixed_process} ? 'mixed' : undef,
         serializer    => $opts{serializer} || 'storable',
         fetchers      => $opts{fetchers} || [[undef, 'fetch_source_from_file']],
+        root_dir      => $opts{root_directory},
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -557,8 +560,8 @@ sub merge {
 }
 
 sub _save {
-    my ($self, $root_dir, $report_dir, $is_part) = @_;
-    my $state_dir = state_dir($root_dir, $is_part);
+    my ($self, $report_dir, $is_part) = @_;
+    my $state_dir = state_dir($self->{root_dir}, $is_part);
     my $report_base = $is_part ? sprintf('report.%s', $self->{process_id}) : 'report';
 
     File::Path::mkpath([$state_dir, $report_dir]);
@@ -566,7 +569,7 @@ sub _save {
     # the merged metadata is saved separately
     if ($is_part) {
         write_data_any($is_part, $self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
-        $self->{source}->save_part($root_dir) if $self->{source};
+        $self->{source}->save_part if $self->{source};
     }
     write_data_any($is_part, $self->{serializer}, $report_dir, $report_base, [
         $self->{tick},
@@ -577,8 +580,8 @@ sub _save {
     ]);
 }
 
-sub save_part { $_[0]->_save($_[1], $_[2], 1) }
-sub save_aggregate { $_[0]->_save($_[1], $_[2], 0) }
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_aggregate { $_[0]->_save($_[1], 0) }
 
 sub load {
     my ($self, $report) = @_;

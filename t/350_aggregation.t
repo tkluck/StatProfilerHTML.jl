@@ -88,6 +88,7 @@ delete $_->{source} for $r1, $r2, $r3, $r4;
 delete $_->{sourcemap} for $r1, $r2, $r3, $r4;
 delete $_->{process_id} for $r1, $r2, $r3, $r4;
 delete $_->{genealogy} for $r1, $r2, $r3, $r4;
+delete $_->{root_dir} for $r1, $r2, $r3, $r4;
 
 eq_or_diff($r2, $r1);
 eq_or_diff($r3, $r1);

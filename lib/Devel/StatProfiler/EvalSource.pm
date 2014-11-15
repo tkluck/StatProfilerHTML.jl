@@ -49,9 +49,9 @@ sub add_sources_from_reader {
 }
 
 sub _save {
-    my ($self, $root_dir, $is_part) = @_;
-    my $state_dir = state_dir($root_dir, $is_part);
-    my $source_dir = File::Spec::Functions::catdir($root_dir, '__source__');
+    my ($self, $is_part) = @_;
+    my $state_dir = state_dir($self->{root_dir}, $is_part);
+    my $source_dir = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
 
     File::Path::mkpath([$state_dir, $source_dir]);
 
@@ -64,8 +64,8 @@ sub _save {
     }
 }
 
-sub save_part { $_[0]->_save($_[1], 1) }
-sub save_merged { $_[0]->_save($_[1], 0) }
+sub save_part { $_[0]->_save(1) }
+sub save_merged { $_[0]->_save(0) }
 
 sub _merge_source {
     my ($self, $all) = @_;

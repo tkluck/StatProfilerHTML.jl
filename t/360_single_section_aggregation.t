@@ -99,7 +99,7 @@ my ($main3, $content3, $list3) = map $a2->merge_report($_), qw(
 # no need to finalize the report for comparison
 
 # we test source code in another test
-delete $_->{source}, delete $_->{sourcemap}, delete $_->{genealogy}
+delete $_->{source}, delete $_->{sourcemap}, delete $_->{genealogy}, delete $_->{root_dir}
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;

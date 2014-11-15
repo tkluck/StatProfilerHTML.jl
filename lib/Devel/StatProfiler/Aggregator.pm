@@ -130,15 +130,15 @@ sub save_part {
         write_data($self->{serializer}, $state_dir, "processed.$process_id", $processed);
     }
 
-    $self->{source}->save_part($self->{root_dir});
-    $self->{sourcemap}->save_part($self->{root_dir});
+    $self->{source}->save_part;
+    $self->{sourcemap}->save_part;
 
     for my $key (keys %{$self->{reports}}) {
         my $report_dir = File::Spec::Functions::catdir(
             $self->{root_dir}, $key, 'parts',
         );
         # writes some genealogy and source data twice, but it's OK for now
-        $self->{reports}{$key}->save_part($self->{root_dir}, $report_dir);
+        $self->{reports}{$key}->save_part($report_dir);
     }
 }
 
@@ -209,8 +209,8 @@ sub merge_metadata {
     $self->_prepare_merge;
 
     write_data($self->{serializer}, state_dir($self->{root_dir}), 'genealogy', $self->{genealogy});
-    $self->{source}->save_merged($self->{root_dir});
-    $self->{sourcemap}->save_merged($self->{root_dir});
+    $self->{source}->save_merged;
+    $self->{sourcemap}->save_merged;
 
     for my $part (@{$self->{parts}}) {
         unlink $part;
@@ -238,7 +238,7 @@ sub merge_report {
     }
 
     my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
-    $res->save_aggregate($self->{root_dir}, $report_dir);
+    $res->save_aggregate($report_dir);
 
     for my $part (@parts) {
         unlink $part;
