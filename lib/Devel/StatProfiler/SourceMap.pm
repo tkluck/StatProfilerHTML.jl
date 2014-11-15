@@ -115,7 +115,7 @@ sub _save {
 
     File::Path::mkpath($state_dir);
 
-    write_data_any($is_part, $self->{serializer}, $state_dir, 'sourcemap', $self->{map});
+    write_data_any($is_part, $self, $state_dir, 'sourcemap', $self->{map});
 }
 
 sub save_part { $_[0]->_save(1) }

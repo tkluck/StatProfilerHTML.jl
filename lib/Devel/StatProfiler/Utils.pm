@@ -87,19 +87,27 @@ sub write_data_any {
 }
 
 sub write_data_part {
-    my ($serializer, $dir, $file_base, $data) = @_;
+    my ($obj, $dir, $file_base, $data) = @_;
+    die "first parameter of write_data_part() must be an object" unless ref $obj;
+    die ref($obj), " passed to write_data_part() is missing the serializer attribute"
+        unless $obj->{serializer};
+
     my ($fh, $tmppath, $path) = _output_file($dir, $file_base);
 
-    _write_and_rename($serializer, $fh, $tmppath, $path, $data);
+    _write_and_rename($obj->{serializer}, $fh, $tmppath, $path, $data);
 }
 
 sub write_data {
-    my ($serializer, $dir, $file, $data) = @_;
+    my ($obj, $dir, $file, $data) = @_;
+    die "first parameter of write_data() must be an object" unless ref $obj;
+    die ref($obj), " passed to write_data() is missing the serializer attribute"
+        unless $obj->{serializer};
+
     my $full_tmppath = File::Spec::Functions::catfile($dir, "_$file.tmp");
     my $full_path = File::Spec::Functions::catfile($dir, $file);
     open my $fh, '>', $full_tmppath;
 
-    _write_and_rename($serializer, $fh, $full_tmppath, $full_path, $data);
+    _write_and_rename($obj->{serializer}, $fh, $full_tmppath, $full_path, $data);
 }
 
 sub write_file {

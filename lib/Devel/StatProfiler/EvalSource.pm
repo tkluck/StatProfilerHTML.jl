@@ -56,7 +56,7 @@ sub _save {
     File::Path::mkpath([$state_dir, $source_dir]);
 
     # $self->{seen_in_process} can be reconstructed fomr $self->{all}
-    write_data_any($is_part, $self->{serializer}, $state_dir, 'source', $self->{all});
+    write_data_any($is_part, $self, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
         write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash})

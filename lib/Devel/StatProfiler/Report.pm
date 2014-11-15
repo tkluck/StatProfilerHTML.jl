@@ -568,10 +568,10 @@ sub _save {
 
     # the merged metadata is saved separately
     if ($is_part) {
-        write_data_any($is_part, $self->{serializer}, $state_dir, 'genealogy', $self->{genealogy});
+        write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy});
         $self->{source}->save_part if $self->{source};
     }
-    write_data_any($is_part, $self->{serializer}, $report_dir, $report_base, [
+    write_data_any($is_part, $self, $report_dir, $report_base, [
         $self->{tick},
         $self->{stack_depth},
         $self->{perl_version},

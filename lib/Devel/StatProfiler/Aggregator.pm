@@ -121,13 +121,13 @@ sub save_part {
     my $parts_dir = state_dir($self, 1);
     File::Path::mkpath([$state_dir, $parts_dir]);
 
-    write_data_part($self->{serializer}, $parts_dir, 'genealogy', $self->{genealogy});
+    write_data_part($self, $parts_dir, 'genealogy', $self->{genealogy});
 
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};
 
         next unless $processed->{modified};
-        write_data($self->{serializer}, $state_dir, "processed.$process_id", $processed);
+        write_data($self, $state_dir, "processed.$process_id", $processed);
     }
 
     $self->{source}->save_part;
@@ -208,7 +208,7 @@ sub merge_metadata {
 
     $self->_prepare_merge;
 
-    write_data($self->{serializer}, state_dir($self), 'genealogy', $self->{genealogy});
+    write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
     $self->{source}->save_merged;
     $self->{sourcemap}->save_merged;
 
