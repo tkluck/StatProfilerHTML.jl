@@ -63,6 +63,7 @@ sub process_trace_files {
         my $sc = Devel::StatProfiler::SectionChangeReader->new($r);
         my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
             @{$r->get_genealogy_info};
+        next if $process_ordinal > 1 && !$self->{processed}{$process_id};
         my $state = $self->{processed}{$process_id} ||= {
             process_id   => $process_id,
             ordinal      => 0,
