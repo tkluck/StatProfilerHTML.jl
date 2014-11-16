@@ -40,6 +40,7 @@ sub start_file_mapping {
         return;
     }
 
+    $self->{ignore_mapping} = 0;
     $self->{current_map} = [1, $physical_file, 1];
     $self->{current_file} = $physical_file;
     push @{$self->{map}{$physical_file}}, $self->{current_map};
@@ -47,6 +48,11 @@ sub start_file_mapping {
 
 sub end_file_mapping {
     my ($self, $physical_line) = @_;
+
+    if ($self->{ignore_mapping}) {
+        $self->{current_map} = $self->{current_file} = undef;
+        return;
+    }
 
     if (my $map = $self->{current_map}) {
         delete $self->{map}{$self->{current_file}}
@@ -61,16 +67,14 @@ sub end_file_mapping {
     push @{$self->{map}{$self->{current_file}}}, [$physical_line + 1, undef, $physical_line + 1]
         if $self->{map}{$self->{current_file}};
 
-    $self->{ignore_mapping} = 0;
-    $self->{current_map} = undef;
-    $self->{current_file} = undef;
+    $self->{current_map} = $self->{current_file} = undef;
 }
 
 sub add_file_mapping {
     my ($self, $physical_line, $mapped_file, $mapped_line) = @_;
-    die "Causal failure for '$self->{current_file}'" unless $self->{current_map};
-
     return if $self->{ignore_mapping};
+
+    die "Causal failure for '$self->{current_file}'" unless $self->{current_map};
 
     my ($st, $en) = (substr($mapped_file, 0, 1), substr($mapped_file, -1, 1));
     if ($st eq $en && ($st eq '"' || $st eq "'")) {
