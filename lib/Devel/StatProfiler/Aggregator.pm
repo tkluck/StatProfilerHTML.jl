@@ -23,6 +23,14 @@ use File::Path ();
 my $MAIN_REPORT_ID = ['__main__'];
 
 
+sub shards {
+    my ($class, $root_dir) = @_;
+    my $state_dir = state_dir({root_dir => $root_dir});
+    my @files = glob File::Spec::Functions::catfile($state_dir, 'shard.*');
+
+    return map m{[/\\]shard\.([^/\\]+)$}, @files;
+}
+
 sub new {
     my ($class, %opts) = @_;
     my $genealogy = {};
@@ -155,6 +163,11 @@ sub save_part {
         );
         # writes some genealogy and source data twice, but it's OK for now
         $self->{reports}{$key}->save_part($report_dir);
+    }
+
+    my $shard_marker = File::Spec::Functions::catfile($state_dir, "shard.$self->{shard}");
+    unless (-f $shard_marker) {
+        open my $fh, '>', $shard_marker;
     }
 }
 
