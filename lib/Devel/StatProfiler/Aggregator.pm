@@ -58,6 +58,19 @@ sub new {
     return $self;
 }
 
+sub can_process_trace_file {
+    my ($self, @files) = @_;
+
+    return grep {
+        my $r = ref $_ ? $_ : Devel::StatProfiler::Reader->new($_);
+        my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+            @{$r->get_genealogy_info};
+        my $state = $self->{processed}{$process_id} // { ordinal => 0 };
+
+        $process_ordinal == $state->{ordinal} + 1;
+    } @files;
+}
+
 sub process_trace_files {
     my ($self, @files) = @_;
 
