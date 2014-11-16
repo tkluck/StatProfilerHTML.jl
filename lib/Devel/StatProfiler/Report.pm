@@ -741,7 +741,7 @@ sub _fetch_source {
 # merges the entries for multiple logical files to match the source
 # code of a physical file
 sub _merged_entry {
-    my ($self, $file, $mapping) = @_;
+    my ($self, $file, $mapping, $diagnostics) = @_;
     my $base = $self->{aggregate}{files}{$file};
     my $merged = {
         name      => $base->{name},
@@ -809,9 +809,9 @@ sub _merged_entry {
             }
         }
 
-        warn "There are unmapped subs for '$key' in '$file'"
+        push @$diagnostics, "There are unmapped subs for '$key' in '$file'"
             unless $sub_index == @subs;
-        warn "There are unmapped callees for '$key' in '$file'"
+        push @$diagnostics, "There are unmapped callees for '$key' in '$file'"
             unless $callee_index == @callees;
     }
 
@@ -987,7 +987,7 @@ sub output {
             # #line directive in one of the parsed files
             push @queued_files, $file;
         } elsif (my $mapping = $self->{sourcemap}->get_mapping($file)) {
-            my $merged_entry = $self->_merged_entry($file, $mapping);
+            my $merged_entry = $self->_merged_entry($file, $mapping, \@diagnostics);
 
             $format_file->($merged_entry, $ends, $code, $mapping);
         } else {
