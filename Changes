@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.03      2014-11-18 12:36:18 CET
+
     - Do not report eval BLOCK stack frames
     - Allow running aggregation on multiple hosts
     - Minor tweaks to aggregation code
