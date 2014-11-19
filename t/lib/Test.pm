@@ -19,14 +19,14 @@ our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
   qw(
-        take_sample
         get_samples
         get_sources
-        temp_profile_file
-        temp_profile_dir
         precision_factor
         run_ctests
         spawn
+        take_sample
+        temp_profile_dir
+        temp_profile_file
         visual_test
   )
 );
