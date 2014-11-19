@@ -88,12 +88,8 @@ map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
     for $r1, $r2, $r3, $r4;
 
 # we test source code in another test
-delete $_->{source} for $r1, $r2, $r3, $r4;
-delete $_->{sourcemap} for $r1, $r2, $r3, $r4;
-delete $_->{process_id} for $r1, $r2, $r3, $r4;
-delete $_->{genealogy} for $r1, $r2, $r3, $r4;
-delete $_->{root_dir} for $r1, $r2, $r3, $r4;
-delete $_->{shard} for $r1, $r2, $r3, $r4;
+delete @{$_}{qw(source sourcemap process_id genealogy root_dir shard)}
+    for $r1, $r2, $r3, $r4;
 
 eq_or_diff($r2, $r1);
 eq_or_diff($r3, $r1);
