@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.04      2014-11-19 23:47:19 CET
+
+    - Test fixes for Perl 5.14
+    - Optionally Gzip-compress generated HTML/SVG files
+
 0.03      2014-11-18 12:36:18 CET
 
     - Do not report eval BLOCK stack frames
