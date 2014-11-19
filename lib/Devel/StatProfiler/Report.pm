@@ -597,8 +597,6 @@ sub load {
         process_id
         aggregate
     )} = @{read_data($self->{serializer}, $report)};
-
-    $self->{tick} += 0; # force numification, for Perl 5.14
 }
 
 sub _fileify {

@@ -84,8 +84,7 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
     for $r1, $r2, $r3, $r4;
 
 # Storable and number stringification
-map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
-    for $r1, $r2, $r3, $r4;
+numify($_) for $r2, $r3, $r4;
 
 # we test source code in another test
 delete @{$_}{qw(source sourcemap process_id genealogy root_dir shard)}

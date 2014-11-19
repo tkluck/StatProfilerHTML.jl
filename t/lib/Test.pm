@@ -10,6 +10,7 @@ use File::Temp ();
 use File::Spec;
 use Capture::Tiny qw(capture);
 use Pod::Usage;
+use Scalar::Util qw(reftype);
 use Config;
 use if $Config{usethreads}, 'threads';
 
@@ -21,6 +22,7 @@ our @EXPORT = (
   qw(
         get_samples
         get_sources
+        numify
         precision_factor
         run_ctests
         spawn
@@ -121,6 +123,19 @@ sub precision_factor {
         return 1;
     }
     return int(($precision / 1000) + 0.5) * 2;
+}
+
+sub numify {
+    my $v = $_[0];
+
+    return unless defined $v;
+    if (!ref $v) {
+        $_[0] += 0 if $v =~ /^[0-9]+$/;
+    } elsif (reftype $v eq 'HASH') {
+        numify($v->{$_}) for keys %$v;
+    } elsif (reftype $v eq 'ARRAY') {
+        numify($_) for @$v;
+    }
 }
 
 sub visual_test {

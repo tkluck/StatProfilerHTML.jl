@@ -108,7 +108,7 @@ delete @{$_}{qw(source sourcemap genealogy root_dir shard)}
         $main3, $content3, $list3;
 
 # Storable and number stringification
-map { $_->{start_line} += 0 } values %{$_->{aggregate}{subs}}
+numify($_)
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;
