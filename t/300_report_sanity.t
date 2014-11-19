@@ -151,11 +151,14 @@ is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
 ### end file attributes
 ### start flamegraph
 
-my @traces = map { s{__FILE__}{__FILE__}reg } qw(
-    __FILE__:main;__FILE__:main::foo:28;t/lib/Test.pm:t::lib::Test::take_sample:82;(unknown):Time::HiRes::usleep
-    __FILE__:main;__FILE__:X::__ANON__:19;t/lib/Test.pm:t::lib::Test::take_sample:82;(unknown):Time::HiRes::usleep
+my @traces = map {
+    s{__FILE__}{__FILE__}reg =~
+    s{\$TAKE_SAMPLE_LINE}{$t::lib::Test::TAKE_SAMPLE_LINE}rg
+} qw(
+    __FILE__:main;__FILE__:main::foo:28;t/lib/Test.pm:t::lib::Test::take_sample:$TAKE_SAMPLE_LINE;(unknown):Time::HiRes::usleep
+    __FILE__:main;__FILE__:X::__ANON__:19;t/lib/Test.pm:t::lib::Test::take_sample:$TAKE_SAMPLE_LINE;(unknown):Time::HiRes::usleep
     __FILE__:main::BEGIN:13;(unknown):Time::HiRes::sleep
-    __FILE__:main;__FILE__:Moo::bar:24;t/lib/Test.pm:t::lib::Test::take_sample:82;(unknown):Time::HiRes::usleep
+    __FILE__:main;__FILE__:Moo::bar:24;t/lib/Test.pm:t::lib::Test::take_sample:$TAKE_SAMPLE_LINE;(unknown):Time::HiRes::usleep
 );
 
 for my $trace (@traces) {
