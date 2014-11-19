@@ -22,6 +22,7 @@ use File::Spec::Functions ();
 use File::Copy ();
 use File::Path ();
 use Text::MicroTemplate;
+use IO::Compress::Gzip;
 use POSIX ();
 
 my $NO_SOURCE = ['Source not available...'];
@@ -106,12 +107,26 @@ sub _get_template {
 }
 
 sub _write_template {
-    my ($self, $sub, $data, $dir, $file) = @_;
+    my ($self, $sub, $data, $dir, $file, $compress) = @_;
     my $text = $sub->($data);
+    my $target = File::Spec::Functions::catfile($dir, $file);
 
-    open my $fh, '>', File::Spec::Functions::catfile($dir, $file);
-    print $fh $text;
+    open my $fh, '>', $compress ? "$target.gz" : $target;
+    if ($compress) {
+        IO::Compress::Gzip::gzip(\"$text", $fh)
+              or die "gzip failed: $IO::Compress::Gzip::GzipError";
+    } else {
+        print $fh $text;
+    }
     close $fh;
+}
+
+sub _compress_inplace {
+    my ($self, $path) = @_;
+
+    IO::Compress::Gzip::gzip($path, "$path.gz")
+        or die "gzip failed: $IO::Compress::Gzip::GzipError";
+    unlink $path;
 }
 
 sub _call_site_id {
@@ -835,7 +850,7 @@ sub _format_ratio {
 }
 
 sub output {
-    my ($self, $directory) = @_;
+    my ($self, $directory, $compress) = @_;
     my @diagnostics;
 
     die "Unable to create report without a source map and an eval map"
@@ -973,7 +988,7 @@ sub output {
         );
 
         $self->_write_template($TEMPLATES{file}, \%file_data,
-                               $directory, $entry->{report});
+                               $directory, $entry->{report}, $compress);
     };
 
     # write reports for physical files
@@ -1053,6 +1068,12 @@ sub output {
 
         system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$nameattr $calls_data > $calls_svg") == 0
             or die "Generating $calls_svg failed\n";
+
+        if ($compress) {
+            $self->_compress_inplace($calls_data);
+            $self->_compress_inplace($nameattr);
+            $self->_compress_inplace($calls_svg);
+        }
     }
 
     # format subs page
@@ -1065,7 +1086,7 @@ sub output {
     );
 
     $self->_write_template($TEMPLATES{subs}, \%subs_data,
-                           $directory, 'subs.html');
+                           $directory, 'subs.html', $compress);
 
     # format index page
     my %main_data = (
@@ -1080,7 +1101,7 @@ sub output {
     );
 
     $self->_write_template($TEMPLATES{index}, \%main_data,
-                           $directory, 'index.html');
+                           $directory, 'index.html', $compress);
 
     # copy CSS
     File::Copy::copy(
