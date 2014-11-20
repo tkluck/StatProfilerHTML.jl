@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.05      2014-11-20 23:08:26 CET
+
+    - Fix race condition when loading merged report
+
 0.04      2014-11-19 23:47:19 CET
 
     - Test fixes for Perl 5.14
