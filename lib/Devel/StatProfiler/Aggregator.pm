@@ -195,8 +195,8 @@ sub _merge_genealogy {
     }
 }
 
-sub _prepare_merge {
-    my ($self) = @_;
+sub _load_metadata {
+    my ($self, $parts) = @_;
 
     return if %{$self->{genealogy}};
 
@@ -216,9 +216,9 @@ sub _prepare_merge {
     my $source_merged = state_file($self, 0, 'source');
     my $sourcemap_merged = state_file($self, 0, 'sourcemap');
 
-    my @genealogy_parts = glob state_file($self, 1, 'genealogy.*');
-    my @source_parts = glob state_file($self, 1, 'source.*');
-    my @sourcemap_parts = glob state_file($self, 1, 'sourcemap.*');
+    my @genealogy_parts = $parts ? glob state_file($self, 1, 'genealogy.*') : ();
+    my @source_parts = $parts ? glob state_file($self, 1, 'source.*') : ();
+    my @sourcemap_parts = $parts ? glob state_file($self, 1, 'sourcemap.*') : ();
 
     for my $file (@genealogy_parts, ($genealogy_merged) x !!-f $genealogy_merged) {
         $self->_merge_genealogy(read_data($self->{serializer}, $file));
@@ -238,7 +238,7 @@ sub _prepare_merge {
 sub merge_metadata {
     my ($self) = @_;
 
-    $self->_prepare_merge;
+    $self->_load_metadata('parts');
 
     write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
     $self->{source}->save_merged;
@@ -252,7 +252,7 @@ sub merge_metadata {
 sub merge_report {
     my ($self, $report_id) = @_;
 
-    $self->_prepare_merge;
+    $self->_load_metadata('parts');
 
     my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "*.$self->{shard}.*");
     my $res = $self->_fresh_report(mixed_process => 1);
@@ -282,7 +282,7 @@ sub merge_report {
 sub merged_report {
     my ($self, $report_id, $map_source) = @_;
 
-    $self->_prepare_merge;
+    $self->_load_metadata;
 
     my $res = $self->_fresh_report(mixed_process => 1);
 
