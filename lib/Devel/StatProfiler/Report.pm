@@ -1034,9 +1034,12 @@ sub output {
         }
 
         # TODO use symlink/hardlinks where available
+        my ($source, $target) = ($reverse_entry->{report}, $entry->{report});
+
+        $source .= '.gz', $target .= '.gz' if $compress;
         File::Copy::copy(
-            File::Spec::Functions::catfile($directory, $reverse_entry->{report}),
-            File::Spec::Functions::catfile($directory, $entry->{report}));
+            File::Spec::Functions::catfile($directory, $source),
+            File::Spec::Functions::catfile($directory, $target));
     }
 
     # format flame graph
