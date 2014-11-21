@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.06      2014-11-21 22:24:46 CET
+
+    - Fix compressed report generation for #line-mapped files
+
 0.05      2014-11-20 23:08:26 CET
 
     - Fix race condition when loading merged report
