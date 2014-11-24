@@ -1,31 +1,10 @@
 - file output
-  - decide whether to store the full sub/file name every time or
-    cache recently-used ones to save on file size (and maybe I/O speed)
-    I can imagine two ways of going about this:
-    => A scheme like Sereal's COPY tag that could (in this case) appear
-       in any context where a string is expected and that encodes an
-       offset in the file from which the actual string is to be read.
-       Sereal chooses absolute offsets for a number of reasons. This might
-       be better off with relative backreferencing offsets. The upside of
-       this is that the data producer can itself make trade-offs as to
-       whether and where to make use of this. The decoder can start
-       decoding from arbitrary positions in a file (though it may have
-       to seek if it didn't read the entire file). The downside of this
-       is that if we don't know anything about the data we're reading,
-       in order to cache anything (to avoid lots of seeks), the decoder
-       has to keep ALL strings in an in-memory cache because the encoder
-       cannot realistically go back to flag strings that need keeping
-       around (seek on encoder/profiler side is even worse).
-    => More of an adaptive encoding where in order decode, one has to
-       decode the entire file running up to the atom to be decoded
-       because the state of the decoder ('s cached strings) is part of
-       the decoding decisions.
-    => I don't think these things are worth implementing.
-  - use async I/O to reduce delays? (probably not)
+  - check whether getting rid of varint encoding speed up the writer
+    (we compress using Snappy anyway)
 - test various interesting cases
   - do ""
   - sort {}/map {}
-- differentiate BEGIN blocks/evals in profile visualization
+  - test lexical subs in Perl 5.20+
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
@@ -40,17 +19,13 @@
   - it might be useful to have both the original and generated code
     in the report, with some way to toggle between the two
 - metadata/segmenting
-  - for separate requests, needs to store per-request metadata
-  - might store separate requests in separate files, or in separate
-    segments of the same file
-  - each request needs its own metadata
-  - might be useful to have multiple different, potentially overlapping
-    sub-segments (es. to mark a setup/teardown phase)
-  - don't assume the metadata is available at the beginning of the request
-  ===> Currently supporting a simple notion of sections. Let's see if that's
-       good enough.
+  - supports writing overlapping sections
+  - metadata does not belong to a section (probably not an issue, but
+    it needs better handling in the aggregation phase)
+  - overlapping/nested sections are not handled during aggregation
   - add global metadata (global to the whole process tree, available
     after report aggregation)
+  - add @INC to global metadata
 - some serious benchmarking
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
@@ -60,16 +35,11 @@
   logical file (with overlapping and non-overlapping line ranges)
   (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
 - make scope hooks per-interpreter, and disable them when disabling profiling
-- test lexical subs in Perl 5.20+
 
 - detect multiple evals with the same #line directive and different source code
 - closure aggregation
 - recursive sub aggregation
-- would be nice to support arbitrary aggregation (es. by URL)
-  - add post-process step that computes a per-segment summary, so
-    aggregating different segments is hopefully faster
-  - maybe do the aggregation directly in the browser, to reduce CPU
-    usage on the storage server
+- handle overlapping/nested sections
 - make aggregation code reusable both as a script and in a web application
 - file reader: Better error reporting
 - the case fixed by 27fb541f0c03c541997604c4118dc82f4d1acec8, the synthetic
@@ -79,3 +49,8 @@
 - test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
 - move finalize() work earlier during aggregation
 - shorter/nicer filenames in the HTML report (use @INC/custom prefixes)
+- allow calling file fetchers with multiple paths (to replace git-show with
+  git-cat-file)
+- use two directory levels instead of dumping all eval source code in
+  a single directory
+- remove the full file list from report index and add a separate "all files"
