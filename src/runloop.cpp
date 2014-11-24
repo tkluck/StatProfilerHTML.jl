@@ -1104,11 +1104,6 @@ devel::statprofiler::set_save_source(unsigned int save_source)
     dTHX;
     dMY_CXT;
 
-    if (MY_CXT.is_any_running()) {
-        warn("Trying to change source saving setting while profiling is in progress");
-        return;
-    }
-
     source_code_kind = (SourceCodeKind) save_source;
 }
 

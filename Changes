@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+    - Allow changing source code saving policy while profiling
+
 0.06      2014-11-21 22:24:46 CET
 
     - Fix compressed report generation for #line-mapped files
