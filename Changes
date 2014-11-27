@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.08      2014-11-27 17:15:41 CET
+
+    - Fix glitch in the collection of eval BLOCK stack frames
+
 0.07      2014-11-24 11:37:21 CET
 
     - Allow changing source code saving policy while profiling
