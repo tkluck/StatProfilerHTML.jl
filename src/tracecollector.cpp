@@ -48,6 +48,7 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
     const PERL_SI *top_si = PL_curstackinfo;
     CV *db_sub = PL_DBsub ? GvCV(PL_DBsub) : NULL;
     COP *line = PL_curcop;
+    bool previous_is_eval_block = false;
 
     for (;;) {
         // skip over auxiliary stacks pushed by PUSHSTACKi
@@ -78,8 +79,9 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
             // when called between an entersub and the following nextstate,
             // ignore the set-up but-not-entered-yet stack frame
             // also ignore the call frame set up for BEGIN blocks
+            bool is_eval_block = CxTRYBLOCK(sub);
             if (line != caller->blk_oldcop && line != &PL_compiling &&
-                    !CxTRYBLOCK(sub)) {
+                    !is_eval_block) {
                 if (CxTYPE(sub) != CXt_EVAL) {
                     trace.add_frame(FRAME_SUB, sub->blk_sub.cv, NULL, line);
                 } else if (CxOLD_OP_TYPE(sub) != OP_ENTEREVAL) {
@@ -101,8 +103,10 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
             }
             else
                 ++depth;
-            line = caller->blk_oldcop;
+            if (!is_eval_block)
+                line = caller->blk_oldcop;
 
+            previous_is_eval_block = is_eval_block;
             if (!--depth)
                 break;
         }
