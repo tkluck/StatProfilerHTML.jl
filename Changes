@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.09      2014-12-01 21:42:34 CET
+
+    - Saner API to get the final merged report object
+
 0.08      2014-11-27 17:15:41 CET
 
     - Fix glitch in the collection of eval BLOCK stack frames
