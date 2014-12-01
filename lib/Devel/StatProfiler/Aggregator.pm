@@ -37,6 +37,7 @@ sub new {
     my $self = bless {
         root_dir     => $opts{root_directory},
         shard        => $opts{shard},
+        shards       => $opts{shards},
         slowops      => $opts{slowops},
         flamegraph   => $opts{flamegraph},
         serializer   => $opts{serializer} || 'storable',
@@ -174,7 +175,7 @@ sub save_part {
 sub load {
     my ($self) = @_;
 
-    return unless -d $self->{root_dir};
+    return unless -d $self->{root_dir} && $self->{shard};
     my $processed_glob = state_file($self, 0, 'processed.%') =~ s{%}{*}r;
 
     for my $file (glob $processed_glob) {
@@ -212,23 +213,27 @@ sub _load_metadata {
         shard          => $self->{shard},
     );
 
-    my $genealogy_merged = state_file($self, 0, 'genealogy');
-    my $source_merged = state_file($self, 0, 'source');
-    my $sourcemap_merged = state_file($self, 0, 'sourcemap');
+    my (@genealogy_merged, @source_merged, @sourcemap_merged);
+    for my $shard ($self->{shard} ? ($self->{shard}) : @{$self->{shards}}) {
+        my $info = {root_dir => $self->{root_dir}, shard => $shard};
+        push @genealogy_merged, state_file($info, 0, 'genealogy');
+        push @source_merged, state_file($info, 0, 'source');
+        push @sourcemap_merged, state_file($info, 0, 'sourcemap');
+    }
 
     my @genealogy_parts = $parts ? glob state_file($self, 1, 'genealogy.*') : ();
     my @source_parts = $parts ? glob state_file($self, 1, 'source.*') : ();
     my @sourcemap_parts = $parts ? glob state_file($self, 1, 'sourcemap.*') : ();
 
-    for my $file (@genealogy_parts, ($genealogy_merged) x !!-f $genealogy_merged) {
+    for my $file (grep -f $_, (@genealogy_parts, @genealogy_merged)) {
         $self->_merge_genealogy(read_data($self->{serializer}, $file));
     }
 
-    for my $file (@source_parts, ($source_merged) x !!-f $source_merged) {
+    for my $file (grep -f $_, (@source_parts, @source_merged)) {
         $source->load_and_merge($file);
     }
 
-    for my $file (@sourcemap_parts, ($sourcemap_merged) x !!-f $sourcemap_merged) {
+    for my $file (grep -f $_, (@sourcemap_parts, @sourcemap_merged)) {
         $sourcemap->load_and_merge($file);
     }
 
@@ -291,12 +296,20 @@ sub merged_report {
     $res->{sourcemap} = $self->{sourcemap};
     $res->{genealogy} = $self->{genealogy};
 
-    my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
+    my $first = 1;
+    for my $shard (@{$self->{shards}}) {
+        my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$shard");
 
-    if (-f $file) {
-        $res->load($file);
-        $res->map_source if $map_source;
+        if (-f $file) {
+            my $report = $first ? $res : $self->_fresh_report;
+
+            $report->load($file);
+            $res->merge($report) if !$first && $report->{tick}; # TODO add accessor
+        }
+        $first = 0;
     }
+
+    $res->map_source if $map_source;
 
     return $res;
 }

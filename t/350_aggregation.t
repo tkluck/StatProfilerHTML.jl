@@ -73,7 +73,7 @@ my $r3 = $a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    shard          => 'shard1',
+    shards         => ['shard1'],
     slowops        => [qw(ftdir unstack)],
 );
 my $r4 = $a3->merged_report('__main__', 'map_source');
