@@ -1021,7 +1021,7 @@ sub output {
         my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
 
         unless ($reverse_file) {
-            push @diagnostics, "Unable to find source for '$file'";
+            push @diagnostics, "Unable to find reverse file for '$file'";
             next;
         }
 
@@ -1029,7 +1029,7 @@ sub output {
         my $reverse_entry = $files->{$reverse_file};
 
         unless ($reverse_entry && $reverse_entry->{report}) {
-            push @diagnostics, "Unable to find source for '$file'";
+            push @diagnostics, "Unable to find source for '$file' ($reverse_file)";
             next;
         }
 
