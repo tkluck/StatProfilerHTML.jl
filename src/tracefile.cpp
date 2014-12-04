@@ -659,6 +659,27 @@ SV *TraceFileReader::read_trace()
             else
                 sv_setuv(HeVAL(depth), 1 + SvUV(HeVAL(depth)));
             sections_changed = true;
+
+            if (1) {
+                // horrible temporary hack to avoid the sample after a
+                // section close to be counted as part of the section;
+                // to be fixed by adding a saner API for dealing with
+                // samples inside sections
+                sample = (HV *) sv_2mortal((SV *) newHV());
+                frames = newAV();
+
+                hv_stores(sample, "frames", newRV_noinc((SV *) frames));
+                hv_stores(sample, "weight", newSViv(0));
+                hv_stores(sample, "op_name", &PL_sv_no);
+
+                if (new_metadata)
+                    hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));
+                hv_stores(sample, "sections_changed", sections_changed ? &PL_sv_yes : &PL_sv_no);
+                hv_stores(sample, "metadata_changed", metadata_changed ? &PL_sv_yes : &PL_sv_no);;
+                sections_changed = metadata_changed = false;
+                return sv_bless(newRV_inc((SV *) sample), st_stash);
+            }
+
             break;
         }
         case TAG_SECTION_END: {
@@ -676,6 +697,27 @@ SV *TraceFileReader::read_trace()
             else
                 sv_setuv(HeVAL(depth), depth_num - 1);
             sections_changed = true;
+
+            if (1) {
+                // horrible temporary hack to avoid the sample after a
+                // section close to be counted as part of the section;
+                // to be fixed by adding a saner API for dealing with
+                // samples inside sections
+                sample = (HV *) sv_2mortal((SV *) newHV());
+                frames = newAV();
+
+                hv_stores(sample, "frames", newRV_noinc((SV *) frames));
+                hv_stores(sample, "weight", newSViv(0));
+                hv_stores(sample, "op_name", &PL_sv_no);
+
+                if (new_metadata)
+                    hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));
+                hv_stores(sample, "sections_changed", sections_changed ? &PL_sv_yes : &PL_sv_no);
+                hv_stores(sample, "metadata_changed", metadata_changed ? &PL_sv_yes : &PL_sv_no);;
+                sections_changed = metadata_changed = false;
+                return sv_bless(newRV_inc((SV *) sample), st_stash);
+            }
+
             break;
         }
         case TAG_STREAM_END:

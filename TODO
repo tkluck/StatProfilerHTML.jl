@@ -55,3 +55,12 @@
   a single directory
 - remove the full file list from report index and add a separate "all files"
 - split the Aggregator class in two (aggregation and loading of the final report)
+- add an API to read traces by section, and remove the horrible hack of returning
+  a fake empty trace when a section starts/ends
+    - add some kind of ->watch_sections("name1", "name2") to the reader,
+      with the option of returning data both inside and outside the section
+    - instead of returning a single trace, the reader now returns a section,
+      with included metadata; this means a sample can be potentially returned
+      multiple times in different sections
+    - the aggregator class needs to be tweaked but most of the logic should
+      remain the same

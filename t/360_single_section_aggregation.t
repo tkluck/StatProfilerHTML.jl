@@ -10,7 +10,9 @@ BEGIN { ($profile_dir, $template) = temp_profile_dir(); }
 
 use Devel::StatProfiler -template => $template, -interval => 1000;
 
+my (@m, $h);
 my @requests = qw(content index list detail);
+BEGIN { $h = __LINE__ + 2 }
 my %handlers = (
     content => sub { take_sample() },
     index   => sub { take_sample() },
@@ -23,7 +25,19 @@ for my $i (1..50) {
 
     Devel::StatProfiler::start_section('section');
 
-    take_sample();
+    if ($request eq 'content') {
+        $h = $h; # to force Perl into creating an extra nextstate
+        take_sample(); BEGIN { $m[0] = __LINE__ }
+    } elsif ($request eq 'index') {
+        $h = $h; # to force Perl into creating an extra nextstate
+        take_sample(); BEGIN { $m[1] = __LINE__ }
+    } elsif ($request eq 'list') {
+        $h = $h; # to force Perl into creating an extra nextstate
+        take_sample(); BEGIN { $m[2] = __LINE__ }
+    } elsif ($request eq 'detail') {
+        $h = $h; # to force Perl into creating an extra nextstate
+        take_sample(); BEGIN { $m[3] = __LINE__ }
+    }
     $handlers{$request}->();
 
     Devel::StatProfiler::write_custom_metadata('key', $request);
@@ -120,5 +134,33 @@ eq_or_diff($list2, $list1);
 eq_or_diff($main3, $main1);
 eq_or_diff($content3, $content1);
 eq_or_diff($list3, $list1);
+
+for my $content ($content1, $content2, $content3) {
+    my $lines = $content->{aggregate}{files}{__FILE__()}{lines}{inclusive};
+
+    for my $i (0 .. 3) {
+        if ($i == 0) {
+            ok($lines->[$h + $i], "sample for $requests[$i] handler is there");
+            ok($lines->[$m[$i]], "sample for $requests[$i] caller is there");
+        } else {
+            ok(!$lines->[$h + $i], "sample for $requests[$i] handler is not there");
+            ok(!$lines->[$m[$i]], "sample for $requests[$i] caller is not there");
+        }
+    }
+}
+
+for my $content ($list1, $list2, $list3) {
+    my $lines = $content->{aggregate}{files}{__FILE__()}{lines}{inclusive};
+
+    for my $i (0 .. 3) {
+        if ($i == 2) {
+            ok($lines->[$h + $i], "sample for $requests[$i] handler is there");
+            ok($lines->[$m[$i]], "sample for $requests[$i] caller is there");
+        } else {
+            ok(!$lines->[$h + $i], "sample for $requests[$i] handler is not there");
+            ok(!$lines->[$m[$i]], "sample for $requests[$i] caller is not there");
+        }
+    }
+}
 
 done_testing();
