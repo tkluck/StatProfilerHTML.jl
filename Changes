@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.10      2014-12-05 10:17:57 CET
+
+    - Fix incorrect section attribution for the first/last
+      sample of a section
+
 0.09      2014-12-01 21:42:34 CET
 
     - Saner API to get the final merged report object
