@@ -136,7 +136,7 @@ eq_or_diff($content3, $content1);
 eq_or_diff($list3, $list1);
 
 for my $content ($content1, $content2, $content3) {
-    my $lines = $content->{aggregate}{files}{__FILE__()}{lines}{inclusive};
+    my $lines = $content->{aggregate}{files}{+__FILE__}{lines}{inclusive};
 
     for my $i (0 .. 3) {
         if ($i == 0) {
@@ -150,7 +150,7 @@ for my $content ($content1, $content2, $content3) {
 }
 
 for my $content ($list1, $list2, $list3) {
-    my $lines = $content->{aggregate}{files}{__FILE__()}{lines}{inclusive};
+    my $lines = $content->{aggregate}{files}{+__FILE__}{lines}{inclusive};
 
     for my $i (0 .. 3) {
         if ($i == 2) {
