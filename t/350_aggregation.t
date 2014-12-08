@@ -87,7 +87,7 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
 numify($_) for $r2, $r3, $r4;
 
 # we test source code in another test
-delete @{$_}{qw(source sourcemap process_id genealogy root_dir shard)}
+delete @{$_}{qw(source sourcemap process_id genealogy root_dir shard)}, delete @{$_->{metadata}}{qw(shard root_dir)}
     for $r1, $r2, $r3, $r4;
 
 eq_or_diff($r2, $r1);

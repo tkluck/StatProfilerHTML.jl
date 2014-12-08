@@ -9,6 +9,7 @@ use Devel::StatProfiler::SectionChangeReader;
 use Devel::StatProfiler::Report;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
+use Devel::StatProfiler::Metadata;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
@@ -19,6 +20,7 @@ use Devel::StatProfiler::Utils qw(
 );
 
 use File::Path ();
+use File::Basename ();
 
 my $MAIN_REPORT_ID = ['__main__'];
 
@@ -51,6 +53,11 @@ sub new {
             genealogy      => $genealogy,
         ),
         sourcemap    => Devel::StatProfiler::SourceMap->new(
+            serializer     => $opts{serializer},
+            root_directory => $opts{root_directory},
+            shard          => $opts{shard},
+        ),
+        metadata     => Devel::StatProfiler::Metadata->new(
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
             shard          => $opts{shard},
@@ -155,6 +162,7 @@ sub save_part {
         write_data($self, $state_dir, "processed.$process_id", $processed);
     }
 
+    $self->{metadata}->save_part;
     $self->{source}->save_part;
     $self->{sourcemap}->save_part;
 
@@ -201,6 +209,11 @@ sub _load_metadata {
 
     return if %{$self->{genealogy}};
 
+    my $metadata = $self->{metadata} = Devel::StatProfiler::Metadata->new(
+        serializer     => $self->{serializer},
+        root_directory => $self->{root_dir},
+        shard          => $self->{shard},
+    );
     my $source = $self->{source} = Devel::StatProfiler::EvalSource->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
@@ -213,17 +226,23 @@ sub _load_metadata {
         shard          => $self->{shard},
     );
 
-    my (@genealogy_merged, @source_merged, @sourcemap_merged);
+    my (@genealogy_merged, @source_merged, @sourcemap_merged, @metadata_merged);
     for my $shard ($self->{shard} ? ($self->{shard}) : @{$self->{shards}}) {
         my $info = {root_dir => $self->{root_dir}, shard => $shard};
         push @genealogy_merged, state_file($info, 0, 'genealogy');
         push @source_merged, state_file($info, 0, 'source');
         push @sourcemap_merged, state_file($info, 0, 'sourcemap');
+        push @metadata_merged, state_file($info, 0, 'metadata');
     }
 
     my @genealogy_parts = $parts ? glob state_file($self, 1, 'genealogy.*') : ();
     my @source_parts = $parts ? glob state_file($self, 1, 'source.*') : ();
     my @sourcemap_parts = $parts ? glob state_file($self, 1, 'sourcemap.*') : ();
+    my @metadata_parts = $parts ? glob state_file($self, 1, 'metadata.*') : ();
+
+    for my $file (grep -f $_, (@metadata_parts, @metadata_merged)) {
+        $metadata->load_and_merge($file);
+    }
 
     for my $file (grep -f $_, (@genealogy_parts, @genealogy_merged)) {
         $self->_merge_genealogy(read_data($self->{serializer}, $file));
@@ -237,7 +256,7 @@ sub _load_metadata {
         $sourcemap->load_and_merge($file);
     }
 
-    push @{$self->{parts}}, @genealogy_parts, @source_parts, @sourcemap_parts;
+    push @{$self->{parts}}, @genealogy_parts, @source_parts, @sourcemap_parts, @metadata_parts;
 }
 
 sub merge_metadata {
@@ -246,6 +265,7 @@ sub merge_metadata {
     $self->_load_metadata('parts');
 
     write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
+    $self->{metadata}->save_merged;
     $self->{source}->save_merged;
     $self->{sourcemap}->save_merged;
 
@@ -259,7 +279,8 @@ sub merge_report {
 
     $self->_load_metadata('parts');
 
-    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "*.$self->{shard}.*");
+    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
+    my @metadata = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
     my $res = $self->_fresh_report(mixed_process => 1);
 
     # TODO fix this incestuous relation
@@ -274,10 +295,16 @@ sub merge_report {
         $res->merge($report);
     }
 
+    for my $file (@metadata) {
+        $res->load_and_merge_metadata($file);
+    }
+
     my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
     $res->save_aggregate($report_dir);
 
-    for my $part (@parts) {
+    $res->add_metadata($self->global_metadata);
+
+    for my $part (@parts, @metadata) {
         unlink $part;
     }
 
@@ -298,17 +325,22 @@ sub merged_report {
 
     my $first = 1;
     for my $shard (@{$self->{shards}}) {
-        my $file = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$shard");
+        my $data = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$shard");
+        my $metadata = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$shard");
 
-        if (-f $file) {
+        if (-f $data) {
             my $report = $first ? $res : $self->_fresh_report;
 
-            $report->load($file);
+            $report->load($data);
             $res->merge($report) if !$first && $report->{tick}; # TODO add accessor
+        }
+        if (-f $metadata) {
+            $res->load_and_merge_metadata($metadata);
         }
         $first = 0;
     }
 
+    $res->add_metadata($self->global_metadata);
     $res->map_source if $map_source;
 
     return $res;
@@ -344,6 +376,25 @@ sub report_names {
         glob File::Spec::Functions::catfile($self->{root_dir}, '*');
 
     return \@dirs;
+}
+
+sub add_report_metadata {
+    my ($self, $report_id, $metadata) = @_;
+
+    $self->{reports}{$report_id} ||= $self->_fresh_report;
+    $self->{reports}{$report_id}->add_metadata($metadata);
+}
+
+sub global_metadata {
+    my ($self) = @_;
+
+    return $self->{metadata}->get;
+}
+
+sub add_global_metadata {
+    my ($self, $metadata) = @_;
+
+    $self->{metadata}->add_entry($_, $metadata->{$_}) for keys %$metadata;
 }
 
 sub handle_section_change {

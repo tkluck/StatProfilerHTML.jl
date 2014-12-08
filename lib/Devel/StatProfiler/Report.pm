@@ -8,6 +8,7 @@ use autodie qw(open close);
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
+use Devel::StatProfiler::Metadata;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
@@ -70,6 +71,11 @@ sub new {
         ) : (
             source    => undef,
             sourcemap => undef,
+        ),
+        metadata     => Devel::StatProfiler::Metadata->new(
+            serializer         => $opts{serializer},
+            root_directory     => $opts{root_directory},
+            shard              => $opts{shard},
         ),
         genealogy     => $genealogy,
         flamegraph    => $opts{flamegraph} || 0,
@@ -464,6 +470,8 @@ sub merge {
         }
     }
 
+    $self->{metadata}->merge($report->{metadata});
+
     {
         my $my_map = $self->{aggregate}{file_map};
         my $other_map = $report->{aggregate}{file_map};
@@ -589,7 +597,10 @@ sub _save {
     # the merged metadata is saved separately
     if ($is_part) {
         write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy});
+        $self->{metadata}->save_report_part($report_dir);
         $self->{source}->save_part if $self->{source};
+    } else {
+        $self->{metadata}->save_report_merged($report_dir);
     }
     write_data_any($is_part, $self, $report_dir, $report_base, [
         $self->{tick},
@@ -613,6 +624,24 @@ sub load {
         process_id
         aggregate
     )} = @{read_data($self->{serializer}, $report)};
+}
+
+sub load_and_merge_metadata {
+    my ($self, $metadata) = @_;
+
+    $self->{metadata}->load_and_merge($metadata);
+}
+
+sub metadata {
+    my ($self) = @_;
+
+    return $self->{metadata}->get;
+}
+
+sub add_metadata {
+    my ($self, $metadata) = @_;
+
+    $self->{metadata}->add_entry($_, $metadata->{$_}) for keys %$metadata;
 }
 
 sub _fileify {
