@@ -336,6 +336,16 @@ sub _fresh_report {
     );
 }
 
+sub report_names {
+    my ($self) = @_;
+    my @dirs = grep $_ ne '__state',
+        map  File::Basename::basename($_),
+        grep -d $_,
+        glob File::Spec::Functions::catfile($self->{root_dir}, '*');
+
+    return \@dirs;
+}
+
 sub handle_section_change {
     my ($self, $sc, $state) = @_;
 
