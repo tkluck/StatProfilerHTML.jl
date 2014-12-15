@@ -310,6 +310,7 @@ sub read_trace {
         push @queue, $trace;
         if ($trace->sections_changed) {
             if (%{$r->get_custom_metadata} &&
+                    $r->get_custom_metadata->{key} &&
                     $self->{value} eq $r->get_custom_metadata->{key}) {
                 $self->{queue} = \@queue;
                 $r->clear_custom_metadata;

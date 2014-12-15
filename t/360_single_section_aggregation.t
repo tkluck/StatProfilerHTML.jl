@@ -20,6 +20,9 @@ my %handlers = (
     detail  => sub { take_sample() },
 );
 
+Devel::StatProfiler::write_custom_metadata('release', '1.3');
+Devel::StatProfiler::write_custom_metadata('release_date', '2013-07-03');
+
 for my $i (1..50) {
     my $request = $requests[rand @requests];
 
@@ -55,11 +58,16 @@ Devel::StatProfiler::stop_profile();
         my ($self, $sc, $metadata) = @_;
         my $request = $metadata->{key} || 'unknown';
 
-        $sc->clear_custom_metadata;
+        $sc->delete_custom_metadata(['key']);
         if ($request eq 'content' || $request eq 'list') {
-            return ['__main__', $request];
+            return ['__main__', $request], {
+                release         => $metadata->{release},
+            };
         } else {
-            return ['__main__'];
+            return ['__main__'], {
+                release         => $metadata->{release},
+                release_date    => $metadata->{release_date},
+            };
         }
     }
 }
@@ -71,12 +79,17 @@ my ($main1, $content1, $list1) = map Devel::StatProfiler::Report->new(mixed_proc
 $main1->add_trace_file($_) for @files;
 $content1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'content')) for @files;
 $list1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'list')) for @files;
+
+$main1->add_metadata({release_date => '2013-07-03'});
+$_->add_metadata({release => '1.3'}) for $main1, $content1, $list1;
+$_->add_metadata({tag => 'test-1.3'}) for $main1, $content1, $list1;
 # no need to finalize the report for comparison
 
 my $a1 = TestAggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
     shard          => 'shard1',
 );
+$a1->add_global_metadata({tag => 'test-1.3'});
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
     ($process_id) = @{$r->get_genealogy_info};
@@ -100,6 +113,7 @@ for my $file (@files) {
             root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
             shard          => 'shard1',
         );
+        $a->add_global_metadata({tag => 'test-1.3'});
         $a->load;
         $a->process_trace_files($sr);
         $a->save_part;
@@ -135,6 +149,14 @@ eq_or_diff($main3, $main1);
 eq_or_diff($content3, $content1);
 eq_or_diff($list3, $list1);
 
+for my $main ($main1, $main2, $main3) {
+    eq_or_diff($main->metadata, {
+        tag             => 'test-1.3',
+        release         => '1.3',
+        release_date    => '2013-07-03'
+    });
+}
+
 for my $content ($content1, $content2, $content3) {
     my $lines = $content->{aggregate}{files}{+__FILE__}{lines}{inclusive};
 
@@ -147,6 +169,11 @@ for my $content ($content1, $content2, $content3) {
             ok(!$lines->[$m[$i]], "sample for $requests[$i] caller is not there");
         }
     }
+
+    eq_or_diff($content->metadata, {
+        tag             => 'test-1.3',
+        release         => '1.3',
+    });
 }
 
 for my $content ($list1, $list2, $list3) {
@@ -161,6 +188,11 @@ for my $content ($list1, $list2, $list3) {
             ok(!$lines->[$m[$i]], "sample for $requests[$i] caller is not there");
         }
     }
+
+    eq_or_diff($content->metadata, {
+        tag             => 'test-1.3',
+        release         => '1.3',
+    });
 }
 
 done_testing();

@@ -114,7 +114,7 @@ sub process_trace_files {
 
         while ($sc->read_traces) {
             last if !$sc->sections_changed && %{$sc->get_active_sections};
-            my $report_keys = $self->handle_section_change($sc, $sc->get_custom_metadata);
+            my ($report_keys, $metadata) = $self->handle_section_change($sc, $sc->get_custom_metadata);
             my $entry = $self->{partial}{"@$report_keys"} ||= {
                 report_keys => $report_keys,
                 report      => $self->_fresh_report,
@@ -124,6 +124,7 @@ sub process_trace_files {
                 $state->{report} = undef;
             }
             $entry->{report}->add_trace_file($sc);
+            $entry->{report}->add_metadata($metadata) if $metadata && %$metadata;
         }
 
         if (!$sc->empty) {
