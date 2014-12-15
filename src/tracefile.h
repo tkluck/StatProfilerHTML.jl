@@ -127,6 +127,7 @@ namespace devel {
             // thus far.
             HV *get_custom_metadata();
             void clear_custom_metadata();
+            void delete_custom_metadata(AV *keys);
 
             // Returns the source code that has been collected thus far
             HV *get_source_code();

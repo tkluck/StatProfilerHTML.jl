@@ -2,4 +2,5 @@
 
 %typemap{size_t}{simple};
 %typemap{SV *}{simple};
+%typemap{AV *}{simple};
 %typemap{HV *}{simple};

@@ -56,6 +56,7 @@ double test_hires_time();
     HV *get_custom_metadata();
     HV *get_source_code();
     void clear_custom_metadata();
+    void delete_custom_metadata(AV *keys);
     HV *get_active_sections();
     bool is_file_ended();
     bool is_stream_ended();

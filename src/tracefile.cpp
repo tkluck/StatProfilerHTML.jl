@@ -741,6 +741,16 @@ void TraceFileReader::clear_custom_metadata()
     hv_clear(custom_metadata);
 }
 
+void TraceFileReader::delete_custom_metadata(AV *keys)
+{
+    for (int i = 0, max = AvFILL(keys); i <= max; ++i) {
+        SV **key = av_fetch(keys, i, 0);
+
+        if (key)
+            hv_delete_ent(custom_metadata, *key, G_DISCARD, 0);
+    }
+}
+
 HV *TraceFileReader::get_source_code()
 {
     return source_code;
