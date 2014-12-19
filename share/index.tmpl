@@ -22,9 +22,9 @@
           <th>Inclusive</th>
           <th>Subroutine</th>
         </tr>
-<? my $max = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
+<? my $max_subs = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
    my ($sub_link, $format_total_ratio) = @variables{qw(sub_link format_total_ratio)};
-   for my $sub (@{$variables{subs}}[0..$max - 1]) {
+   for my $sub (@{$variables{subs}}[0..$max_subs - 1]) {
  ?>
         <tr>
           <td><?= $format_total_ratio->($sub->{exclusive}) ?></td>
