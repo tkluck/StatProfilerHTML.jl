@@ -863,6 +863,8 @@ sub output {
     my @subs = sort { $b->{exclusive} <=> $a->{exclusive} ||
                       $b->{inclusive} <=> $a->{inclusive} }
                     values %{$self->{aggregate}{subs}};
+    my @files = sort { $b->{exclusive} <=> $a->{exclusive} }
+                    values %$files;
 
     my $date = POSIX::strftime('%c', localtime(time));
     my $include = sub {
@@ -1095,8 +1097,7 @@ sub output {
     my %main_data = (
         include             => $include,
         date                => $date,
-        files               => [sort { $b->{exclusive} <=> $a->{exclusive} }
-                                     values %$files],
+        files               => \@files,
         subs                => \@subs,
         flamegraph          => $flamegraph_link,
         sub_link            => $sub_link,
