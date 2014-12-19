@@ -30,6 +30,7 @@ my $NO_SOURCE = ['Source not available...'];
 my %TEMPLATES = (
     file      => _get_template('file.tmpl'),
     subs      => _get_template('subs.tmpl'),
+    files     => _get_template('files.tmpl'),
     index     => _get_template('index.tmpl'),
     header    => _get_template('header.tmpl'),
 );
@@ -1092,6 +1093,17 @@ sub output {
 
     $self->_write_template($TEMPLATES{subs}, \%subs_data,
                            $directory, 'subs.html', $compress);
+
+    # format files page
+    my %files_data = (
+        include             => $include,
+        date                => $date,
+        files               => \@files,
+        format_total_ratio  => $format_total_samples,
+    );
+
+    $self->_write_template($TEMPLATES{files}, \%files_data,
+                           $directory, 'files.html', $compress);
 
     # format index page
     my %main_data = (

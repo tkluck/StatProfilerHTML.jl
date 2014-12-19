@@ -48,13 +48,16 @@
           <th>Exclusive</th>
           <th>Report</th>
         </tr>
-?  for my $file (@{$variables{files}}) {
+<? my $max_files = scalar @{$variables{files}} > 20 ? 20 : scalar @{$variables{files}};
+   for my $file (@{$variables{files}}[0 .. $max_files - 1]) {
+ ?>
         <tr>
           <td><?= $format_total_ratio->($file->{exclusive}) ?></td>
           <td><a href="<?= $file->{report} ?>"><?= $file->{name} eq '' ? '(unknown)' : $file->{name} ?></a></td>
         </tr>
 ?  }
       </table>
+      <a href="files.html">All files</a>
     </div>
   </body>
 </html>

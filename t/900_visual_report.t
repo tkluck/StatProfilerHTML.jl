@@ -75,6 +75,8 @@ samples and list of callers.
 
 =item "All subs" link works
 
+=item "All files" link works
+
 =back
 
 =head1 FILE PAGE

@@ -53,7 +53,6 @@
   git-cat-file)
 - use two directory levels instead of dumping all eval source code in
   a single directory
-- remove the full file list from report index and add a separate "all files"
 - split the Aggregator class in two (aggregation and loading of the final report)
 - add an API to read traces by section, and remove the horrible hack of returning
   a fake empty trace when a section starts/ends
