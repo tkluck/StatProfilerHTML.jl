@@ -60,8 +60,15 @@ sub _save {
     write_data_any($is_part, $self, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
-        write_file($source_dir, $hash, 'use_utf8', $self->{hashed}{$hash})
-            unless -e File::Spec::Functions::catfile($source_dir, $hash);
+        my $source_subdir = File::Spec::Functions::catdir(
+            $source_dir,
+            substr($hash, 0, 2),
+            substr($hash, 2, 2),
+        );
+
+        File::Path::mkpath([$source_subdir]);
+        write_file($source_subdir, substr($hash, 4), 'use_utf8', $self->{hashed}{$hash})
+            unless -e File::Spec::Functions::catfile($source_subdir, substr($hash, 4));
     }
 }
 
@@ -95,7 +102,13 @@ sub get_source_by_hash {
     my ($self, $hash) = @_;
 
     return $self->{hashed}{$hash} // read_file(
-        File::Spec::Functions::catfile($self->{root_dir}, '__source__', $hash),
+        File::Spec::Functions::catfile(
+            $self->{root_dir},
+            '__source__',
+            substr($hash, 0, 2),
+            substr($hash, 2, 2),
+            substr($hash, 4)
+        ),
         'use_utf8',
     );
 }
