@@ -31,6 +31,12 @@ sub add_entry {
     $self->{metadata}{$key} = $value;
 }
 
+sub set_at_inc {
+    my ($self, $value) = @_;
+
+    $self->add_entry("\x00at_inc", [split /\x00/, $value]);
+}
+
 sub _save {
     my ($self, $dir, $is_part) = @_;
 
@@ -69,6 +75,12 @@ sub get {
     my ($self) = @_;
 
     return { %{$self->{metadata}} };
+}
+
+sub get_at_inc {
+    my ($self, $value) = @_;
+
+    $self->{metadata}{"\x00at_inc"} // [];
 }
 
 1;

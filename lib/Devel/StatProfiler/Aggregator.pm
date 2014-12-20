@@ -138,6 +138,10 @@ sub process_trace_files {
 
         $self->{source}->add_sources_from_reader($r);
         $self->{sourcemap}->add_sources_from_reader($r);
+
+        my $metadata = $r->get_custom_metadata;
+        $self->{metadata}->set_at_inc($metadata->{"\x00at_inc"})
+            if $metadata->{"\x00at_inc"};
     }
 }
 

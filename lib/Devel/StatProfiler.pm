@@ -96,6 +96,12 @@ sub guarded_section {
   return Devel::StatProfiler::SectionGuard->new(section_name => $section_name);
 }
 
+sub write_inc_path {
+    my ($at_inc) = $_[0] // \@INC;
+
+    write_custom_metadata("\x00at_inc", join "\x00", @$at_inc);
+}
+
 1;
 
 __END__

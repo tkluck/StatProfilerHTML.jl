@@ -26,6 +26,7 @@ for (my $count = 10000; ; $count *= 2) {
     last if time - $start >= 0.5;
 }
 
+Devel::StatProfiler::write_inc_path;
 Devel::StatProfiler::stop_profile();
 
 my $r = Devel::StatProfiler::Report->new(

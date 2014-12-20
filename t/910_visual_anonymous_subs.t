@@ -23,6 +23,7 @@ my $anon2 = sub {
 $anon1->();
 $anon2->();
 
+Devel::StatProfiler::write_inc_path;
 Devel::StatProfiler::stop_profile();
 
 my $r = Devel::StatProfiler::Report->new(

@@ -16,7 +16,6 @@
   - metadata does not belong to a section (probably not an issue, but
     it needs better handling in the aggregation phase)
   - overlapping/nested sections are not handled during aggregation
-  - add @INC to global metadata
 - some serious benchmarking
   - add a fast benchmark to be used during development and a slow more
     realistic one for release

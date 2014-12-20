@@ -46,6 +46,7 @@ EOT
 
 use Test::LineMap;
 
+Devel::StatProfiler::write_inc_path;
 Devel::StatProfiler::stop_profile();
 
 my $r = Devel::StatProfiler::Report->new(

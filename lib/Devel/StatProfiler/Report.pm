@@ -306,6 +306,10 @@ sub add_trace_file {
 
     $self->{source}->add_sources_from_reader($r) if $self->{source};
     $self->{sourcemap}->add_sources_from_reader($r) if $self->{sourcemap};
+
+    my $metadata = $r->get_custom_metadata;
+    $self->{metadata}->set_at_inc($metadata->{"\x00at_inc"})
+        if $metadata->{"\x00at_inc"};
 }
 
 sub _map_hash_rx {
