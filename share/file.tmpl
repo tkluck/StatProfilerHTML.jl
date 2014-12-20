@@ -18,7 +18,7 @@
           <th>Code</th>
         </tr>
 <? my ($lines, $exclusive, $inclusive, $subs, $callees, $mapping) = @variables{qw(lines exclusive inclusive subs callees mapping)};
-   my ($sub_link, $file_link, $lookup_sub, $format_total_ratio, $format_ratio) = @variables{qw(sub_link file_link lookup_sub format_total_ratio format_ratio)};
+   my ($sub_link, $sub_name, $file_link, $lookup_sub, $format_total_ratio, $format_ratio) = @variables{qw(sub_link sub_name file_link lookup_sub format_total_ratio format_ratio)};
    my ($logical_line, $logical_file, $physical_end) = (1, undef, 1);
    my $map_index = 0;
 
@@ -61,7 +61,7 @@
 ?          my $callee = $lookup_sub->($call->{callee});
               <?= $format_ratio->($call->{inclusive}, $inclusive->[$line]) ?>
               samples spent calling
-              <a href="<?= $sub_link->($callee) ?>"><?= $callee->{name} ?></a><br />
+              <a href="<?= $sub_link->($callee) ?>"><?= $sub_name->($callee->{name}) ?></a><br />
 ?      }
             </div>
 ?    }

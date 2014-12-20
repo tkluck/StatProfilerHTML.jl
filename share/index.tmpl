@@ -23,14 +23,14 @@
           <th>Subroutine</th>
         </tr>
 <? my $max_subs = scalar @{$variables{subs}} > 20 ? 20 : scalar @{$variables{subs}};
-   my ($sub_link, $format_total_ratio) = @variables{qw(sub_link format_total_ratio)};
+   my ($sub_link, $sub_name, $file_name, $format_total_ratio) = @variables{qw(sub_link sub_name file_name format_total_ratio)};
    for my $sub (@{$variables{subs}}[0..$max_subs - 1]) {
  ?>
         <tr>
           <td><?= $format_total_ratio->($sub->{exclusive}) ?></td>
           <td><?= $format_total_ratio->($sub->{inclusive}) ?></td>
           <td>
-            <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
+            <a href="<?= $sub_link->($sub) ?>"><?= $sub_name->($sub->{name}) ?></a>
 ?    if ($sub->{kind} == 2) {
             (opcode)
 ?    } elsif ($sub->{kind} == 1) {
@@ -53,7 +53,7 @@
  ?>
         <tr>
           <td><?= $format_total_ratio->($file->{exclusive}) ?></td>
-          <td><a href="<?= $file->{report} ?>"><?= $file->{name} eq '' ? '(unknown)' : $file->{name} ?></a></td>
+          <td><a href="<?= $file->{report} ?>"><?= $file_name->($file->{name}) ?></a></td>
         </tr>
 ?  }
       </table>

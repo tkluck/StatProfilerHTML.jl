@@ -901,6 +901,7 @@ sub output {
                     values %$files;
 
     my $date = POSIX::strftime('%c', localtime(time));
+    my $at_inc = [map s{[/\\]$}{}r, @{$self->{metadata}->get_at_inc}];
     my $include = sub {
         $TEMPLATES{$_[0]}->($_[1]);
     };
@@ -919,6 +920,17 @@ sub output {
         }
     };
 
+    my $file_name = sub {
+        return '(unknown)' if $_[0] eq '';
+
+        for my $dir (@$at_inc) {
+            return substr $_[0], length($dir) + 1
+                if rindex($_[0], $dir, 0) == 0 && substr($_[0], length($dir), 1) =~ m{[/\\]};
+        }
+
+        return $_[0];
+    };
+
     my $file_link = sub {
         my ($file, $line) = @_;
         my $report = $self->{aggregate}{files}{$file}{report};
@@ -926,6 +938,11 @@ sub output {
         # twice, because we have physical files with source code for
         # multiple logical files (via #line directives)
         return sprintf '%s#L%s-%d', $report, $report, $line;
+    };
+
+    my $sub_name = sub {
+        return $_[0] if $_[0] !~ m{[/\\]};
+        return $file_name->($_[0]);
     };
 
     my $lookup_sub = sub {
@@ -1016,6 +1033,7 @@ sub output {
             inclusive               => $entry->{lines}{inclusive},
             callees                 => $entry->{lines}{callees},
             sub_link                => $sub_link,
+            sub_name                => $sub_name,
             file_link               => $file_link,
             format_total_ratio      => $format_total_samples,
             format_ratio            => \&_format_ratio,
@@ -1100,7 +1118,7 @@ sub output {
                 "\t",
                 $sub->{uq_name},
                 "href=" . $sub_link->($sub),
-                "function=" . $sub->{name},
+                "function=" . $sub_name->($sub->{name}),
             ), "\n";
         }
         close $attrs_fh;
@@ -1121,6 +1139,7 @@ sub output {
         date                => $date,
         subs                => \@subs,
         sub_link            => $sub_link,
+        sub_name            => $sub_name,
         format_total_ratio  => $format_total_samples,
     );
 
@@ -1132,6 +1151,7 @@ sub output {
         include             => $include,
         date                => $date,
         files               => \@files,
+        file_name           => $file_name,
         format_total_ratio  => $format_total_samples,
     );
 
@@ -1146,6 +1166,8 @@ sub output {
         subs                => \@subs,
         flamegraph          => $flamegraph_link,
         sub_link            => $sub_link,
+        sub_name            => $sub_name,
+        file_name           => $file_name,
         format_total_ratio  => $format_total_samples,
     );
 

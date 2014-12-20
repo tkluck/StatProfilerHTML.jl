@@ -16,12 +16,12 @@
           <th class="sorttable_sorted">Exclusive</th>
           <th>Report</th>
         </tr>
-<? my ($format_total_ratio) = @variables{qw(format_total_ratio)};
+<? my ($file_name, $format_total_ratio) = @variables{qw(file_name format_total_ratio)};
    for my $file (@{$variables{files}}) {
  ?>
         <tr>
           <td sorttable_customkey="<?= $file->{exclusive} ?>"><?= $format_total_ratio->($file->{exclusive}) ?></td>
-          <td><a href="<?= $file->{report} ?>"><?= $file->{name} eq '' ? '(unknown)' : $file->{name} ?></a></td>
+          <td><a href="<?= $file->{report} ?>"><?= $file_name->($file->{name}) ?></a></td>
         </tr>
 ?  }
       </table>

@@ -37,7 +37,6 @@
 - test case for 9d4110d016a72fabfb5cd45c4ae97468c9070f51
 - test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
 - move finalize() work earlier during aggregation
-- shorter/nicer filenames in the HTML report (use @INC/custom prefixes)
 - allow calling file fetchers with multiple paths (to replace git-show with
   git-cat-file)
 - split the Aggregator class in two (aggregation and loading of the final report)

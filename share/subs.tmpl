@@ -17,14 +17,14 @@
           <th>Inclusive</td>
           <th>Subroutine</th>
         </tr>
-<? my ($sub_link, $format_total_ratio) = @variables{qw(sub_link format_total_ratio)};
+<? my ($sub_link, $sub_name, $format_total_ratio) = @variables{qw(sub_link sub_name format_total_ratio)};
    for my $sub (@{$variables{subs}}) {
  ?>
         <tr>
           <td sorttable_customkey="<?= $sub->{exclusive} ?>"><?= $format_total_ratio->($sub->{exclusive}) ?></td>
           <td sorttable_customkey="<?= $sub->{inclusive} ?>"><?= $format_total_ratio->($sub->{inclusive}) ?></td>
           <td>
-            <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
+            <a href="<?= $sub_link->($sub) ?>"><?= $sub_name->($sub->{name}) ?></a>
 ?    if ($sub->{kind} == 2) {
             (opcode)
 ?    } elsif ($sub->{kind} == 1) {
