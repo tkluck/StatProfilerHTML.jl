@@ -12,7 +12,7 @@ using namespace std;
 #define FILE_MAGIC     "=statprofiler"
 #define FORMAT_VERSION 1
 
-#if PERL_SUBVERSION < 16
+#if PERL_VERSION < 16
 # ifndef GvNAMEUTF8
 #   define GvNAMEUTF8(foo) 0
 # endif
@@ -971,7 +971,7 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 
             if (stash) {
                 package = HvNAME(stash);
-#if PERL_SUBVERSION >= 16
+#if PERL_VERSION >= 16
                 package_utf8 = HvNAMEUTF8(stash);
                 package_size = HvNAMELEN(stash);
 #else

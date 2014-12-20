@@ -25,7 +25,7 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
              * twice; the first for the normal foo() call, and the second
              * for a faked up re-entry into the sub to execute the
              * code block. Hide this faked entry from the world. */
-#if PERL_SUBVERSION >= 18
+#if PERL_VERSION >= 18
             if (cx->cx_type & CXp_SUB_RE_FAKE)
                 continue;
 #endif
