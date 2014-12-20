@@ -986,7 +986,21 @@ int TraceFileWriter::add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP 
 
         if (frame_type == FRAME_SUB) {
             OP *first = CvSTART(sub);
-            COP *first_line = first->op_type == OP_NEXTSTATE ? (COP *) first : NULL;
+            COP *first_line = NULL;
+
+            if (first->op_type == OP_NEXTSTATE) {
+                first_line = (COP *) first;
+            }
+#if PERL_VERSION >= 18
+            else if (first->op_type == OP_INTROCV) {
+                OP *lineseq1 = ((UNOP *) CvROOT(sub))->op_first;
+                OP *lineseq2 = ((UNOP *) lineseq1)->op_first;
+                OP *nextstate = lineseq2->op_next;
+
+                first_line = nextstate && nextstate->op_type == OP_NEXTSTATE ? (COP *) nextstate : NULL;
+            }
+#endif
+
             int first_lineno = first_line ? CopLINE(first_line) : -1;
 
             status += out.write_byte(TAG_SUB_FRAME);

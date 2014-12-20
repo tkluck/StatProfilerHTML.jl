@@ -4,7 +4,6 @@
 - test various interesting cases
   - do ""
   - sort {}/map {}
-  - test lexical subs in Perl 5.20+
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
   - 0x100 descriptive names for eval ""
