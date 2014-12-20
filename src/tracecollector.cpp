@@ -8,7 +8,7 @@ namespace {
 }
 
 
-// needs to be kept in sync with S_dopoptosub in op.c
+// needs to be kept in sync with S_dopoptosub in pp_ctl.c
 STATIC I32
 S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 {
