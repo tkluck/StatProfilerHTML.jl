@@ -2,7 +2,6 @@
   - check whether getting rid of varint encoding speed up the writer
     (we compress using Snappy anyway)
 - test various interesting cases
-  - do ""
   - sort {}/map {}
 - add option to set $^P to
   - 0x200 descriptive names for anonymous subroutines
