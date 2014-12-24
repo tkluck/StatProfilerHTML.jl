@@ -43,6 +43,10 @@ table {
     /* border-spacing: 0px; */
 }
 
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+    content: " \25B4\25BE"
+}
+
 th {
     border: solid 1px #c0c0c0;
     padding-right: 0.5ex;

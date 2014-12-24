@@ -1119,10 +1119,13 @@ sub output {
     $self->_write_template($TEMPLATES{index}, \%main_data,
                            $directory, 'index.html', $compress);
 
-    # copy CSS
+    # copy CSS/JS
     File::Copy::copy(
         File::ShareDir::dist_file('Devel-StatProfiler', 'statprofiler.css'),
         File::Spec::Functions::catfile($directory, 'statprofiler.css'));
+    File::Copy::copy(
+        File::ShareDir::dist_file('Devel-StatProfiler', 'sorttable.js'),
+        File::Spec::Functions::catfile($directory, 'sorttable.js'));
 
     return \@diagnostics;
 }

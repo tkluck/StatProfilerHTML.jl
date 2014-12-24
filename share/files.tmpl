@@ -4,22 +4,23 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
+    <script src="sorttable.js"></script>
     <title>StatProfiler: file list</title>
   </head>
   <body>
 ?= $variables{include}->('header', $_[0])
     <div id="body-content">
-      <table>
+      <table class="sortable">
         <caption>Files, sorted by exclusive sample count</caption>
         <tr>
-          <th>Exclusive</th>
+          <th class="sorttable_sorted">Exclusive</th>
           <th>Report</th>
         </tr>
 <? my ($format_total_ratio) = @variables{qw(format_total_ratio)};
    for my $file (@{$variables{files}}) {
  ?>
         <tr>
-          <td><?= $format_total_ratio->($file->{exclusive}) ?></td>
+          <td sorttable_customkey="<?= $file->{exclusive} ?>"><?= $format_total_ratio->($file->{exclusive}) ?></td>
           <td><a href="<?= $file->{report} ?>"><?= $file->{name} eq '' ? '(unknown)' : $file->{name} ?></a></td>
         </tr>
 ?  }

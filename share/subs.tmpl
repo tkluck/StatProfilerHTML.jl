@@ -4,15 +4,16 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="statprofiler.css">
+    <script src="sorttable.js"></script>
     <title>StatProfiler: subroutine list</title>
   </head>
   <body>
 ?= $variables{include}->('header', $_[0])
     <div id="body-content">
-      <table>
+      <table class="sortable">
         <caption>Subroutines, sorted by exclusive sample count</caption>
         <tr>
-          <th>Exclusive</td>
+          <th class="sorttable_sorted">Exclusive</td>
           <th>Inclusive</td>
           <th>Subroutine</th>
         </tr>
@@ -20,8 +21,8 @@
    for my $sub (@{$variables{subs}}) {
  ?>
         <tr>
-          <td><?= $format_total_ratio->($sub->{exclusive}) ?></td>
-          <td><?= $format_total_ratio->($sub->{inclusive}) ?></td>
+          <td sorttable_customkey="<?= $sub->{exclusive} ?>"><?= $format_total_ratio->($sub->{exclusive}) ?></td>
+          <td sorttable_customkey="<?= $sub->{inclusive} ?>"><?= $format_total_ratio->($sub->{inclusive}) ?></td>
           <td>
             <a href="<?= $sub_link->($sub) ?>"><?= $sub->{name} ?></a>
 ?    if ($sub->{kind} == 2) {
