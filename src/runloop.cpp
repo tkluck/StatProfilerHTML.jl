@@ -124,6 +124,8 @@ namespace {
 
         void new_id();
         void pid_changed();
+
+        void restart();
     };
 
     struct CounterCxt {
@@ -254,6 +256,16 @@ Cxt::~Cxt() {
     if (trace && trace->is_valid())
         trace->close(TraceFileWriter::write_end_tag);
     delete trace;
+}
+
+void
+Cxt::restart()
+{
+    parent_ordinal = ordinal;
+    memcpy(parent_id, id, sizeof(id));
+
+    ordinal = 0;
+    new_id();
 }
 
 TraceFileWriter *
@@ -864,6 +876,8 @@ set_profiler_state(pTHX)
     switch (state) {
     case 0: // disable
     case 1: // enable
+        if (state == 1 && (!MY_CXT.trace || !MY_CXT.trace->is_valid()))
+            MY_CXT.restart();
         MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ state == 1);
         break;
     case 2: // stop
