@@ -82,8 +82,7 @@ sub _set_profiler_state {
 
 sub disable_profile { _set_profiler_state(0) }
 sub enable_profile  { _set_profiler_state(1) }
-sub restart_profile { _set_profiler_state(2) }
-sub stop_profile    { _set_profiler_state(3) }
+sub stop_profile    { _set_profiler_state(2) }
 
 sub save_source {
   my ($value) = @_;
@@ -232,7 +231,7 @@ twice in some situations.
 
 =head2 changing profiler state
 
-Calling C<enable_profile>, C<disable_profile>, C<restart_profile> and
+Calling C<enable_profile>, C<disable_profile> and
 C<stop_profile> from an inner runloop (including but not limited to
 from C<use>, C<require>, C<sort> blocks, callbacks invoked from XS
 code) can have confusing results: runloops started afterwards will
