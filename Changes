@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.12      2014-12-30 09:54:29 CET
+
+    - Make tables sortable
+    - Move list of all files to a separate page
+    - Use multiple directory levels for saved eval "" source code
+    - Handle lexical subroutines
+
 0.11      2014-12-05 10:31:08 CET
 
     - Test fix for Perl 5.14
