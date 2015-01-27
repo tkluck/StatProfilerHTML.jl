@@ -21,6 +21,7 @@ use Devel::StatProfiler::Utils qw(
 
 use File::Path ();
 use File::Basename ();
+use Errno;
 
 my $MAIN_REPORT_ID = ['__main__'];
 
@@ -192,10 +193,25 @@ sub load {
     my $processed_glob = state_file($self, 0, 'processed.%') =~ s{%}{*}r;
 
     for my $file (glob $processed_glob) {
-        my $processed = read_data($self->{serializer}, $file);
+        eval {
+            my $processed = read_data($self->{serializer}, $file);
 
-        $processed->{modified} = 0;
-        $self->{processed}{$processed->{process_id}} = $processed;
+            $processed->{modified} = 0;
+            $self->{processed}{$processed->{process_id}} = $processed;
+
+            1;
+        } or do {
+            my $error = $@ || "Zombie error";
+
+            if ($error->isa("autodie::exception") &&
+                    $error->matches('open') &&
+                    $error->errno == Errno::ENOENT) {
+                # silently ignore, it might have been cleaned up by
+                # another process
+            } else {
+                die;
+            }
+        };
     }
 }
 
