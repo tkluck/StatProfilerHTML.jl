@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.13      2015-01-27 17:03:19 CET
+
+    - Speed up aggregation when there is an high number of child
+      processes.
+
 0.12      2014-12-30 09:54:29 CET
 
     - Make tables sortable
