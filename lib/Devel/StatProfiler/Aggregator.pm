@@ -165,7 +165,11 @@ sub save_part {
         my $processed = $self->{processed}{$process_id};
 
         next unless $processed->{modified};
-        write_data($self, $state_dir, "processed.$process_id", $processed);
+        if ($processed->{ended}) {
+            unlink state_file($self, 0, 'processed.$process_id');
+        } else {
+            write_data($self, $state_dir, "processed.$process_id", $processed);
+        }
     }
 
     $self->{metadata}->save_part;
