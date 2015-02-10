@@ -252,7 +252,8 @@ Cxt::~Cxt() {
 
     if (outer_runloop)
         Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
-    PL_runops = original_runloop;
+    if (original_runloop)
+        PL_runops = original_runloop;
     if (trace && trace->is_valid())
         trace->close(TraceFileWriter::write_end_tag);
     delete trace;
