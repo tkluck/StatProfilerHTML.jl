@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.14      2015-02-13 12:54:53 CET
+
+    - Fix segmentation fault that happens under uWSGI when loading the
+      module without starting the profiler
+
 0.13      2015-01-27 17:03:19 CET
 
     - Speed up aggregation when there is an high number of child
