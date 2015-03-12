@@ -279,8 +279,9 @@ Cxt::create_trace(pTHX)
         ++ordinal;
 
         trace->open(filename, is_template, id, ordinal);
-        trace->write_header(sampling_interval, stack_collect_depth,
-                            id, ordinal, parent_id, parent_ordinal);
+        if (trace->is_valid())
+            trace->write_header(sampling_interval, stack_collect_depth,
+                                id, ordinal, parent_id, parent_ordinal);
     }
 
     return trace;
