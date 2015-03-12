@@ -190,23 +190,21 @@ sub _file {
 }
 
 sub _check_consistency {
-    my ($self, $tick, $depth, $perl_version, $process_id, $file) = @_;
+    my ($self, $tick, $perl_version, $process_id, $file) = @_;
 
     if ($self->{tick} == 0) {
         $self->{tick} = $tick;
-        $self->{stack_depth} = $depth;
         $self->{perl_version} = $perl_version;
         $self->{process_id} //= $process_id;
     } else {
         if ($tick != $self->{tick} ||
-                $depth != $self->{stack_depth} ||
                 $perl_version ne $self->{perl_version}) {
             die <<EOT;
 Inconsistent sampling parameters:
-Current tick duration: $self->{tick} stack sample depth: $self->{stack_depth} Perl version: $self->{perl_version}
+Current tick duration: $self->{tick} Perl version: $self->{perl_version}
 
 $file sampling parameters:
-Tick duration: $tick stack sample depth: $depth Perl version: $perl_version
+Tick duration: $tick Perl version: $perl_version
 EOT
         }
 
@@ -234,7 +232,6 @@ sub add_trace_file {
 
     $self->_check_consistency(
         $r->get_source_tick_duration,
-        $r->get_source_stack_sample_depth,
         $r->get_source_perl_version,
         $process_id,
         $file,
@@ -460,7 +457,6 @@ sub merge {
 
     $self->_check_consistency(
         $report->{tick},
-        $report->{stack_depth},
         $report->{perl_version},
         $report->{process_id},
         'merged report',
