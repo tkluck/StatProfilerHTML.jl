@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+    - Allow writing section start/end when profiling is enabled but
+      the runloop has not started yet
+
 0.14      2015-02-13 12:54:53 CET
 
     - Fix segmentation fault that happens under uWSGI when loading the
