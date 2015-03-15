@@ -82,7 +82,7 @@ sub can_process_trace_file {
         my $r = ref $_ ? $_ : Devel::StatProfiler::Reader->new($_);
         my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
             @{$r->get_genealogy_info};
-        my $state = $self->{processed}{$process_id} // { ordinal => 0 };
+        my $state = $self->_state($process_id) // { ordinal => 0 };
 
         $process_ordinal == $state->{ordinal} + 1;
     } @files;
@@ -96,15 +96,7 @@ sub process_trace_files {
         my $sc = Devel::StatProfiler::SectionChangeReader->new($r);
         my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
             @{$r->get_genealogy_info};
-        next if $process_ordinal > 1 && !$self->{processed}{$process_id};
-        my $state = $self->{processed}{$process_id} ||= {
-            process_id   => $process_id,
-            ordinal      => 0,
-            report       => undef,
-            reader_state => undef,
-            modified     => 0,
-            ended        => 0,
-        };
+        my $state = $self->_state($process_id);
         next if $process_ordinal != $state->{ordinal} + 1;
 
         $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
@@ -193,30 +185,47 @@ sub save_part {
 sub load {
     my ($self) = @_;
 
-    return unless -d $self->{root_dir} && $self->{shard};
-    my $processed_glob = state_file($self, 0, 'processed.%') =~ s{%}{*}r;
+    # nothing to do here anymore, still it's better to leave the hook
+    # in place
+}
 
-    for my $file (glob $processed_glob) {
-        eval {
-            my $processed = read_data($self->{serializer}, $file);
+sub _state {
+    my ($self, $process_id) = @_;
 
-            $processed->{modified} = 0;
-            $self->{processed}{$processed->{process_id}} = $processed;
+    return $self->{processed}{$process_id} //= do {
+        my $state_file = state_file($self, 0, "processed.$process_id");
+        my $processed;
 
-            1;
-        } or do {
-            my $error = $@ || "Zombie error";
+        if (-f $state_file) {
+            eval {
+                $processed = read_data($self->{serializer}, $state_file);
+                $processed->{modified} = 0;
 
-            if ($error->isa("autodie::exception") &&
-                    $error->matches('open') &&
-                    $error->errno == Errno::ENOENT) {
-                # silently ignore, it might have been cleaned up by
-                # another process
-            } else {
-                die;
-            }
+                1;
+            } or do {
+                my $error = $@ || "Zombie error";
+
+                if ($error->isa("autodie::exception") &&
+                        $error->matches('open') &&
+                        $error->errno == Errno::ENOENT) {
+                    # silently ignore, it might have been cleaned up by
+                    # another process
+                } else {
+                    die;
+                }
+            };
+        }
+
+        # initial state
+        $processed // {
+            process_id   => $process_id,
+            ordinal      => 0,
+            report       => undef,
+            reader_state => undef,
+            modified     => 0,
+            ended        => 0,
         };
-    }
+    };
 }
 
 sub _merge_genealogy {
