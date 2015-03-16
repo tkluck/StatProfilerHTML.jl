@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.17      2015-03-16 09:54:02 CET
+
+    - Avoid pathological case when there are many process state files
+
 0.16      2015-03-12 19:26:18 CET
 
     - Fix segfault when the output directory is not writable
