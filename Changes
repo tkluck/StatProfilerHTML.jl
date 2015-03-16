@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.16      2015-03-12 19:26:18 CET
+
+    - Fix segfault when the output directory is not writable
+
 0.15      2015-03-12 10:09:01 CET
 
     - Allow writing section start/end when profiling is enabled but
