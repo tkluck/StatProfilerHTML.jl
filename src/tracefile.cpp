@@ -654,7 +654,7 @@ SV *TraceFileReader::read_trace()
         case TAG_SECTION_START: {
             SV *section_name = read_string(aTHX_ in);
             HE *depth = hv_fetch_ent(sections, section_name, 1, 0);
-            if (!depth || !SvOK(HeVAL(depth)))
+            if (!SvOK(HeVAL(depth)))
                 sv_setuv(HeVAL(depth), 1);
             else
                 sv_setuv(HeVAL(depth), 1 + SvUV(HeVAL(depth)));
