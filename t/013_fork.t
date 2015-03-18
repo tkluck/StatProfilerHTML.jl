@@ -15,6 +15,8 @@ usleep(50000); BEGIN { $in_parent_before = __LINE__ }
 
 my ($parent_base) = map s/\.[0-9]+_$//r, glob $profile_file . '*';
 
+Devel::StatProfiler::start_section('section');
+
 my $pid = fork();
 die "fork() failed: $!" unless defined $pid;
 
@@ -23,12 +25,14 @@ if ($pid) {
     0; # here to force Perl to generate a nextstate for the previous line...
 } else {
     usleep(50000); BEGIN { $in_child = __LINE__ }
+    Devel::StatProfiler::end_section('section');
     exit 0;
 }
 
 die "waitpid() error: $!"
     if waitpid($pid, 0) != $pid;
 
+Devel::StatProfiler::end_section('section');
 Devel::StatProfiler::stop_profile();
 
 my @files = (
@@ -38,11 +42,13 @@ my @files = (
 
 is(scalar @files, 3, 'both processes wrote a trace file');
 my (@sleep_patterns, @genealogies);
+my $state;
 
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
     my %sleep_pattern;
 
+    $r->set_reader_state($state) if $state;
     while (my $trace = $r->read_trace) {
         my $frames = $trace->frames;
 
@@ -50,6 +56,7 @@ for my $file (@files) {
             $sleep_pattern{$frame->line} += $trace->weight;
         }
     }
+    $state = $r->get_reader_state;
 
     push @sleep_patterns, \%sleep_pattern;
     push @genealogies, $r->get_genealogy_info;

@@ -109,6 +109,8 @@ namespace {
         unsigned int ordinal, parent_ordinal;
         pid_t pid, tid;
         TraceFileWriter *trace;
+        HV *sections;
+        bool restore_sections;
 
         Cxt();
         Cxt(const Cxt &cxt);
@@ -143,6 +145,12 @@ static void
 increment_counter(CounterCxt *arg);
 static void
 test_increment_counter(CounterCxt *arg);
+
+static void
+copy_hv(pTHX_ HV *src, HV *dest);
+
+static void
+restore_section_state(pTHX_ pMY_CXT);
 
 START_MY_CXT;
 
@@ -189,6 +197,22 @@ namespace {
     void (* increment_counter_function)(CounterCxt *cxt) = &increment_counter;
 }
 
+static void
+copy_hv(pTHX_ HV *src, HV *dest)
+{
+    char *key;
+    I32 klen;
+
+    hv_iterinit(src);
+
+    while (SV *value = hv_iternextsv(src, &key, &klen)) {
+        SV **targ = hv_fetch(dest, key, klen, 1);
+
+        SvSetSV(*targ, value);
+    }
+}
+
+
 static bool
 start_counter_thread();
 
@@ -222,9 +246,15 @@ Cxt::Cxt() :
     parent_ordinal(0),
     pid(getpid()),
     tid(new_thread_id()),
+    sections(NULL),
+    restore_sections(false),
     trace(NULL)
 {
+    dTHX;
+
     new_id();
+
+    sections = newHV();
 }
 
 Cxt::Cxt(const Cxt &cxt) :
@@ -241,15 +271,24 @@ Cxt::Cxt(const Cxt &cxt) :
     parent_ordinal(cxt.ordinal),
     pid(cxt.pid),
     tid(new_thread_id()),
+    sections(NULL),
+    restore_sections(true),
     trace(NULL)
 {
+    dTHX;
+
     new_id();
     memcpy(parent_id, cxt.id, sizeof(id));
+
+    sections = newHV();
+
+    copy_hv(aTHX_ cxt.sections, sections);
 }
 
 Cxt::~Cxt() {
     dTHX;
 
+    SvREFCNT_dec(sections);
     if (outer_runloop)
         Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
     if (original_runloop)
@@ -279,9 +318,15 @@ Cxt::create_trace(pTHX)
         ++ordinal;
 
         trace->open(filename, is_template, id, ordinal);
-        if (trace->is_valid())
+        if (trace->is_valid()) {
             trace->write_header(sampling_interval, stack_collect_depth,
                                 id, ordinal, parent_id, parent_ordinal);
+
+            if (restore_sections) {
+                restore_sections = false;
+                restore_section_state(aTHX_ this);
+            }
+        }
     }
 
     return trace;
@@ -364,6 +409,18 @@ Cxt::pid_changed()
     tid = new_thread_id();
 
     new_id();
+}
+
+static void
+restore_section_state(pTHX_ pMY_CXT)
+{
+    char *key;
+    I32 klen;
+
+    hv_iterinit(MY_CXT.sections);
+    while (HE *hek = hv_iternext(MY_CXT.sections)) {
+        MY_CXT.trace->start_section(hv_iterkeysv(hek));
+    }
 }
 
 static void
@@ -887,6 +944,7 @@ set_profiler_state(pTHX)
             MY_CXT.resuming = switch_runloop(aTHX_ aMY_CXT_ false);
         if (MY_CXT.trace)
             MY_CXT.trace->close(TraceFileWriter::write_end_tag);
+        hv_clear(MY_CXT.sections);
         break;
     }
 
@@ -964,8 +1022,10 @@ child_after_fork()
 
     MY_CXT.pid_changed();
     MY_CXT.ordinal = 0;
-    if (running && MY_CXT.trace)
+    if (running && MY_CXT.trace) {
         reopen_output_file(aTHX_ aMY_CXT);
+        restore_section_state(aTHX_ aMY_CXT);
+    }
 }
 
 
@@ -1022,12 +1082,13 @@ devel::statprofiler::clone_runloop(pTHX)
 
     // ensures that any eval text the child depends on is in an
     // already closed file, ready for processing
-    if (original_cxt->trace && original_cxt->trace->is_valid())
+    if (original_cxt->trace && original_cxt->trace->is_valid()) {
         reopen_output_file(aTHX_
 #ifdef PERL_IMPLICIT_CONTEXT
                            original_cxt
 #endif
         );
+    }
 }
 
 
@@ -1138,6 +1199,12 @@ devel::statprofiler::start_section(pTHX_ SV *section_name)
     if (MY_CXT.enabled) {
         MY_CXT.create_trace(aTHX);
         MY_CXT.trace->start_section(section_name);
+
+        HE *depth = hv_fetch_ent(MY_CXT.sections, section_name, 1, 0);
+        if (!SvOK(HeVAL(depth)))
+            sv_setuv(HeVAL(depth), 1);
+        else
+            sv_setuv(HeVAL(depth), 1 + SvUV(HeVAL(depth)));
     }
 }
 
@@ -1149,6 +1216,18 @@ devel::statprofiler::end_section(pTHX_ SV *section_name)
     if (MY_CXT.enabled) {
         MY_CXT.create_trace(aTHX);
         MY_CXT.trace->end_section(section_name);
+
+        // we don't want to die here on mismatched sections
+        HE *depth = hv_fetch_ent(MY_CXT.sections, section_name, 0, 0);
+        if (depth) {
+            UV depth_count = SvOK(HeVAL(depth)) ? SvUV(HeVAL(depth)) : 1;
+
+            if (depth_count == 1) {
+                hv_delete_ent(MY_CXT.sections, section_name, G_DISCARD, 0);
+            } else {
+                sv_setuv(HeVAL(depth), depth_count - 1);
+            }
+        }
     }
 }
 

@@ -14,7 +14,10 @@ my ($in_parent_before, $in_parent_after, $in_child);
 
 sub my_thread {
     usleep(50000); BEGIN { $in_child = __LINE__ }
+    Devel::StatProfiler::end_section('section');
 }
+
+Devel::StatProfiler::start_section('section');
 
 usleep(50000); BEGIN { $in_parent_before = __LINE__ }
 
@@ -26,6 +29,7 @@ usleep(50000); BEGIN { $in_parent_after = __LINE__ }
 
 $thr->join;
 
+Devel::StatProfiler::end_section('section');
 Devel::StatProfiler::stop_profile();
 
 my @files = (
@@ -35,11 +39,13 @@ my @files = (
 
 is(scalar @files, 3, 'both threads wrote a trace file');
 my (@sleep_patterns, @genealogies);
+my $state;
 
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
     my %sleep_pattern;
 
+    $r->set_reader_state($state) if $state;
     while (my $trace = $r->read_trace) {
         my $frames = $trace->frames;
 
@@ -47,6 +53,7 @@ for my $file (@files) {
             $sleep_pattern{$frame->line} += $trace->weight;
         }
     }
+    $state = $r->get_reader_state;
 
     push @sleep_patterns, \%sleep_pattern;
     push @genealogies, $r->get_genealogy_info;
