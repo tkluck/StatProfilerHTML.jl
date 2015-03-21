@@ -699,23 +699,9 @@ sub finalize {
     }
 
     # in case there are extra file entries without subs (added
-    # manually in order to parse #line directives), and in case
-    # there are files/evals where the "principal" part did not get an entry
-    # because it has no samples, but some of the other parts, mapped by #line
-    # directives got some samples
+    # manually in order to parse #line directives)
     for my $entry (values %{$self->{aggregate}{files}}) {
         $entry->{report} ||= sprintf('%s-line.html', _fileify($entry->{name}));
-
-        my $reverse_file = $self->{sourcemap} &&
-            $self->{sourcemap}->get_reverse_mapping($entry->{name});
-
-        # ensure the main entry for the file/eval is present
-        if ($reverse_file && !$self->{aggregate}{files}{$reverse_file}) {
-            my $entry = $self->_file($reverse_file);
-
-            $entry->{report} = sprintf('%s-line.html', _fileify($reverse_file));
-            $entry->{exclusive} = 0;;
-        }
     }
 }
 
@@ -785,18 +771,20 @@ sub _fetch_source {
 # code of a physical file
 sub _merged_entry {
     my ($self, $file, $mapping, $diagnostics) = @_;
+    # we need to ensure the merged entry is created with the correct metadata
+    # (especially the report file)
     my $base = $self->{aggregate}{files}{$file};
     my $merged = {
-        name      => $base->{name},
-        basename  => $base->{basename},
+        name      => $base && $base->{name},
+        basename  => $base && $base->{basename},
         lines     => {
-            exclusive       => [@{$base->{lines}{exclusive}}],
-            inclusive       => [@{$base->{lines}{inclusive}}],
-            callees         => {%{$base->{lines}{callees}}},
+            exclusive       => [],
+            inclusive       => [],
+            callees         => {},
         },
-        report    => $base->{report},
-        exclusive => $base->{exclusive},
-        subs      => {%{$base->{subs}}},
+        report    => $base && $base->{report},
+        exclusive => 0,
+        subs      => {},
     };
     my %line_ranges;
 
@@ -813,11 +801,14 @@ sub _merged_entry {
     }
 
     for my $key (keys %line_ranges) {
-        next if $key eq $file;
         my $entry = $self->{aggregate}{files}{$key};
 
         # we have no data for this part of the file
         next unless $entry;
+
+        $merged->{name} ||= $entry->{name};
+        $merged->{basename} ||= $entry->{basename};
+        $merged->{report} ||= $entry->{report};
 
         my @ranges = sort { $a->[1] <=> $b->[1] } @{$line_ranges{$key}};
         my @subs = sort { $a <=> $b } keys %{$entry->{subs}};
@@ -955,9 +946,6 @@ sub output {
     };
 
     # format files
-    my @queued_files;
-    my %merged_profiles;
-
     my $format_file = sub {
         my ($entry, $ends, $code, $mapping) = @_;
         # map logical line, physical file, physical line ->
@@ -1043,17 +1031,41 @@ sub output {
     };
 
     # write reports for physical files
-    for my $file (keys %$files) {
+    my %extra_reverse_files;
+    my (@first_pass, @second_pass) = (keys %$files);
+
+    @extra_reverse_files{@first_pass} = ();
+    while (@first_pass) {
+        my $file = shift @first_pass;
         my ($ends, $code) = $self->_fetch_source($file);
 
         # TODO merge xs:<file> with real file entry, if there is one
         if ($code eq $NO_SOURCE) {
+            my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
+
+            # if there are files/evals where the "principal" part did not
+            # get any samples, but some of the other parts (mapped by
+            # #line directives) got some samples, ensure we render the
+            # "principal" part, so it can be used as the source of the copy
+            # in the loop below
+            if ($reverse_file &&
+                    $reverse_file =~ /eval:/ &&
+                    !$files->{$reverse_file} &&
+                    !exists $extra_reverse_files{$reverse_file}) {
+                $extra_reverse_files{$reverse_file} = undef;
+                push @first_pass, $reverse_file;
+            }
+
             # re-process this later, in case the mapping is due to a
             # #line directive in one of the parsed files
-            push @queued_files, $file;
+            push @second_pass, $file;
         } elsif (my $mapping = $self->{sourcemap}->get_mapping($file)) {
             my $merged_entry = $self->_merged_entry($file, $mapping, \@diagnostics);
 
+            # we only care about one of the values
+            if (exists $extra_reverse_files{$file}) {
+                $extra_reverse_files{$file} = $merged_entry->{report};
+            }
             $format_file->($merged_entry, $ends, $code, $mapping);
         } else {
             my $entry = $files->{$file};
@@ -1068,7 +1080,7 @@ sub output {
 
     # logical files (just copies the content of the report written by
     # the loop above
-    for my $file (@queued_files) {
+    for my $file (@second_pass) {
         # this can only be a mapped copy of an existing file
         my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
 
@@ -1077,17 +1089,16 @@ sub output {
             next;
         }
 
-        my $entry = $files->{$file};
-        my $reverse_entry = $files->{$reverse_file};
-
-        unless ($reverse_entry && $reverse_entry->{report}) {
+        my $target = $files->{$file}->{report};
+        my $source = $extra_reverse_files{$reverse_file} //
+            ($files->{$reverse_file} && $files->{$reverse_file}->{report});
+        unless ($source) {
             push @diagnostics, "Unable to find source for '$file' ($reverse_file)";
             next;
         }
+        next if $source eq $target;
 
         # TODO use symlink/hardlinks where available
-        my ($source, $target) = ($reverse_entry->{report}, $entry->{report});
-
         $source .= '.gz', $target .= '.gz' if $compress;
         File::Copy::copy(
             File::Spec::Functions::catfile($directory, $source),
