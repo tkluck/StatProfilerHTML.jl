@@ -182,8 +182,7 @@ sub _file {
             # filled during finalization
             callees         => {},
         },
-        # filled during finalization
-        report    => undef,
+        report    => sprintf('%s-line.html', _fileify($file)),
         exclusive => 0,
         subs      => {},
     };
@@ -549,7 +548,7 @@ sub merge {
             my $file = $my_files->{$file_id} ||= {
                 name      => $other_file->{name},
                 basename  => $other_file->{basename},
-                report    => undef,
+                report    => $other_file->{report},
                 lines     => {
                     exclusive       => [],
                     inclusive       => [],
@@ -687,7 +686,6 @@ sub finalize {
         # that don't have an assigned file yet
         my $entry = $self->_file($sub->{file});
 
-        $entry->{report} ||= sprintf('%s-line.html', _fileify($sub->{file}));
         $entry->{exclusive} += $sub->{exclusive};
         push @{$entry->{subs}{$sub->{start_line}}}, $sub
             if !$sub->{is_main} && !$sub->{is_eval};
@@ -696,12 +694,6 @@ sub finalize {
         for my $line (keys %$callees) {
             push @{$entry->{lines}{callees}{$line}}, values %{$callees->{$line}};
         }
-    }
-
-    # in case there are extra file entries without subs (added
-    # manually in order to parse #line directives)
-    for my $entry (values %{$self->{aggregate}{files}}) {
-        $entry->{report} ||= sprintf('%s-line.html', _fileify($entry->{name}));
     }
 }
 
