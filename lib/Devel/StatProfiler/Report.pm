@@ -988,6 +988,7 @@ sub output {
                 my $match = $SPECIAL_SUBS{$name} ?
                     qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b|^\s*\Q$name\E\b} :
                     qr{\bsub\s+(?:\Q$fq_name\E|\Q$name\E)\b};
+                # TODO move this code to _merged_entry
                 my $start_line = $sub->{start_line};
                 for (my $i = 0; $i < @$mapping; ++$i) {
                     my $entry = $mapping->[$i];
@@ -1045,6 +1046,7 @@ sub output {
     for my $file (keys %$files) {
         my ($ends, $code) = $self->_fetch_source($file);
 
+        # TODO merge xs:<file> with real file entry, if there is one
         if ($code eq $NO_SOURCE) {
             # re-process this later, in case the mapping is due to a
             # #line directive in one of the parsed files

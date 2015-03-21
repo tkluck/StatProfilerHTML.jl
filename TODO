@@ -39,6 +39,7 @@
 - move finalize() work earlier during aggregation
 - allow calling file fetchers with multiple paths (to replace git-show with
   git-cat-file)
+- merge xs:<file> with real file entries, if there is a matching one
 - split the Aggregator class in two (aggregation and loading of the final report)
 - add an API to read traces by section, and remove the horrible hack of returning
   a fake empty trace when a section starts/ends
