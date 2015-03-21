@@ -294,6 +294,7 @@ sub add_trace_file {
 
             if (!$i) {
                 $sub->{exclusive} += $weight;
+                $file->{exclusive} += $weight;
                 $file->{lines}{exclusive}[$line] += $weight if $line > 0;
             }
         }
@@ -359,6 +360,7 @@ sub _merge_file_entry {
 
     $a->{name} = $b->{name} if $a->{name} gt $b->{name};
     $a->{basename} = $b->{basename} if $a->{basename} gt $b->{basename};
+    $a->{exclusive} += $b->{exclusive};
 
     _merge_lines($a->{lines}{exclusive}, $b->{lines}{exclusive});
     _merge_lines($a->{lines}{inclusive}, $b->{lines}{inclusive});
@@ -656,7 +658,6 @@ sub finalize {
         # the entry for all files are already there
         my $entry = $self->_file($sub->{file});
 
-        $entry->{exclusive} += $sub->{exclusive};
         push @{$entry->{subs}{$sub->{start_line}}}, $sub
             if !$sub->{is_main} && !$sub->{is_eval};
 
