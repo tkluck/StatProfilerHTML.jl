@@ -74,7 +74,7 @@ samples and list of callers.
 
 =item Links to C<Test/Begin.pm> do not have the C<t/lib> prefix
 
-=item There is an "(unknown)" link for C<Time::HiRes> XSUBs
+=item There is an "xs:Time/HiRes.pm" link for C<Time::HiRes> XSUBs
 
 =item "All subs" link works
 

@@ -53,7 +53,6 @@ sub new {
             subs      => {},
             flames    => {},
             files     => {},
-            file_map  => {},
             finalized => 0,
         },
         $opts{sources} ? (
@@ -143,16 +142,11 @@ sub _call_site_id {
 }
 
 sub _sub {
-    my ($self, $frame) = @_;
-    my $file = $frame->file;
+    my ($self, $frame, $file) = @_;
     my $uq_name = $frame->uq_sub_name;
     my $name = $frame->fq_sub_name || $uq_name;
 
-    # count the number of subroutines of a certain package defined per
-    # file, used as an heuristic for where to display xsub time
-    if ($frame->line > 0 && $frame->package) {
-        $self->{aggregate}{file_map}{$frame->package}{$file}++;
-    }
+    $file //= $frame->file;
 
     return $self->{aggregate}{subs}{$uq_name} ||= {
         name       => $name,
@@ -168,6 +162,13 @@ sub _sub {
         is_main    => $frame->is_main,
         is_eval    => $frame->is_eval,
     };
+}
+
+sub _xssub {
+    my ($self, $frame) = @_;
+    my $xs_file = 'xs:' . ($frame->package =~ s{::}{/}rg) . '.pm';
+
+    return $self->_sub($frame, $xs_file);
 }
 
 sub _file {
@@ -258,11 +259,18 @@ sub add_trace_file {
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
             my $line = $frame->line;
-            my $sub = $self->_sub($frame);
-            my $file = $line > 0 ? $self->_file($sub->{file}) : undef;
+
+            # XS vs. normal sub or opcode
+            my ($sub, $file);
+            if ($line == -1) {
+                $sub = $self->_xssub($frame);
+            } else {
+                $sub = $self->_sub($frame);
+            }
+            $file = $self->_file($sub->{file});
 
             $sub->{inclusive} += $weight;
-            $file->{lines}{inclusive}[$line] += $weight if $file;
+            $file->{lines}{inclusive}[$line] += $weight if $line > 0;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -289,7 +297,7 @@ sub add_trace_file {
 
             if (!$i) {
                 $sub->{exclusive} += $weight;
-                $file->{lines}{exclusive}[$line] += $weight if $file;
+                $file->{lines}{exclusive}[$line] += $weight if $line > 0;
             }
         }
 
@@ -413,7 +421,6 @@ sub map_source {
     my $files = $self->{aggregate}{files};
     my $subs = $self->{aggregate}{subs};
     my $flames = $self->{aggregate}{flames};
-    my $file_map = $self->{aggregate}{file_map};
     my %eval_map;
     $process_id ||= $self->{process_id};
 
@@ -432,10 +439,6 @@ sub map_source {
     my $file_repl_sub = sub {
         $_[0] =~ s/$file_map_qr/$1$eval_map{$2}$3/gr
     };
-
-    for my $package (values %$file_map) {
-        _map_hash_rx($package, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_map_entry);
-    }
 
     _map_hash_rx($files, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_entry);
     _map_hash_rx($subs, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_sub_entry);
@@ -470,17 +473,6 @@ sub merge {
     }
 
     $self->{metadata}->merge($report->{metadata});
-
-    {
-        my $my_map = $self->{aggregate}{file_map};
-        my $other_map = $report->{aggregate}{file_map};
-
-        for my $package (keys %$other_map) {
-            for my $file (keys %{$other_map->{$package}}) {
-                $my_map->{$package}{$file} += $other_map->{$package}{$file};
-            }
-        }
-    }
 
     {
         my $my_subs = $self->{aggregate}{subs};
@@ -659,31 +651,9 @@ sub finalize {
     die "Reports can only be finalized once" if $self->{aggregate}{finalized};
     $self->{aggregate}{finalized} = 1;
 
-    # use the file defining the maximum number of subs of a certain
-    # package as the main file for that package (for xsubs)
-    my %package_map;
-    for my $package (keys %{$self->{aggregate}{file_map}}) {
-        my $max = 0;
-
-        for my $file (keys %{$self->{aggregate}{file_map}{$package}}) {
-            my $count = $self->{aggregate}{file_map}{$package}{$file};
-
-            if ($count > $max) {
-                $package_map{$package} = $file;
-                $max = $count;
-            }
-        }
-    }
-
     for my $sub (sort { $a->{file} cmp $b->{file} }
                       values %{$self->{aggregate}{subs}}) {
-        # set the file for the xsub
-        if ($sub->{kind} == 1) {
-            $sub->{file} = $package_map{$sub->{package}} // '';
-        }
-
-        # the entry for all files are already there, except for XSUBs
-        # that don't have an assigned file yet
+        # the entry for all files are already there
         my $entry = $self->_file($sub->{file});
 
         $entry->{exclusive} += $sub->{exclusive};
@@ -707,7 +677,7 @@ sub _fetch_source {
     my ($self, $path) = @_;
     my @lines;
 
-    if ($path eq '') {
+    if ($path =~ /^xs:/) {
         return [], ['Dummy file to stick orphan XSUBs in...'];
     }
 
@@ -900,7 +870,7 @@ sub output {
     };
 
     my $file_name = sub {
-        return '(unknown)' if $_[0] eq '';
+        die "All subs must have a file name" if $_[0] eq '';
 
         for my $dir (@$at_inc) {
             return substr $_[0], length($dir) + 1

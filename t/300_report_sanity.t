@@ -41,17 +41,9 @@ $r->add_trace_file($profile_file);
 $r->finalize;
 
 # sanity checking
-my %file_map = map { $_ => [keys %{$a->{file_map}{$_}}] }
-                   qw(main X Moo t::lib::Test);
-eq_or_diff(\%file_map, {
-    'main'         => [__FILE__],
-    'X'            => [__FILE__],
-    'Moo'          => [__FILE__],
-    't::lib::Test' => ['t/lib/Test.pm'],
-});
-eq_or_diff([sort grep !m{^/}, keys %{$a->{files}}],
+eq_or_diff([sort grep !m{^/} && !m{xs:(?!Time/HiRes.pm)}, keys %{$a->{files}}],
            # need to sort this because of / vs. \ in __FILE__
-           [sort '', __FILE__, 't/lib/Test.pm']);
+           [sort 'xs:Time/HiRes.pm', __FILE__, 't/lib/Test.pm']);
 
 my $total; $total += $_->{exclusive} for values %{$a->{files}};
 is($a->{total}, $total);
@@ -59,7 +51,7 @@ is($a->{total}, $total);
 ### start setup
 
 # Time::HiRes
-my $time_hires = $a->{files}{''};
+my $time_hires = $a->{files}{'xs:Time/HiRes.pm'};
 my ($usleep) = grep $_->{name} eq 'Time::HiRes::usleep',
                     @{$time_hires->{subs}{-1}};
 
@@ -87,7 +79,7 @@ is($usleep->{name}, 'Time::HiRes::usleep');
 is($usleep->{package}, 'Time::HiRes');
 is($usleep->{start_line}, -1);
 is($usleep->{kind}, 1);
-is($usleep->{file}, '');
+is($usleep->{file}, 'xs:Time/HiRes.pm');
 cmp_ok($usleep->{exclusive}, '>=', 10 / precision_factor);
 cmp_ok($usleep->{inclusive}, '==', $usleep->{exclusive});
 

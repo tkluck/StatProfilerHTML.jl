@@ -38,8 +38,6 @@ ok($a->{subs}{__FILE__ . ':CORE::subst'});
 ok($a->{subs}{'t/lib/Slowops.pm:CORE::ftdir'});
 ok($a->{subs}{'t/lib/Slowops.pm:CORE::subst'});
 
-ok(!exists $a->{file_map}{CORE});
-
 ### start checking we have one ftdir instance per file
 
 my ($ftdir_main) = grep $_->{name} eq 'CORE::ftdir',

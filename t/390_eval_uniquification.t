@@ -142,19 +142,6 @@ my $a2 = $r2->{aggregate};
     }
 }
 
-## test file_map
-
-{
-    my $f1 = $a1->{file_map};
-    my $f2 = $a2->{file_map};
-
-    is(scalar keys %{$f1->{main}}, 3);
-    is(scalar keys %{$f2->{main}}, 2);
-
-    is($f2->{main}{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8'},
-       $f1->{main}{_e($first_eval_n + 1)} + $f1->{main}{_e($first_eval_n + 2)});
-}
-
 ## test flames
 
 {
@@ -165,6 +152,7 @@ my $a2 = $r2->{aggregate};
     my $f1 = $a1->{flames};
     my $f2 = $a2->{flames};
 
+    ok($f2->{$merged} && $f1->{$src[0]} && $f1->{$src[1]}); # sanity
     is($f2->{$merged},
        $f1->{$src[0]} + $f1->{$src[1]});
 }
