@@ -65,16 +65,5 @@ isnt($ftdir_main, $ftdir_so);
 }
 
 ### end  checking op-sub call sites
-### start checking op-sub is in callees
-
-my $slowops_pm = $a->{files}{'t/lib/Slowops.pm'};
-{
-    my @callees = sort { our ($a, $b); $a->{callee} cmp $b->{callee} }
-                       @{$slowops_pm->{lines}{callees}{$slowops_foo_line}};
-
-    is($callees[0]{callee}, $ftdir_so->{uq_name});
-}
-
-### start checking op-sub is in callees
 
 done_testing();

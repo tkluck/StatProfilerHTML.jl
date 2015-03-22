@@ -177,8 +177,6 @@ sub _file {
         lines     => {
             exclusive       => [],
             inclusive       => [],
-            # filled during finalization
-            callees         => {},
         },
         report    => sprintf('%s-line.html', _fileify($file)),
         exclusive => 0,
@@ -549,7 +547,6 @@ sub merge {
                 lines     => {
                     exclusive       => [],
                     inclusive       => [],
-                    callees         => {},
                 },
                 exclusive => 0,
                 subs      => {},
@@ -661,20 +658,6 @@ sub finalize {
 
     die "Reports can only be finalized once" if $self->{aggregate}{finalized};
     $self->{aggregate}{finalized} = 1;
-
-    for my $sub (sort { $a->{file} cmp $b->{file} }
-                      values %{$self->{aggregate}{subs}}) {
-        # Backwards compatibility for releases before 0.21
-        $sub->{file} //= 'xs:unknown';
-
-        # the entry for all files are already there
-        my $entry = $self->_file($sub->{file});
-
-        my $callees = $sub->{callees};
-        for my $line (keys %$callees) {
-            push @{$entry->{lines}{callees}{$line}}, values %{$callees->{$line}};
-        }
-    }
 }
 
 sub fetch_source_from_file {
@@ -753,12 +736,12 @@ sub _merged_entry {
         lines     => {
             exclusive       => [],
             inclusive       => [],
-            callees         => {},
         },
         report    => $base && $base->{report},
         exclusive => 0,
         subs      => {},
     };
+    my $merged_callees = {};
     my %line_ranges;
 
     for (my $i = 0; $i < $#$mapping; ++$i) {
@@ -785,7 +768,8 @@ sub _merged_entry {
 
         my @ranges = sort { $a->[1] <=> $b->[1] } @{$line_ranges{$key}};
         my @subs = sort { $a <=> $b } keys %{$entry->{subs}};
-        my @callees = sort { $a <=> $b } keys %{$entry->{lines}{callees}};
+        my $entry_callees = $self->_callees_by_file($entry);
+        my @callees = sort { $a <=> $b } keys %$entry_callees;
         my ($sub_index, $callee_index) = (0, 0);
 
         $merged->{exclusive} += $entry->{exclusive};
@@ -804,7 +788,7 @@ sub _merged_entry {
             while ($callee_index < @callees && $callees[$callee_index] <= $logical_end) {
                 my $mapped = $callees[$callee_index] - $logical_start + $physical_start;
 
-                $merged->{lines}{callees}{$mapped} = $entry->{lines}{callees}{$callees[$callee_index]};
+                $merged_callees->{$mapped} = $entry_callees->{$callees[$callee_index]};
                 ++$callee_index;
             }
 
@@ -822,7 +806,7 @@ sub _merged_entry {
             unless $callee_index == @callees;
     }
 
-    return $merged;
+    return ($merged, $merged_callees);
 }
 
 sub _format_ratio {
@@ -841,6 +825,22 @@ sub _format_ratio {
     } else {
         return sprintf '%d', $value;
     }
+}
+
+sub _callees_by_file {
+    my ($self, $file_entry) = @_;
+    my $callees = {};
+
+    for my $sub_name (map keys %$_, values %{$file_entry->{subs}}) {
+        my $sub = $self->{aggregate}{subs}{$sub_name};
+        my $sub_callees = $sub->{callees};
+
+        for my $line (keys %$sub_callees) {
+            push @{$callees->{$line}}, values %{$sub_callees->{$line}};;
+        }
+    }
+
+    return $callees;
 }
 
 sub render_flamegraphs {
@@ -924,6 +924,7 @@ sub output {
     # Backwards compatibility for releases before 0.21
     $_->{report} //= sprintf('%s-line.html', _fileify($_->{name}))
 	for @files;
+    $_->{file} //= 'xs:unknown' for @subs;
 
     my $date = POSIX::strftime('%c', localtime(time));
     my $at_inc = [map s{[/\\]$}{}r, @{$self->{metadata}->get_at_inc}];
@@ -987,7 +988,7 @@ sub output {
 
     # format files
     my $format_file = sub {
-        my ($entry, $ends, $code, $mapping) = @_;
+        my ($entry, $ends, $code, $callees, $mapping) = @_;
         # map logical line, physical file, physical line ->
         #     logical line, HTML report file, physical line
         my $mapping_for_link = [map {
@@ -1059,7 +1060,7 @@ sub output {
             subs                    => \%subs,
             exclusive               => $entry->{lines}{exclusive},
             inclusive               => $entry->{lines}{inclusive},
-            callees                 => $entry->{lines}{callees},
+            callees                 => $callees,
             sub_link                => $sub_link,
             sub_name                => $sub_name,
             file_link               => $file_link,
@@ -1103,21 +1104,22 @@ sub output {
             # #line directive in one of the parsed files
             push @second_pass, $file;
         } elsif (my $mapping = $self->{sourcemap}->get_mapping($file)) {
-            my $merged_entry = $self->_merged_entry($file, $mapping, \@diagnostics);
+            my ($merged_entry, $callees) = $self->_merged_entry($file, $mapping, \@diagnostics);
 
             # we only care about one of the values
             if (exists $extra_reverse_files{$file}) {
                 $extra_reverse_files{$file} = $merged_entry->{report};
             }
-            $format_file->($merged_entry, $ends, $code, $mapping);
+            $format_file->($merged_entry, $ends, $code, $callees, $mapping);
         } else {
             my $entry = $files->{$file};
             my $mapping = [
                 [1, $file, 1],
                 [scalar @$code, undef, scalar @$code],
             ];
+            my $callees = $self->_callees_by_file($entry);
 
-            $format_file->($entry, $ends, $code, $mapping);
+            $format_file->($entry, $ends, $code, $callees, $mapping);
         }
     }
 

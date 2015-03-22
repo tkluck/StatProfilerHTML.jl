@@ -129,15 +129,6 @@ cmp_ok($test_pm->{exclusive}, '<=', 5 / precision_factor);
 # WTF cmp_ok($test_pm->{inclusive}, '>=', 20);
 cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 10 / precision_factor);
 
-# callees
-{
-    my $ca = $test_pm->{lines}{callees}{$take_sample_line}[0];
-
-    cmp_ok($ca->{inclusive}, '>=', 10 / precision_factor);
-    # WTF cmp_ok($ca->{esclusive}, '<=', 5);
-    is($ca->{callee}, $usleep->{uq_name});
-}
-
 #subs
 is(sub_at_line($a, $test_pm, $take_sample_line), $take_sample);
 
