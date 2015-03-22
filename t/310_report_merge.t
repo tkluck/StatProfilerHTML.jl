@@ -28,7 +28,6 @@ my $r1 = Devel::StatProfiler::Report->new(
     slowops    => [qw(ftdir unstack)],
 );
 $r1->add_trace_file($profile_file);
-# no need to finalize the report for comparison
 
 my $r2 = Devel::StatProfiler::Report->new(
     flamegraph => 1,
@@ -47,7 +46,6 @@ for (;;) {
     $r2->merge($t);
     last if $sr->done;
 }
-# no need to finalize the report for comparison
 
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }

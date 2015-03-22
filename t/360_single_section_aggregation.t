@@ -83,7 +83,6 @@ $list1->add_trace_file(t::lib::Test::FilteredReader->new($_, 'list')) for @files
 $main1->add_metadata({release_date => '2013-07-03'});
 $_->add_metadata({release => '1.3'}) for $main1, $content1, $list1;
 $_->add_metadata({tag => 'test-1.3'}) for $main1, $content1, $list1;
-# no need to finalize the report for comparison
 
 my $a1 = TestAggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
@@ -103,7 +102,6 @@ $a1->save_part;
 my ($main2, $content2, $list2) = map $a1->merge_report($_, 'with_metadata'), qw(
     __main__ content list
 );
-# no need to finalize the report for comparison
 
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
@@ -127,7 +125,6 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 my ($main3, $content3, $list3) = map $a2->merge_report($_, 'with_metadata'), qw(
     __main__ content list
 );
-# no need to finalize the report for comparison
 
 # we test source code in another test
 delete @{$_}{qw(source sourcemap genealogy root_dir shard)}, delete @{$_->{metadata}}{qw(shard root_dir)}

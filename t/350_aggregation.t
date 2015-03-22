@@ -28,7 +28,6 @@ my $r1 = Devel::StatProfiler::Report->new(
     slowops => [qw(ftdir unstack)],
 );
 $r1->add_trace_file($_) for @files;
-# no need to finalize the report for comparison
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
@@ -46,7 +45,6 @@ for my $file (@files) {
 }
 $a1->save_part;
 my $r2 = $a1->merge_report('__main__');
-# no need to finalize the report for comparison
 
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
@@ -70,7 +68,6 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 );
 $a2->merge_metadata;
 my $r3 = $a2->merge_report('__main__');
-# no need to finalize the report for comparison
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
@@ -78,7 +75,6 @@ my $a3 = Devel::StatProfiler::Aggregator->new(
     slowops        => [qw(ftdir unstack)],
 );
 my $r4 = $a3->merged_report('__main__', 'map_source');
-# no need to finalize the report for comparison
 
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }

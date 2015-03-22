@@ -39,7 +39,6 @@
   - treat truncated files as a closed stream
 - test case for 9d4110d016a72fabfb5cd45c4ae97468c9070f51
 - test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
-- move finalize() work earlier during aggregation
 - allow calling file fetchers with multiple paths (to replace git-show with
   git-cat-file)
 - merge xs:<file> with real file entries, if there is a matching one

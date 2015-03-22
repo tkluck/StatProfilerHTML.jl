@@ -38,7 +38,6 @@ my $take_sample_line = $t::lib::Test::TAKE_SAMPLE_LINE;
 my $r = Devel::StatProfiler::Report->new(flamegraph => 1);
 my $a = $r->{aggregate};
 $r->add_trace_file($profile_file);
-$r->finalize;
 
 # sanity checking
 eq_or_diff([sort grep !m{^/} && !m{xs:(?!Time/HiRes.pm)}, keys %{$a->{files}}],

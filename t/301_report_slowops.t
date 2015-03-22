@@ -30,7 +30,6 @@ my $r = Devel::StatProfiler::Report->new(
 );
 my $a = $r->{aggregate};
 $r->add_trace_file($profile_file);
-$r->finalize;
 
 # sanity checking
 ok($a->{subs}{__FILE__ . ':CORE::ftdir'});

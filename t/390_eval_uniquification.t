@@ -54,7 +54,6 @@ my $r1 = Devel::StatProfiler::Report->new(
     flamegraph    => 1,
 );
 $r1->add_trace_file($profile_file);
-# no need to finalize the report for comparison
 
 my $r2 = Storable::dclone($r1);
 $r2->map_source;

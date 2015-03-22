@@ -35,11 +35,9 @@ my $r1 = Devel::StatProfiler::Report->new(sources => 1);
 $r1->add_trace_file($profile_file);
 $r1->_fetch_source('t/lib/Test.pm'); # does not contain #line directives
 $r1->_fetch_source('t/lib/Test/LineMap.pm');
-# no need to finalize the report for comparison
 
 my $r2 = Devel::StatProfiler::Report->new(sources => 1);
 $r2->add_trace_file($profile_file);
-# no need to finalize the report for comparison
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
@@ -48,7 +46,6 @@ my $a1 = Devel::StatProfiler::Aggregator->new(
 $a1->process_trace_files($profile_file);
 $a1->save_part;
 my $r3 = $a1->merge_report('__main__');
-# no need to finalize the report for comparison
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
@@ -56,14 +53,12 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 );
 $a2->merge_metadata;
 my $r4 = $a2->merge_report('__main__');
-# no need to finalize the report for comparison
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
     shards         => ['shard1'],
 );
 my $r5 = $a3->merged_report('__main__', 'map_source');
-# no need to finalize the report for comparison
 
 my %eval_map = (
     'eval:6b3cd1d74ca85645e1b7441e303697abb2167799' => [

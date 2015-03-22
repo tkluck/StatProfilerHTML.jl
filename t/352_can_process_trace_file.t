@@ -38,7 +38,6 @@ for my $file (@files) {
 }
 $a1->save_part;
 my $r1 = $a1->merge_report('__main__');
-# no need to finalize the report for comparison
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
     root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
@@ -62,7 +61,6 @@ for my $file (@files) {
 }
 $a2->save_part;
 my $r2 = $a2->merge_report('__main__');
-# no need to finalize the report for comparison
 
 eq_or_diff($r1->{aggregate}, $r2->{aggregate});
 
