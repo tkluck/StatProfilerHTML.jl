@@ -53,15 +53,16 @@ is($a->{total}, $total);
 # Time::HiRes
 my $time_hires = $a->{files}{'xs:Time/HiRes.pm'};
 my ($usleep) = grep $_->{name} eq 'Time::HiRes::usleep',
-                    @{$time_hires->{subs}{-1}};
+               map  $a->{subs}{$_},
+                    keys %{$time_hires->{subs}{-1}};
 
 # current file
 my $me = $a->{files}{__FILE__ . ''};
-my $moo = $me->{subs}{$l2}[0];
+my $moo = sub_at_line($a, $me, $l2);
 
 # t/lib/Test.pm
 my $test_pm = $a->{files}{'t/lib/Test.pm'};
-my $take_sample = $test_pm->{subs}{$take_sample_line}[0];
+my $take_sample = sub_at_line($a, $test_pm, $take_sample_line);
 
 ### end setup
 ### start all subroutines
@@ -138,7 +139,7 @@ cmp_ok($test_pm->{lines}{inclusive}[$take_sample_line], '>=', 10 / precision_fac
 }
 
 #subs
-is($test_pm->{subs}{$take_sample_line}[0], $take_sample);
+is(sub_at_line($a, $test_pm, $take_sample_line), $take_sample);
 
 ### end file attributes
 ### start flamegraph

@@ -39,11 +39,12 @@ ok($a->{subs}{'t/lib/Slowops.pm:CORE::ftdir'});
 ok($a->{subs}{'t/lib/Slowops.pm:CORE::subst'});
 
 ### start checking we have one ftdir instance per file
-
 my ($ftdir_main) = grep $_->{name} eq 'CORE::ftdir',
-                        @{$a->{files}{+__FILE__}{subs}{-2}};
+                   map  $a->{subs}{$_},
+                        keys %{$a->{files}{+__FILE__}{subs}{-2}};
 my ($ftdir_so)   = grep $_->{name} eq 'CORE::ftdir',
-                        @{$a->{files}{'t/lib/Slowops.pm'}{subs}{-2}};
+                   map  $a->{subs}{$_},
+                        keys %{$a->{files}{'t/lib/Slowops.pm'}{subs}{-2}};
 
 is($ftdir_main, $a->{subs}{__FILE__ . ':CORE::ftdir'});
 is($ftdir_so,   $a->{subs}{'t/lib/Slowops.pm:CORE::ftdir'});

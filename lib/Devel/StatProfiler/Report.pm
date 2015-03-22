@@ -268,6 +268,7 @@ sub add_trace_file {
 
             $sub->{inclusive} += $weight;
             $file->{lines}{inclusive}[$line] += $weight if $line > 0;
+            $file->{subs}{$sub->{start_line}}{$sub->{uq_name}} = undef;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -450,6 +451,11 @@ sub map_source {
         }
     }
 
+    for my $file (values %$files) {
+        _map_hash_rx($_, $file_map_qr, $file_repl_sub, \%eval_map, sub {})
+            for values %{$file->{subs}};
+    }
+
     _map_hash_rx($flames, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_map_entry);
 }
 
@@ -564,6 +570,12 @@ sub merge {
                 $my_inclusive->[$i] += $other_inclusive->[$i]
                     if $other_inclusive->[$i];
             }
+
+            my $other_subs = $other_file->{subs};
+            my $my_subs = $file->{subs};
+            for my $line (keys %$other_subs) {
+                @{$my_subs->{$line}}{keys %{$other_subs->{$line}}} = ();
+            }
         }
     }
 
@@ -657,9 +669,6 @@ sub finalize {
 
         # the entry for all files are already there
         my $entry = $self->_file($sub->{file});
-
-        push @{$entry->{subs}{$sub->{start_line}}}, $sub
-            if !$sub->{is_main} && !$sub->{is_eval};
 
         my $callees = $sub->{callees};
         for my $line (keys %$callees) {
@@ -993,7 +1002,10 @@ sub output {
         # (yes, fragile, but mostly good enough)
         my %subs;
         for my $subs_at_line (values %{$entry->{subs}}) {
-            for my $sub (@$subs_at_line) {
+            for my $uq_name (keys %$subs_at_line) {
+                my $sub = $self->{aggregate}{subs}{$uq_name} //
+                    die "Unable to find sub '$uq_name'";
+                next if $sub->{is_main} || $sub->{is_eval};
                 my $fq_name = $sub->{name};
                 my $name = $fq_name =~ s{.*::}{}r;
 

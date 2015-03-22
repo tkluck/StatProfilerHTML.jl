@@ -31,6 +31,7 @@ our @EXPORT = (
         temp_profile_dir
         temp_profile_file
         visual_test
+        sub_at_line
   )
 );
 
@@ -122,6 +123,15 @@ sub get_sources {
     1 while $r->read_trace;
 
     return $r->get_source_code;
+}
+
+sub sub_at_line {
+    my ($aggregate, $file, $line) = @_;
+    my @subs = keys %{$file->{subs}{$line}};
+
+    die "Multiple subs @subs at $file->{name} line $line"
+        if @subs > 1;
+    return $aggregate->{subs}{$subs[0]};
 }
 
 sub precision_factor {
