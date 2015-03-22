@@ -130,7 +130,7 @@ sub numify {
 
     return unless defined $v;
     if (!ref $v) {
-        $_[0] += 0 if $v =~ /^[0-9]+$/;
+        $_[0] += 0 if $v =~ /^-?[0-9]+$/;
     } elsif (reftype $v eq 'HASH') {
         numify($v->{$_}) for keys %$v;
     } elsif (reftype $v eq 'ARRAY') {
