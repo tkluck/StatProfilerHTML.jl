@@ -324,7 +324,7 @@ Cxt::create_trace(pTHX)
 
             if (restore_sections) {
                 restore_sections = false;
-                restore_section_state(aTHX_ this);
+                restore_section_state(aTHX_ aMY_CXT);
             }
         }
     }
