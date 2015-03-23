@@ -2,6 +2,12 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.18      2015-03-23 09:27:36 CET
+
+    - Do not add unnecessary entries for files containing #line directives
+    - Re-emit section markers after fork (re-emitting metadata needs to
+      be done by the calling program)
+
 0.17      2015-03-16 09:54:02 CET
 
     - Avoid pathological case when there are many process state files
