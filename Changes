@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.19      2015-03-24 11:23:02 CET
+
+    - Handle reports with spaces in their names
+
 0.18      2015-03-23 09:27:36 CET
 
     - Do not add unnecessary entries for files containing #line directives
