@@ -19,6 +19,7 @@ use Devel::StatProfiler::Utils qw(
     write_data_part
 );
 
+use File::Glob qw(bsd_glob);
 use File::Path ();
 use File::Basename ();
 use Errno;
@@ -29,7 +30,7 @@ my $MAIN_REPORT_ID = ['__main__'];
 sub shards {
     my ($class, $root_dir) = @_;
     my $state_dir = state_dir({root_dir => $root_dir});
-    my @files = glob File::Spec::Functions::catfile($state_dir, 'shard.*');
+    my @files = bsd_glob File::Spec::Functions::catfile($state_dir, 'shard.*');
 
     return map m{[/\\]shard\.([^/\\]+)$}, @files;
 }
@@ -269,10 +270,10 @@ sub _load_metadata {
         push @metadata_merged, state_file($info, 0, 'metadata');
     }
 
-    my @genealogy_parts = $parts ? glob state_file($self, 1, 'genealogy.*') : ();
-    my @source_parts = $parts ? glob state_file($self, 1, 'source.*') : ();
-    my @sourcemap_parts = $parts ? glob state_file($self, 1, 'sourcemap.*') : ();
-    my @metadata_parts = $parts ? glob state_file($self, 1, 'metadata.*') : ();
+    my @genealogy_parts = $parts ? bsd_glob state_file($self, 1, 'genealogy.*') : ();
+    my @source_parts = $parts ? bsd_glob state_file($self, 1, 'source.*') : ();
+    my @sourcemap_parts = $parts ? bsd_glob state_file($self, 1, 'sourcemap.*') : ();
+    my @metadata_parts = $parts ? bsd_glob state_file($self, 1, 'metadata.*') : ();
 
     for my $file (grep -f $_, (@metadata_parts, @metadata_merged)) {
         $metadata->load_and_merge($file);
@@ -313,8 +314,8 @@ sub merge_report {
 
     $self->_load_metadata('parts');
 
-    my @parts = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
-    my @metadata = glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
+    my @parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
+    my @metadata = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
     my $res = $self->_fresh_report(mixed_process => 1);
 
     # TODO fix this incestuous relation
@@ -407,7 +408,7 @@ sub report_names {
     my @dirs = grep $_ ne '__state__' && $_ ne '__source__',
         map  File::Basename::basename($_),
         grep -d $_,
-        glob File::Spec::Functions::catfile($self->{root_dir}, '*');
+        bsd_glob File::Spec::Functions::catfile($self->{root_dir}, '*');
 
     return \@dirs;
 }
