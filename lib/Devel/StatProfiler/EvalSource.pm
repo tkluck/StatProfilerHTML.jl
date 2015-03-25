@@ -49,12 +49,57 @@ sub add_sources_from_reader {
     }
 }
 
+# this tries to optimize for the case where we dumped all evals, the number
+# of evals is unlikely to be an issue when we only dump traced ones
+sub _pack_data {
+    my ($self) = @_;
+    my $all = $self->{all};
+
+    for my $process_id (keys %$all) {
+        ORDINAL: for my $ordinal (keys %{$all->{$process_id}}) {
+            my $first = $all->{$process_id}{$ordinal}{first};
+            my $next = $first && $first + length($all->{$process_id}{$ordinal}{packed}) / 20;
+
+            # files are processed in sequential order, and either we have all the
+            # evals handed to us in order, or we have holes in the sequence
+            # (depending on save_source mode)
+            next if $first && !exists $all->{$process_id}{$ordinal}{sparse}{"(eval $next)"};
+            my @names = sort keys %{$all->{$process_id}{$ordinal}{sparse}};
+            if (!$first) {
+                for my $name (@names) {
+                    $name =~ /^\(eval ([0-9]+)\)$/
+                        or die "Unparsable eval name '$name'";
+                    if (!$first) {
+                        $first = $1;
+                        $next = $first + 1;
+                    } elsif ($next == $1) {
+                        ++$next
+                    } else {
+                        # not contiguous, bail out
+                        next ORDINAL;
+                    }
+                }
+                $all->{$process_id}{$ordinal}{first} = $first;
+            }
+
+            my $curr = $first;
+            for my $name (@names) {
+                my $hash = delete $all->{$process_id}{$ordinal}{sparse}{"(eval $curr)"};
+                $all->{$process_id}{$ordinal}{packed} .= pack "H*", $hash;
+                ++$curr;
+            }
+        }
+    }
+}
+
 sub _save {
     my ($self, $is_part) = @_;
     my $state_dir = state_dir($self, $is_part);
     my $source_dir = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
 
     File::Path::mkpath([$state_dir, $source_dir]);
+
+    $self->_pack_data;
 
     # $self->{seen_in_process} can be reconstructed fomr $self->{all}
     write_data_any($is_part, $self, $state_dir, 'source', $self->{all});
@@ -80,18 +125,41 @@ sub _merge_source {
 
     for my $process_id (keys %$all) {
         for my $ordinal (keys %{$all->{$process_id}}) {
-            for my $name (keys %{$all->{$process_id}{$ordinal}{sparse} //
-                                     $all->{$process_id}{$ordinal}}) {
-                my $hash = $all->{$process_id}{$ordinal}{sparse}{$name} //
-                    $all->{$process_id}{$ordinal}{$name};
+            my $entry = $all->{$process_id}{$ordinal};
+
+            for my $name (keys %{$entry->{sparse} //
+                                     # backwards compatibility
+                                     $entry}) {
+                my $hash = $entry->{sparse}{$name} //
+                    # backwards compatibility
+                    $entry->{$name};
                 warn "Duplicate eval STRING source code for eval '$name'"
                     if exists $self->{seen_in_process}{$process_id}{$name} &&
                        $self->{seen_in_process}{$process_id}{$name} ne $hash;
                 $self->{seen_in_process}{$process_id}{$name} = $hash;
                 $self->{all}{$process_id}{$ordinal}{sparse}{$name} = $hash;
             }
+
+            if ($entry->{first}) {
+                # this is a bit silly: first we construct a sparse map
+                # out of the packed entry, then we re-pack it; still
+                # it's more straightforward to code than the alternative,
+                # and it should not hurt speed too much
+                for my $i (0 .. length($entry->{packed}) / 20 - 1) {
+                    my $name = "(eval " . ($entry->{first} + $i) . ")";
+                    my $hash = unpack "H*", substr $entry->{packed}, $i * 20, 20;
+
+                    warn "Duplicate eval STRING source code for eval '$name'"
+                        if exists $self->{seen_in_process}{$process_id}{$name} &&
+                            $self->{seen_in_process}{$process_id}{$name} ne $hash;
+                    $self->{seen_in_process}{$process_id}{$name} = $hash;
+                    $self->{all}{$process_id}{$ordinal}{sparse}{$name} = $hash;
+                }
+            }
         }
     }
+
+    $self->_pack_data;
 }
 
 sub load_and_merge {
@@ -134,9 +202,20 @@ sub get_hash_by_name {
 
         if ($self->{all}{$p_id}) {
             for my $ord (reverse 1..$o) {
-                my $hash = $self->{all}{$p_id}{$ord} &&
-                    $self->{all}{$p_id}{$ord}{sparse}{$name};
-                return $hash if $hash;
+                if (my $entry = $self->{all}{$p_id}{$ord}) {
+                    my $hash = $entry->{sparse}{$name};
+                    return $hash if $hash;
+                    if ($name =~ /^\(eval ([0-9]+)\)$/ &&
+                            $entry->{first} &&
+                            $1 >= $entry->{first} &&
+                            $1 < $entry->{first} + length($entry->{packed}) / 20) {
+                        return unpack 'H*', substr(
+                            $entry->{packed},
+                            ($1 - $entry->{first}) * 20,
+                            20,
+                        );
+                    }
+                }
             }
         }
     }

@@ -75,11 +75,12 @@ my @hashes = keys %{$rs1->{hashed}};
 is(scalar @hashes, 6);
 
 eq_or_diff($rs2->{seen_in_process}, $rs1->{seen_in_process});
-eq_or_diff($rs2->{all}, $rs1->{all});
+# those two are different "by design" (one is packed, the other is not)
+# eq_or_diff($rs2->{all}, $rs1->{all});
 eq_or_diff($rs2->{genealogy}, $rs1->{genealogy});
 
 eq_or_diff($rs3->{seen_in_process}, $rs1->{seen_in_process});
-eq_or_diff($rs3->{all}, $rs1->{all});
+eq_or_diff($rs3->{all}, $rs2->{all});
 eq_or_diff($rs3->{genealogy}, $rs1->{genealogy});
 
 for my $rs ($rs1, $rs2, $rs3) {
@@ -125,6 +126,22 @@ for my $rs ($rs1, $rs2, $rs3) {
        '', 'after spawn point');
     is($rs->get_source_by_name($grandchild_id, _e($first_eval_n + 3)),
        '', 'after spawn point');
+}
+
+# test packing worked as expected
+for my $process_id (keys %{$rs1->{all}}) {
+    for my $ordinal (keys %{$rs1->{all}{$process_id}}) {
+        my $rs1e = $rs1->{all}{$process_id}{$ordinal};
+        my $rs2e = $rs2->{all}{$process_id}{$ordinal};
+
+        note("checking $process_id - $ordinal");
+        ok( scalar %{$rs1e->{sparse}} && !$rs1e->{first});
+        ok(!scalar %{$rs2e->{sparse}} &&  $rs2e->{first});
+
+        is(length($rs2e->{packed}) / 20, scalar keys %{$rs1e->{sparse}});
+
+        # stored hashes are tested by the code above
+    }
 }
 
 done_testing();
