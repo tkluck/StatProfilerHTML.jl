@@ -44,7 +44,7 @@ sub add_sources_from_reader {
             if exists $self->{seen_in_process}{$process_id}{$name} &&
                $self->{seen_in_process}{$process_id}{$name} ne $hash;
         $self->{seen_in_process}{$process_id}{$name} = $hash;
-        $self->{all}{$process_id}{$process_ordinal}{$name} = $hash;
+        $self->{all}{$process_id}{$process_ordinal}{sparse}{$name} = $hash;
         $self->{hashed}{$hash} = $source_code->{$name};
     }
 }
@@ -80,13 +80,15 @@ sub _merge_source {
 
     for my $process_id (keys %$all) {
         for my $ordinal (keys %{$all->{$process_id}}) {
-            for my $name (keys %{$all->{$process_id}{$ordinal}}) {
-                my $hash = $all->{$process_id}{$ordinal}{$name};
+            for my $name (keys %{$all->{$process_id}{$ordinal}{sparse} //
+                                     $all->{$process_id}{$ordinal}}) {
+                my $hash = $all->{$process_id}{$ordinal}{sparse}{$name} //
+                    $all->{$process_id}{$ordinal}{$name};
                 warn "Duplicate eval STRING source code for eval '$name'"
                     if exists $self->{seen_in_process}{$process_id}{$name} &&
                        $self->{seen_in_process}{$process_id}{$name} ne $hash;
                 $self->{seen_in_process}{$process_id}{$name} = $hash;
-                $self->{all}{$process_id}{$ordinal}{$name} = $hash;
+                $self->{all}{$process_id}{$ordinal}{sparse}{$name} = $hash;
             }
         }
     }
@@ -133,7 +135,7 @@ sub get_hash_by_name {
         if ($self->{all}{$p_id}) {
             for my $ord (reverse 1..$o) {
                 my $hash = $self->{all}{$p_id}{$ord} &&
-                    $self->{all}{$p_id}{$ord}{$name};
+                    $self->{all}{$p_id}{$ord}{sparse}{$name};
                 return $hash if $hash;
             }
         }

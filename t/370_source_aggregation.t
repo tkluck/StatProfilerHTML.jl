@@ -66,8 +66,9 @@ my $rs1 = $r1->{source};
 my $rs2 = $r2->{source};
 my $rs3 = $r3->{source};
 
-my ($first_eval_name) = keys %{$rs1->{all}{$parent_id}{1}};
-my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/;
+my ($first_eval_name) = keys %{$rs1->{all}{$parent_id}{1}{sparse}};
+my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/ or
+    die "Unparsable '$first_eval_name'";
 
 my @hashes = keys %{$rs1->{hashed}};
 
