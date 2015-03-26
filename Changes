@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.20      2015-03-26 21:04:35 CET
+
+    - Fix 'all_evals' mode for -source to work as documented
+    - Reduce memory footprint for some pathological fork/eval uses
+
 0.19      2015-03-24 11:23:02 CET
 
     - Handle reports with spaces in their names
