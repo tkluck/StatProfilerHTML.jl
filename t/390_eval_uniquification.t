@@ -9,7 +9,7 @@ use Storable;
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
 
-use Devel::StatProfiler -file => $profile_file, -interval => 1000;
+use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 'all_evals';
 
 my $first_eval_name = eval "sub f { (caller 0)[1] } f()";
 my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/;
