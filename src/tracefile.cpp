@@ -435,6 +435,8 @@ void TraceFileReader::open(const std::string &path)
     sections = newHV();
     close();
     in.open(fopen(path.c_str(), "rb"));
+    if (!in.is_valid())
+        croak("Failed to open file '%s'", path.c_str());
     read_header();
 }
 
