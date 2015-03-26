@@ -324,7 +324,11 @@ Cxt::create_trace(pTHX)
 
             if (restore_sections) {
                 restore_sections = false;
-                restore_section_state(aTHX_ aMY_CXT);
+#ifdef PERL_IMPLICIT_CONTEXT
+                restore_section_state(aTHX_ this);
+#else
+                restore_section_state(aTHX);
+#endif
             }
         }
     }
