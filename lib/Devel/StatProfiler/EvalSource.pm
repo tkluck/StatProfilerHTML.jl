@@ -126,6 +126,7 @@ sub _merge_source {
     for my $process_id (keys %$all) {
         for my $ordinal (keys %{$all->{$process_id}}) {
             my $entry = $all->{$process_id}{$ordinal};
+            my $self_entry = $self->{all}{$process_id}{$ordinal} //= {};
 
             for my $name (keys %{$entry->{sparse} //
                                      # backwards compatibility
@@ -137,7 +138,7 @@ sub _merge_source {
                     if exists $self->{seen_in_process}{$process_id}{$name} &&
                        $self->{seen_in_process}{$process_id}{$name} ne $hash;
                 $self->{seen_in_process}{$process_id}{$name} = $hash;
-                $self->{all}{$process_id}{$ordinal}{sparse}{$name} = $hash;
+                $self_entry->{sparse}{$name} = $hash;
             }
 
             if ($entry->{first}) {
@@ -153,7 +154,7 @@ sub _merge_source {
                         if exists $self->{seen_in_process}{$process_id}{$name} &&
                             $self->{seen_in_process}{$process_id}{$name} ne $hash;
                     $self->{seen_in_process}{$process_id}{$name} = $hash;
-                    $self->{all}{$process_id}{$ordinal}{sparse}{$name} = $hash;
+                    $self_entry->{sparse}{$name} = $hash;
                 }
             }
         }
