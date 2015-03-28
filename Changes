@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.21      2015-03-28 16:09:41 CET
+
+    - Generate a synthetic file name for XS functions, based on the package
+    - Speed up merge of packed source maps
+
 0.20      2015-03-26 21:04:35 CET
 
     - Fix 'all_evals' mode for -source to work as documented
