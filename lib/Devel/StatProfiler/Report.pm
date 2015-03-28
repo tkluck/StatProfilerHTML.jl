@@ -144,15 +144,12 @@ sub _call_site_id {
 sub _sub {
     my ($self, $frame, $file) = @_;
     my $uq_name = $frame->uq_sub_name;
-    my $name = $frame->fq_sub_name || $uq_name;
-
-    $file //= $frame->file;
 
     return $self->{aggregate}{subs}{$uq_name} ||= {
-        name       => $name,
+        name       => $frame->fq_sub_name || $uq_name,
         uq_name    => $uq_name,
         package    => $frame->package,
-        file       => $file,
+        file       => $file // $frame->file,
         inclusive  => 0,
         exclusive  => 0,
         callees    => {},
