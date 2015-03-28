@@ -650,6 +650,9 @@ sub finalize {
 
     for my $sub (sort { $a->{file} cmp $b->{file} }
                       values %{$self->{aggregate}{subs}}) {
+        # Backwards compatibility for releases before 0.21
+        $sub->{file} //= 'xs:unknown';
+
         # the entry for all files are already there
         my $entry = $self->_file($sub->{file});
 
@@ -674,6 +677,7 @@ sub _fetch_source {
     my ($self, $path) = @_;
     my @lines;
 
+    # synthesized XS entries
     if ($path =~ /^xs:/) {
         return [], ['Dummy file to stick orphan XSUBs in...'];
     }
@@ -846,6 +850,10 @@ sub output {
     my @files = sort { $b->{exclusive} <=> $a->{exclusive} }
                     values %$files;
 
+    # Backwards compatibility for releases before 0.21
+    $_->{report} //= sprintf('%s-line.html', _fileify($_->{name}))
+	for @files;
+
     my $date = POSIX::strftime('%c', localtime(time));
     my $at_inc = [map s{[/\\]$}{}r, @{$self->{metadata}->get_at_inc}];
     my $include = sub {
@@ -867,7 +875,8 @@ sub output {
     };
 
     my $file_name = sub {
-        die "All subs must have a file name" if $_[0] eq '';
+        # Backwards compatibility for releases before 0.21
+        return '(unknown)' if $_[0] eq '';
 
         for my $dir (@$at_inc) {
             return substr $_[0], length($dir) + 1
