@@ -65,6 +65,7 @@ sub _pack_data {
             # (depending on save_source mode)
             next if $first && !exists $all->{$process_id}{$ordinal}{sparse}{"(eval $next)"};
             my @names = sort keys %{$all->{$process_id}{$ordinal}{sparse}};
+            my $curr;
             if (!$first) {
                 for my $name (@names) {
                     $name =~ /^\(eval ([0-9]+)\)$/
@@ -79,10 +80,11 @@ sub _pack_data {
                         next ORDINAL;
                     }
                 }
-                $all->{$process_id}{$ordinal}{first} = $first;
+                $all->{$process_id}{$ordinal}{first} = $curr = $first;
+            } else {
+                $curr = $next;
             }
 
-            my $curr = $first;
             for my $name (@names) {
                 my $hash = delete $all->{$process_id}{$ordinal}{sparse}{"(eval $curr)"};
                 $all->{$process_id}{$ordinal}{packed} .= pack "H*", $hash;
