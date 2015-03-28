@@ -64,16 +64,16 @@ sub _pack_data {
             # evals handed to us in order, or we have holes in the sequence
             # (depending on save_source mode)
             next if $first && !exists $all->{$process_id}{$ordinal}{sparse}{"(eval $next)"};
-            my @names = sort keys %{$all->{$process_id}{$ordinal}{sparse}};
+            my @indices = sort { $a <=> $b }
+                          map  { /^\(eval ([0-9]+)\)$/ ? ($1) : () }
+                               keys %{$all->{$process_id}{$ordinal}{sparse}};
             my $curr;
             if (!$first) {
-                for my $name (@names) {
-                    $name =~ /^\(eval ([0-9]+)\)$/
-                        or die "Unparsable eval name '$name'";
+                for my $index (@indices) {
                     if (!$first) {
-                        $first = $1;
+                        $first = $index;
                         $next = $first + 1;
-                    } elsif ($next == $1) {
+                    } elsif ($next == $index) {
                         ++$next
                     } else {
                         # not contiguous, bail out
@@ -85,7 +85,7 @@ sub _pack_data {
                 $curr = $next;
             }
 
-            for my $name (@names) {
+            for my $name (@indices) {
                 my $hash = delete $all->{$process_id}{$ordinal}{sparse}{"(eval $curr)"};
                 $all->{$process_id}{$ordinal}{packed} .= pack "H*", $hash;
                 ++$curr;

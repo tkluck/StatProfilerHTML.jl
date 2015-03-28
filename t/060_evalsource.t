@@ -42,6 +42,19 @@ sub _sparse {
     return map +("(eval $_)" => sha1_hex("eval $_")), @range;
 }
 
+# lexicographic order
+{
+    my $s1 = Devel::StatProfiler::EvalSource->new;
+
+    _add_sources($s1, 9..11);
+    $s1->_pack_data;
+    eq_or_diff($s1->{all}{fake_process}{1}, {
+        sparse  => {},
+        first   => 9,
+        packed  => _packed(9..11),
+    });
+}
+
 # repeated packing
 {
     my $s1 = Devel::StatProfiler::EvalSource->new;
