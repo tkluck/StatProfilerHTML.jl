@@ -74,6 +74,8 @@ my @hashes = keys %{$rs1->{hashed}};
 
 is(scalar @hashes, 6);
 
+numify($_) for $rs1, $rs2, $rs3;
+
 eq_or_diff($rs2->{seen_in_process}, $rs1->{seen_in_process});
 # those two are different "by design" (one is packed, the other is not)
 # eq_or_diff($rs2->{all}, $rs1->{all});

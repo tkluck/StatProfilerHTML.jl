@@ -32,6 +32,8 @@ sub new {
     return $self;
 }
 
+my $HOLE = "\x00" x 20;
+
 sub add_sources_from_reader {
     my ($self, $r) = @_;
 
@@ -144,10 +146,47 @@ sub _merge_source {
             }
 
             if ($entry->{first}) {
-                # this is a bit silly: first we construct a sparse map
-                # out of the packed entry, then we re-pack it; still
-                # it's more straightforward to code than the alternative,
-                # and it should not hurt speed too much
+                if ($self_entry->{first}) {
+                    my ($af, $bf) = ($self_entry->{first}, $entry->{first});
+                    my ($ap, $bp);
+
+                    if ($af < $bf) {
+                        ($ap, $bp) = ($self_entry->{packed}, $entry->{packed});
+                    } else {
+                        ($af, $bf) = ($bf, $af);
+                        ($ap, $bp) = ($entry->{packed}, $self_entry->{packed});
+                    }
+                    my $an = $af + length($ap) / 20;
+                    my $bn = $bf + length($bp) / 20;
+
+                    # TODO it does not handle overlapping ranges
+                    #      (probably overkill)
+                    if ($an == $bf) {
+                        # contiguous
+                        $self_entry->{first} = $af;
+                        $self_entry->{packed} = $ap . $bp;
+                    } elsif (
+                            $an < $bf && (
+                                ($bf - $an) < 5 ||
+                                ($bf - $an) < ($bn - $af) / 5)) {
+                        # close enough that leaving an "hole" is ok
+                        $self_entry->{first} = $af;
+                        $self_entry->{packed} = $ap . ($HOLE x ($bf - $an)) . $bp;
+                    } else {
+                        # unpack the second entry (arbitrary)
+                        $self_entry->{first} = $af;
+                        $self_entry->{packed} = $ap;
+
+                        for my $i ($bf..$bf + length($bp) / 20 - 1) {
+                            $self_entry->{sparse}{"(eval $i)"} =
+                                unpack "H*", substr $bp, ($i - $bf) * 20, 20;
+                        }
+                    }
+                } else {
+                    $self_entry->{first} = $entry->{first};
+                    $self_entry->{packed} = $entry->{packed};
+                }
+
                 for my $i (0 .. length($entry->{packed}) / 20 - 1) {
                     my $name = "(eval " . ($entry->{first} + $i) . ")";
                     my $hash = unpack "H*", substr $entry->{packed}, $i * 20, 20;
@@ -156,7 +195,6 @@ sub _merge_source {
                         if exists $self->{seen_in_process}{$process_id}{$name} &&
                             $self->{seen_in_process}{$process_id}{$name} ne $hash;
                     $self->{seen_in_process}{$process_id}{$name} = $hash;
-                    $self_entry->{sparse}{$name} = $hash;
                 }
             }
         }

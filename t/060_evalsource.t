@@ -101,7 +101,9 @@ sub _sparse {
     $s1->_merge_source($s2->{all});
 
     eq_or_diff($s1->{all}{fake_process}{1}, {
-        sparse  => { _sparse(7..8, 10..11) },
+        sparse  => { _sparse(7..8) },
+        first   => 10,
+        packed  => _packed(10..11),
     });
 }
 
@@ -122,7 +124,7 @@ sub _sparse {
     });
 }
 
-# merging packed into packed, with hole
+# merging packed into packed, with small hole
 {
     my $s1 = Devel::StatProfiler::EvalSource->new;
     my $s2 = Devel::StatProfiler::EvalSource->new;
@@ -134,7 +136,25 @@ sub _sparse {
     $s1->_merge_source($s2->{all});
 
     eq_or_diff($s1->{all}{fake_process}{1}, {
-        sparse  => { _sparse(10..11) },
+        sparse  => {  },
+        first   => 7,
+        packed  => _packed(7..8) . ("\x00" x 20) . _packed(10..11),
+    });
+}
+
+# merging packed into packed, with big hole
+{
+    my $s1 = Devel::StatProfiler::EvalSource->new;
+    my $s2 = Devel::StatProfiler::EvalSource->new;
+
+    _add_sources($s1, 7..8);
+    _add_sources($s2, 100..101);
+    $s1->_pack_data;
+    $s2->_pack_data;
+    $s1->_merge_source($s2->{all});
+
+    eq_or_diff($s1->{all}{fake_process}{1}, {
+        sparse  => { _sparse(100..101) },
         first   => 7,
         packed  => _packed(7..8),
     });
