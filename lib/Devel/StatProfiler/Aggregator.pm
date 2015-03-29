@@ -278,7 +278,7 @@ sub _load_metadata {
     my ($metadata_parts, $metadata_merged) = _all_data_files($self, $parts, 'metadata');
 
     $metadata->load_and_merge($_)
-        for @$metadata_parts, @$metadata_merged;
+        for @$metadata_merged, @$metadata_parts;
 
     push @{$self->{parts}}, @$metadata_parts;
 }
@@ -288,7 +288,7 @@ sub _load_genealogy {
     my ($genealogy_parts, $genealogy_merged) = _all_data_files($self, $parts, 'genealogy');
 
     $self->_merge_genealogy(read_data($self->{serializer}, $_))
-        for @$genealogy_parts, @$genealogy_merged;
+        for @$genealogy_merged, @$genealogy_parts;
 
     push @{$self->{parts}}, @$genealogy_parts;
 }
@@ -304,7 +304,7 @@ sub _load_source {
     my ($source_parts, $source_merged) = _all_data_files($self, $parts, 'source');
 
     $source->load_and_merge($_)
-        for @$source_parts, @$source_merged;
+        for @$source_merged, @$source_parts;
 
     push @{$self->{parts}}, @$source_parts;
 }
@@ -319,7 +319,7 @@ sub _load_sourcemap {
     my ($sourcemap_parts, $sourcemap_merged) = _all_data_files($self, $parts, 'sourcemap');
 
     $sourcemap->load_and_merge($_)
-        for @$sourcemap_parts, @$sourcemap_merged;
+        for @$sourcemap_merged, @$sourcemap_parts;
 
     push @{$self->{parts}}, @$sourcemap_parts;
 }
