@@ -425,6 +425,31 @@ sub merged_report {
     return $res;
 }
 
+sub merged_report_metadata {
+    my ($self, $report_id) = @_;
+
+    $self->_load_metadata;
+
+    my $res = Devel::StatProfiler::Metadata->new(
+        serializer     => $self->{serializer},
+        root_directory => $self->{root_dir},
+        shard          => $self->{shard},
+    );
+
+    for my $shard (@{$self->{shards}}) {
+        my $metadata = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$shard");
+
+        if (-f $metadata) {
+            $res->load_and_merge($metadata);
+        }
+    }
+
+    my $global_metadata = $self->global_metadata;
+    $res->add_entry($_ => $global_metadata->{$_}) for keys %$global_metadata;
+
+    return $res;
+}
+
 sub _merge_report {
     my ($self, $report_id, $report) = @_;
 
