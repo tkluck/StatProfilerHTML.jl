@@ -254,65 +254,91 @@ sub _merge_genealogy {
     }
 }
 
+sub _all_data_files {
+    my ($self, $parts, $kind) = @_;
+    my (@merged);
+
+    for my $shard ($self->{shard} ? ($self->{shard}) : @{$self->{shards}}) {
+        my $info = {root_dir => $self->{root_dir}, shard => $shard};
+        my $merged = state_file($info, 0, $kind);
+        push @merged, (-f $merged ? $merged : ());
+    }
+    my @parts = $parts ? bsd_glob state_file($self, 1, $kind . '.*') : ();
+
+    return (\@parts, \@merged);
+}
+
 sub _load_metadata {
     my ($self, $parts) = @_;
-
-    return if %{$self->{genealogy}};
-
     my $metadata = $self->{metadata} = Devel::StatProfiler::Metadata->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
         shard          => $self->{shard},
     );
+    my ($metadata_parts, $metadata_merged) = _all_data_files($self, $parts, 'metadata');
+
+    $metadata->load_and_merge($_)
+        for @$metadata_parts, @$metadata_merged;
+
+    push @{$self->{parts}}, @$metadata_parts;
+}
+
+sub _load_genealogy {
+    my ($self, $parts) = @_;
+    my ($genealogy_parts, $genealogy_merged) = _all_data_files($self, $parts, 'genealogy');
+
+    $self->_merge_genealogy(read_data($self->{serializer}, $_))
+        for @$genealogy_parts, @$genealogy_merged;
+
+    push @{$self->{parts}}, @$genealogy_parts;
+}
+
+sub _load_source {
+    my ($self, $parts) = @_;
     my $source = $self->{source} = Devel::StatProfiler::EvalSource->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
         shard          => $self->{shard},
         genealogy      => $self->{genealogy},
     );
+    my ($source_parts, $source_merged) = _all_data_files($self, $parts, 'source');
+
+    $source->load_and_merge($_)
+        for @$source_parts, @$source_merged;
+
+    push @{$self->{parts}}, @$source_parts;
+}
+
+sub _load_sourcemap {
+    my ($self, $parts) = @_;
     my $sourcemap = $self->{sourcemap} = Devel::StatProfiler::SourceMap->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
         shard          => $self->{shard},
     );
+    my ($sourcemap_parts, $sourcemap_merged) = _all_data_files($self, $parts, 'sourcemap');
 
-    my (@genealogy_merged, @source_merged, @sourcemap_merged, @metadata_merged);
-    for my $shard ($self->{shard} ? ($self->{shard}) : @{$self->{shards}}) {
-        my $info = {root_dir => $self->{root_dir}, shard => $shard};
-        push @genealogy_merged, state_file($info, 0, 'genealogy');
-        push @source_merged, state_file($info, 0, 'source');
-        push @sourcemap_merged, state_file($info, 0, 'sourcemap');
-        push @metadata_merged, state_file($info, 0, 'metadata');
-    }
+    $sourcemap->load_and_merge($_)
+        for @$sourcemap_parts, @$sourcemap_merged;
 
-    my @genealogy_parts = $parts ? bsd_glob state_file($self, 1, 'genealogy.*') : ();
-    my @source_parts = $parts ? bsd_glob state_file($self, 1, 'source.*') : ();
-    my @sourcemap_parts = $parts ? bsd_glob state_file($self, 1, 'sourcemap.*') : ();
-    my @metadata_parts = $parts ? bsd_glob state_file($self, 1, 'metadata.*') : ();
+    push @{$self->{parts}}, @$sourcemap_parts;
+}
 
-    for my $file (grep -f $_, (@metadata_parts, @metadata_merged)) {
-        $metadata->load_and_merge($file);
-    }
+sub _load_all_metadata {
+    my ($self, $parts) = @_;
 
-    for my $file (grep -f $_, (@genealogy_parts, @genealogy_merged)) {
-        $self->_merge_genealogy(read_data($self->{serializer}, $file));
-    }
+    return if %{$self->{genealogy}};
 
-    for my $file (grep -f $_, (@source_parts, @source_merged)) {
-        $source->load_and_merge($file);
-    }
-
-    for my $file (grep -f $_, (@sourcemap_parts, @sourcemap_merged)) {
-        $sourcemap->load_and_merge($file);
-    }
-
-    push @{$self->{parts}}, @genealogy_parts, @source_parts, @sourcemap_parts, @metadata_parts;
+    $self->_load_metadata($parts);
+    $self->_load_genealogy($parts);
+    $self->_load_source($parts);
+    $self->_load_sourcemap($parts);
 }
 
 sub merge_metadata {
     my ($self) = @_;
 
-    $self->_load_metadata('parts');
+    $self->_load_all_metadata('parts');
 
     write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
     $self->{metadata}->save_merged;
@@ -327,7 +353,7 @@ sub merge_metadata {
 sub merge_report {
     my ($self, $report_id) = @_;
 
-    $self->_load_metadata('parts');
+    $self->_load_all_metadata('parts');
 
     my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
     my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
@@ -367,7 +393,7 @@ sub merge_report {
 sub merged_report {
     my ($self, $report_id, $map_source) = @_;
 
-    $self->_load_metadata;
+    $self->_load_all_metadata;
 
     my $res = $self->_fresh_report(mixed_process => 1);
 

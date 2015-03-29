@@ -47,3 +47,7 @@
       multiple times in different sections
     - the aggregator class needs to be tweaked but most of the logic should
       remain the same
+- rework metadata API
+  - per-aggregate one requires a save
+  - per-report one requires a merge
+  - test it
