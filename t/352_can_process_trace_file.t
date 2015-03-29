@@ -66,4 +66,8 @@ my $r2 = $a2->merge_report('__main__');
 
 eq_or_diff($r1->{aggregate}, $r2->{aggregate});
 
+ok(!$a1->can_process_trace_file("$template.__not_existing__"),
+   "can_process_trace_file() is false for non-existing files");
+ok(1, 'can_process_trace_file() did not die');
+
 done_testing();

@@ -80,12 +80,27 @@ sub can_process_trace_file {
     my ($self, @files) = @_;
 
     return grep {
-        my $r = ref $_ ? $_ : Devel::StatProfiler::Reader->new($_);
-        my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
-            @{$r->get_genealogy_info};
-        my $state = $self->_state($process_id) // { ordinal => 0 };
+        my $r = eval {
+            ref $_ ? $_ : Devel::StatProfiler::Reader->new($_)
+        } or do {
+            my $errno = $!;
+            my $error = $@;
 
-        $process_ordinal == $state->{ordinal} + 1;
+            if ($error !~ /^Failed to open file/ || $errno != Errno::ENOENT) {
+                die;
+            }
+            undef;
+        };
+
+        if ($r) {
+            my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
+                @{$r->get_genealogy_info};
+            my $state = $self->_state($process_id) // { ordinal => 0 };
+
+            $process_ordinal == $state->{ordinal} + 1;
+        } else {
+            0;
+        }
     } @files;
 }
 
