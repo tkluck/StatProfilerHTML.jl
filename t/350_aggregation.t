@@ -59,6 +59,7 @@ for my $file (@files) {
         );
         $a->process_trace_files($sr);
         $a->save_part;
+        $a->merge_report('__main__');
         last if $sr->done;
     }
 }

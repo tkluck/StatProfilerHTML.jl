@@ -314,8 +314,11 @@ sub merge_report {
 
     $self->_load_metadata('parts');
 
-    my @parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
-    my @metadata = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
+    my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
+    my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
+    my $report_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
+    my $metadata_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$self->{shard}");
+
     my $res = $self->_fresh_report(mixed_process => 1);
 
     # TODO fix this incestuous relation
@@ -323,14 +326,14 @@ sub merge_report {
     $res->{sourcemap} = $self->{sourcemap};
     $res->{genealogy} = $self->{genealogy};
 
-    for my $file (@parts) {
+    for my $file (grep -f $_, ($report_merged, @report_parts)) {
         my $report = $self->_fresh_report;
 
         $report->load($file);
         $res->merge($report);
     }
 
-    for my $file (@metadata) {
+    for my $file (grep -f $_, ($metadata_merged, @metadata_parts)) {
         $res->load_and_merge_metadata($file);
     }
 
@@ -339,7 +342,7 @@ sub merge_report {
 
     $res->add_metadata($self->global_metadata);
 
-    for my $part (@parts, @metadata) {
+    for my $part (@report_parts, @metadata_parts) {
         unlink $part;
     }
 
