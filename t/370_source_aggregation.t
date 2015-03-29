@@ -70,7 +70,7 @@ my ($first_eval_name) = keys %{$rs1->{all}{$parent_id}{1}{sparse}};
 my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/ or
     die "Unparsable '$first_eval_name'";
 
-my @hashes = keys %{$rs1->{hashed}};
+my @hashes = map unpack("H*", $_), keys %{$rs1->{hashed}};
 
 is(scalar @hashes, 6);
 
@@ -87,7 +87,7 @@ eq_or_diff($rs3->{genealogy}, $rs1->{genealogy});
 
 for my $rs ($rs1, $rs2, $rs3) {
     for my $hash (@hashes) {
-        is($rs->get_source_by_hash($hash), $rs1->{hashed}{$hash},
+        is($rs->get_source_by_hash($hash), $rs1->{hashed}{pack "H*", $hash},
            "Source code for $hash");
     }
 }

@@ -2,7 +2,7 @@
 use t::lib::Test;
 
 use Devel::StatProfiler::EvalSource;
-use Digest::SHA qw(sha1_hex);
+use Digest::SHA qw(sha1);
 
 {
     package DummyReader;
@@ -33,13 +33,13 @@ sub _add_sources {
 sub _packed {
     my (@range) = @_;
 
-    return join '', map +(pack "H*", sha1_hex("eval $_")), @range;
+    return join '', map sha1("eval $_"), @range;
 }
 
 sub _sparse {
     my (@range) = @_;
 
-    return map +("(eval $_)" => sha1_hex("eval $_")), @range;
+    return map +("(eval $_)" => sha1("eval $_")), @range;
 }
 
 # lexicographic order

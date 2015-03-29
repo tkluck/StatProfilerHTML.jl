@@ -8,7 +8,7 @@ use Devel::StatProfiler::Utils qw(
     read_data
     read_file
     state_dir
-    utf8_sha1_hex
+    utf8_sha1
     write_data_any
     write_file
 );
@@ -40,7 +40,7 @@ sub add_sources_from_reader {
     my ($process_id, $process_ordinal) = @{$r->get_genealogy_info};
     my $source_code = $r->get_source_code;
     for my $name (keys %$source_code) {
-        my $hash = utf8_sha1_hex($source_code->{$name});
+        my $hash = utf8_sha1($source_code->{$name});
 
         warn "Duplicate eval STRING source code for eval '$name'"
             if exists $self->{seen_in_process}{$process_id}{$name} &&
@@ -89,7 +89,7 @@ sub _pack_data {
 
             for my $name (@indices) {
                 my $hash = delete $all->{$process_id}{$ordinal}{sparse}{"(eval $curr)"};
-                $all->{$process_id}{$ordinal}{packed} .= pack "H*", $hash;
+                $all->{$process_id}{$ordinal}{packed} .= $hash;
                 ++$curr;
             }
         }
@@ -109,15 +109,16 @@ sub _save {
     write_data_any($is_part, $self, $state_dir, 'source', $self->{all});
 
     for my $hash (keys %{$self->{hashed}}) {
+        my $unpacked = unpack "H*", $hash;
         my $source_subdir = File::Spec::Functions::catdir(
             $source_dir,
-            substr($hash, 0, 2),
-            substr($hash, 2, 2),
+            substr($unpacked, 0, 2),
+            substr($unpacked, 2, 2),
         );
 
         File::Path::mkpath([$source_subdir]);
-        write_file($source_subdir, substr($hash, 4), 'use_utf8', $self->{hashed}{$hash})
-            unless -e File::Spec::Functions::catfile($source_subdir, substr($hash, 4));
+        write_file($source_subdir, substr($unpacked, 4), 'use_utf8', $self->{hashed}{$hash})
+            unless -e File::Spec::Functions::catfile($source_subdir, substr($unpacked, 4));
     }
 }
 
@@ -138,6 +139,9 @@ sub _merge_source {
                 my $hash = $entry->{sparse}{$name} //
                     # backwards compatibility
                     $entry->{$name};
+                # backwards compatibility
+                $hash = pack "H*", $hash if length($hash) == 40;
+
                 warn "Duplicate eval STRING source code for eval '$name'"
                     if exists $self->{seen_in_process}{$process_id}{$name} &&
                        $self->{seen_in_process}{$process_id}{$name} ne $hash;
@@ -179,7 +183,7 @@ sub _merge_source {
 
                         for my $i ($bf..$bf + length($bp) / 20 - 1) {
                             $self_entry->{sparse}{"(eval $i)"} =
-                                unpack "H*", substr $bp, ($i - $bf) * 20, 20;
+                                substr $bp, ($i - $bf) * 20, 20;
                         }
                     }
                 } else {
@@ -189,7 +193,7 @@ sub _merge_source {
 
                 for my $i (0 .. length($entry->{packed}) / 20 - 1) {
                     my $name = "(eval " . ($entry->{first} + $i) . ")";
-                    my $hash = unpack "H*", substr $entry->{packed}, $i * 20, 20;
+                    my $hash = substr $entry->{packed}, $i * 20, 20;
 
                     warn "Duplicate eval STRING source code for eval '$name'"
                         if exists $self->{seen_in_process}{$process_id}{$name} &&
@@ -209,22 +213,24 @@ sub load_and_merge {
     $self->_merge_source(read_data($self->{serializer}, $file));
 }
 
-sub get_source_by_hash {
+sub _get_source_by_hash {
     my ($self, $hash) = @_;
 
-    return $self->{hashed}{$hash} // read_file(
-        File::Spec::Functions::catfile(
+    return $self->{hashed}{$hash} // do {
+        my $unpacked = unpack "H*", $hash;
+        my $path = File::Spec::Functions::catfile(
             $self->{root_dir},
             '__source__',
-            substr($hash, 0, 2),
-            substr($hash, 2, 2),
-            substr($hash, 4)
-        ),
-        'use_utf8',
-    );
+            substr($unpacked, 0, 2),
+            substr($unpacked, 2, 2),
+            substr($unpacked, 4)
+        );
+
+        read_file($path, 'use_utf8');
+    };
 }
 
-sub get_hash_by_name {
+sub _get_hash_by_name {
     my ($self, $process_id, $name) = @_;
     my ($ordinal) = sort { $b <=> $a } keys %{$self->{all}{$process_id} || {}};
     my @queue = [$process_id, $ordinal];
@@ -250,7 +256,7 @@ sub get_hash_by_name {
                             $entry->{first} &&
                             $1 >= $entry->{first} &&
                             $1 < $entry->{first} + length($entry->{packed}) / 20) {
-                        return unpack 'H*', substr(
+                        return substr(
                             $entry->{packed},
                             ($1 - $entry->{first}) * 20,
                             20,
@@ -264,11 +270,24 @@ sub get_hash_by_name {
     return undef;
 }
 
+sub get_hash_by_name {
+    my ($self, $process_id, $name) = @_;
+    my $hash = $self->_get_hash_by_name($process_id, $name);
+
+    return $hash && $hash ne $HOLE ? unpack "H*", $hash : undef;
+}
+
 sub get_source_by_name {
     my ($self, $process_id, $name) = @_;
-    my $hash = $self->get_hash_by_name($process_id, $name);
+    my $hash = $self->_get_hash_by_name($process_id, $name);
 
-    return $hash ? $self->get_source_by_hash($hash) : '';
+    return $hash ? $self->_get_source_by_hash($hash) : '';
+}
+
+sub get_source_by_hash {
+    my ($self, $hash) = @_;
+
+    return $self->_get_source_by_hash(pack "H*", $hash);
 }
 
 1;

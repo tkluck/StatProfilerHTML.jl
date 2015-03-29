@@ -8,7 +8,7 @@ use File::Spec::Functions ();
 use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use Errno ();
 use Exporter qw(import);
-use Digest::SHA qw(sha1_hex);
+use Digest::SHA qw(sha1 sha1_hex);
 
 our @EXPORT_OK = qw(
     check_serializer
@@ -17,6 +17,7 @@ our @EXPORT_OK = qw(
     state_dir
     state_file
     state_file_shard
+    utf8_sha1
     utf8_sha1_hex
     write_data
     write_data_any
@@ -181,6 +182,14 @@ sub _output_file {
     }
 
     die "Can't get here";
+}
+
+sub utf8_sha1 {
+    my ($value) = @_;
+
+    utf8::encode($value) if utf8::is_utf8($value);
+
+    return sha1($value);
 }
 
 sub utf8_sha1_hex {
