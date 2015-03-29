@@ -460,8 +460,14 @@ sub report_names {
 sub add_report_metadata {
     my ($self, $report_id, $metadata) = @_;
 
-    $self->{reports}{$report_id} ||= $self->_fresh_report;
-    $self->{reports}{$report_id}->add_metadata($metadata);
+    my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id, 'parts');
+    my $report_metadata = Devel::StatProfiler::Metadata->new(
+        serializer     => $self->{serializer},
+        root_directory => $self->{root_dir},
+        shard          => $self->{shard},
+    );
+    $report_metadata->add_entry($_ => $metadata->{$_}) for keys %$metadata;
+    $report_metadata->save_report_part($report_dir);
 }
 
 sub global_metadata {
