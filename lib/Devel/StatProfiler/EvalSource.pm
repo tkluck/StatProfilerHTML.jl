@@ -191,14 +191,15 @@ sub _merge_source {
                     $self_entry->{packed} = $entry->{packed};
                 }
 
+                my $seen = $self->{seen_in_process}{$process_id} //= {};
                 for my $i (0 .. length($entry->{packed}) / 20 - 1) {
                     my $name = "(eval " . ($entry->{first} + $i) . ")";
                     my $hash = substr $entry->{packed}, $i * 20, 20;
 
                     warn "Duplicate eval STRING source code for eval '$name'"
-                        if exists $self->{seen_in_process}{$process_id}{$name} &&
-                            $self->{seen_in_process}{$process_id}{$name} ne $hash;
-                    $self->{seen_in_process}{$process_id}{$name} = $hash;
+                        if exists $seen->{$name} &&
+                            $seen->{$name} ne $hash;
+                    $seen->{$name} = $hash;
                 }
             }
         }
