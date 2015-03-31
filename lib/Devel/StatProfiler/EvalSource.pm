@@ -293,4 +293,11 @@ sub get_source_by_hash {
     return $self->_get_source_by_hash(pack "H*", $hash);
 }
 
+sub delete_process {
+    my ($self, $process_id) = @_;
+
+    delete $self->{seen_in_process}{$process_id};
+    delete $self->{all}{$process_id};
+}
+
 1;

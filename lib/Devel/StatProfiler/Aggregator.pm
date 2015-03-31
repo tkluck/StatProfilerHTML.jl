@@ -42,7 +42,7 @@ sub new {
         root_dir     => $opts{root_directory},
         parts_dir    => $opts{parts_directory} // $opts{root_directory},
         shard        => $opts{shard},
-        shards       => $opts{shards},
+        shards       => $opts{shards} || [$opts{shard}],
         slowops      => $opts{slowops},
         flamegraph   => $opts{flamegraph},
         serializer   => $opts{serializer} || 'storable',
@@ -501,6 +501,76 @@ sub all_reports {
     my @dirs = grep {
         $_ eq '__main__' || $_ !~ /^__/
     } map File::Basename::basename($_), grep -d $_, glob $self->{root_dir} . '/*';
+}
+
+sub discard_expired_process_data {
+    my ($self, $expiration) = @_;
+
+    $self->_load_all_metadata;
+
+    my @shards = __PACKAGE__->shards($self->{root_dir});
+    my $aggregator = __PACKAGE__->new(
+        root_directory => $self->{root_dir},
+        shards         => \@shards,
+        serializer     => $self->{serializer},
+    );
+
+    $aggregator->_load_all_metadata;
+
+    # Burn-in eval mapping, so we can discard eval map
+    for my $report_id ($self->all_reports) {
+        my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
+        my $report = $self->merged_report($report_id);
+
+        # TODO fix this incestuous relation
+        $report->{source} = $aggregator->{source};
+        $report->{sourcemap} = $aggregator->{sourcemap};
+        $report->{genealogy} = $aggregator->{genealogy};
+
+        $report->map_source;
+        $report->save_aggregate($report_dir);
+    }
+
+    my $last_sample = $aggregator->{last_sample};
+    my $genealogy = $aggregator->{genealogy};
+
+    my @queue = keys %{$self->{last_sample}};
+    while (@queue) {
+        my %updated;
+
+        for my $process_id (@queue) {
+            my $parent = $genealogy->{$process_id}{1};
+            my $parent_id = $parent->[0];
+
+            unless ($parent_id) {
+                warn "Broken genealogy: '$process_id' has no parent";
+                next;
+            }
+            next if $parent_id eq "00" x 24;
+            $updated{$parent_id} = undef;
+            $last_sample->{$parent_id} = $last_sample->{$process_id}
+                if ($last_sample->{$parent_id} // 0) < $last_sample->{$process_id};
+        }
+
+        @queue = keys %updated;
+    }
+
+    for my $process_id (keys %$genealogy) {
+        next if ($last_sample->{$process_id} // 0) > $expiration;
+
+        # garbage-collect process-related metadata, under the
+        # assumption that if that neither the process nor its childs
+        # produced any samples in the given timeframe, they are "dead"
+        delete $self->{genealogy}{$process_id};
+        delete $self->{last_sample}{$process_id};
+        $self->{source}->delete_process($process_id);
+    }
+
+    # TODO Garbage-collect eval source code
+
+    write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
+    write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
+    $self->{source}->save_merged;
 }
 
 sub _merge_report {

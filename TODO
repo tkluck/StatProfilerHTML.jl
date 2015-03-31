@@ -57,6 +57,10 @@
 - submit flamegraph.pl changes upstream
 - test for 372d862d8bd6e5e46b0e08c8ad59aab9837f48b3, and aggregation is still
   generating way too many "Unable to find reverse file for '$file'" for evals
+- test for discard_expired_process_data
+  - also garbage-collect eval source code
+  - merge and discard evals with the same name and no source mapping
+    if the process that generated them is older than some threshold
 
 - sporadic t/032_xsubs.t failure:
   "Invalid input file: Found stray sub-frame tag without sample-start tag"
