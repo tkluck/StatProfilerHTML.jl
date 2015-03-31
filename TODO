@@ -62,3 +62,5 @@
   - keep track of the number of active childs per process
   - garbage collect all metadata for a childless process after a configurable
     inactive time
+- upgrade flamegraph script to the latest version, and submit changes
+  upstream
