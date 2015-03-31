@@ -66,6 +66,7 @@ sub new {
         ),
         mixed_process=> $opts{mixed_process},
         genealogy    => $genealogy,
+        last_sample  => {},
         parts        => [],
         fetchers     => $opts{fetchers},
     }, $class;
@@ -116,6 +117,7 @@ sub process_trace_files {
         next if $process_ordinal != $state->{ordinal} + 1;
 
         $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
+        $self->{last_sample}{$process_id} = time;
 
         if (my $reader_state = delete $state->{reader_state}) {
             $r->set_reader_state($reader_state);
@@ -168,6 +170,7 @@ sub save_part {
     File::Path::mkpath([$state_dir, $parts_dir]);
 
     write_data_part($self, $parts_dir, 'genealogy', $self->{genealogy});
+    write_data_part($self, $parts_dir, 'last_sample', $self->{last_sample});
 
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};
@@ -254,6 +257,17 @@ sub _merge_genealogy {
     }
 }
 
+sub _merge_last_sample {
+    my ($self, $last_sample) = @_;
+
+    for my $process_id (keys %$last_sample) {
+        my $new = $last_sample->{$process_id};
+        my $current = $self->{last_sample}{$process_id} // 0;
+
+        $self->{last_sample}{$process_id} = $new > $current ? $new : $current;
+    }
+}
+
 sub _all_data_files {
     my ($self, $parts, $kind) = @_;
     my (@merged);
@@ -291,6 +305,16 @@ sub _load_genealogy {
         for @$genealogy_merged, @$genealogy_parts;
 
     push @{$self->{parts}}, @$genealogy_parts;
+}
+
+sub _load_last_sample {
+    my ($self, $parts) = @_;
+    my ($last_sample_parts, $last_sample_merged) = _all_data_files($self, $parts, 'last_sample');
+
+    $self->_merge_last_sample(read_data($self->{serializer}, $_))
+        for @$last_sample_merged, @$last_sample_parts;
+
+    push @{$self->{parts}}, @$last_sample_parts;
 }
 
 sub _load_source {
@@ -331,6 +355,7 @@ sub _load_all_metadata {
 
     $self->_load_metadata($parts);
     $self->_load_genealogy($parts);
+    $self->_load_last_sample($parts);
     $self->_load_source($parts);
     $self->_load_sourcemap($parts);
 }
@@ -341,6 +366,7 @@ sub merge_metadata {
     $self->_load_all_metadata('parts');
 
     write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
+    write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
     $self->{metadata}->save_merged;
     $self->{source}->save_merged;
     $self->{sourcemap}->save_merged;
