@@ -24,6 +24,11 @@
 - decide what to do for multiple distinct evals mapping to the same
   logical file (with overlapping and non-overlapping line ranges)
   (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
+- add a separate "op" type for xsubs
+- always grab eval sequence number (attach it to magic when not tracing
+  all evals)
+- try to detect when an eval did not add any sub/sample, and drop it
+  during aggregation
 
 - detect multiple evals with the same #line directive and different source code
 - closure aggregation
@@ -31,6 +36,7 @@
 - handle overlapping/nested sections
 - make aggregation code reusable both as a script and in a web application
 - file reader: Better error reporting
+  - treat truncated files as a closed stream
 - test case for 9d4110d016a72fabfb5cd45c4ae97468c9070f51
 - test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
 - move finalize() work earlier during aggregation
@@ -51,3 +57,8 @@
   - per-aggregate one requires a save
   - per-report one requires a merge
   - test it
+- garbage-collect metadata for old processes
+  - keep track of last seen sample per process
+  - keep track of the number of active childs per process
+  - garbage collect all metadata for a childless process after a configurable
+    inactive time
