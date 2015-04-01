@@ -18,6 +18,14 @@ for (1..4) {
 Time::HiRes::sleep(0.040); # make "sure" the sample is taken here
 eval "# I am not traced";
 
+my $eval_with_hash_line = <<EOT;
+#line 123 "eval string with #line directive"
+take_sample();
+1;
+EOT
+
+eval $eval_with_hash_line;
+
 Devel::StatProfiler::stop_profile();
 
 my @samples = get_samples($profile_file);
@@ -33,5 +41,6 @@ for my $sample (@samples) {
 }
 
 ok(!grep /# I am not traced/, values %$source);
+ok(exists $source->{'eval string with #line directive'});
 
 done_testing();
