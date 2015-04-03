@@ -754,7 +754,7 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
 static void
 enter_eval_hook(pTHX_ OP *o)
 {
-    if (o->op_type != OP_ENTEREVAL)
+    if (o->op_type != OP_ENTEREVAL || source_code_kind == NONE)
         return;
 
     dMY_CXT;
