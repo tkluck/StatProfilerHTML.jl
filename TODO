@@ -64,3 +64,6 @@
     inactive time
 - upgrade flamegraph script to the latest version, and submit changes
   upstream
+
+- sporadic t/032_xsubs.t failure:
+  "Invalid input file: Found stray sub-frame tag without sample-start tag"
