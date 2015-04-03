@@ -25,6 +25,8 @@
 using namespace devel::statprofiler;
 using namespace std;
 
+extern MGVTBL Devel_StatProfiler_eval_idx_vtbl;
+
 #define MY_CXT_KEY "Devel::StatProfiler::_guts" XS_VERSION
 
 namespace {
@@ -759,11 +761,31 @@ enter_eval_hook(pTHX_ OP *o)
 
     dMY_CXT;
 
+    SV *eval_text = cxstack[cxstack_ix].blk_eval.cur_text;
+    MAGIC *marker = source_code_kind == TRACED_EVALS && SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
+    EvalCollected *collected;
+
+    if (source_code_kind == TRACED_EVALS && !marker) {
+        EvalCollected data;
+
+        marker = sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
+                             &Devel_StatProfiler_eval_idx_vtbl,
+                             (const char *)&data, sizeof(data));
+        collected = (EvalCollected *) marker->mg_ptr;
+    } else if (source_code_kind == TRACED_EVALS) {
+        collected = (EvalCollected *) marker->mg_ptr;
+
+        // this is going to break in case of recursive evals that are
+        // eval()ing the same SV. I'm going to ignore the issue.
+        collected->evalseq = PL_evalseq;
+        collected->saved = false;
+    }
+
     if (source_code_kind == ALL_EVALS_ALWAYS ||
             (MY_CXT.enabled && source_code_kind == ALL_EVALS)) {
         TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
 
-        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, NULL, PL_evalseq);
+        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, PL_evalseq);
     }
 }
 

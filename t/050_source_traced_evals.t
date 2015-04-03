@@ -9,6 +9,11 @@ BEGIN { $profile_file = temp_profile_file(); }
 
 use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 'traced_evals';
 
+my $first_eval_name = eval "take_sample(); sub f { (caller 0)[1] } f()";
+my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/;
+
+sub _e { sprintf '(eval %d)', $_[0] }
+
 for (1..4) {
     eval "take_sample(); take_sample();";
     eval "Time::HiRes::sleep(0.000001);";
@@ -33,14 +38,21 @@ my $source = get_sources($profile_file);
 
 cmp_ok(scalar @samples, '>=', 8);
 cmp_ok(scalar keys %$source, '>=', 4);
-cmp_ok(scalar keys %$source, '<=', 6);
+cmp_ok(scalar keys %$source, '<=', 8);
 
 for my $sample (@samples) {
-    ok(exists $source->{$sample->[2]->file}, 'source code is there');
-    like($source->{$sample->[2]->file}, qr/take_sample/, 'source code is legit');
+    my $file = $sample->[2]->file;
+
+    $file = _e($first_eval_n + 14)
+        if $file =~ /eval string with #line directive/;
+
+    ok(exists $source->{$file}, 'source code is there');
+    like($source->{$file}, qr/take_sample/, 'source code is legit');
 }
 
 ok(!grep /# I am not traced/, values %$source);
-ok(exists $source->{'eval string with #line directive'});
+ok(!exists $source->{'eval string with #line directive'});
+like($source->{_e($first_eval_n + 14)}, 
+     qr/^#line 123 "eval string with #line directive"$/m);
 
 done_testing();

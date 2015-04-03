@@ -183,7 +183,7 @@ namespace devel {
 
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
-            int add_eval_source(SV *eval_text, COP *line, U32 eval_seq);
+            int add_eval_source(SV *eval_text, U32 eval_seq);
             int end_sample();
 
             int write_custom_metadata(SV *key, SV *value);

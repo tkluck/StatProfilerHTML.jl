@@ -3,9 +3,7 @@
 
 using namespace devel::statprofiler;
 
-namespace {
-    MGVTBL eval_idx_vtbl;
-}
+extern MGVTBL Devel_StatProfiler_eval_idx_vtbl;
 
 
 // needs to be kept in sync with S_dopoptosub in pp_ctl.c
@@ -89,12 +87,15 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
                 } else {
                     if (eval_source) {
                         SV *eval_text = sub->blk_eval.cur_text;
-                        MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &eval_idx_vtbl) : NULL;
+                        MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
 
-                        if (!marker) {
-                            sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
-                                        &eval_idx_vtbl, NULL, 0);
-                            trace.add_eval_source(eval_text, line, 0);
+                        if (marker) {
+                            EvalCollected *collected = (EvalCollected *) marker->mg_ptr;
+
+                            if (!collected->saved) {
+                                trace.add_eval_source(eval_text, collected->evalseq);
+                                collected->saved = true;
+                            }
                         }
                     }
 
@@ -117,3 +118,5 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
     if (depth && line != &PL_compiling)
         trace.add_frame(FRAME_MAIN, NULL, NULL, line);
 }
+
+MGVTBL Devel_StatProfiler_eval_idx_vtbl;

@@ -8,6 +8,16 @@ namespace devel {
     namespace statprofiler {
         class TraceFileWriter;
 
+        struct EvalCollected {
+            U32 evalseq;
+            bool saved;
+
+            EvalCollected() :
+                evalseq(PL_evalseq),
+                saved(false)
+            { }
+        };
+
         void collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool eval_source);
     }
 }
