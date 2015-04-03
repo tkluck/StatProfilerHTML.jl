@@ -26,6 +26,7 @@ enum {
     TAG_XSUB_FRAME              = 5,
     TAG_MAIN_FRAME              = 6,
     TAG_EVAL_STRING             = 7,
+    TAG_EVAL_SEQ                = 8,
     TAG_FILE_END                = 196,
     TAG_STREAM_END              = 197,
     TAG_SECTION_START           = 198,
@@ -624,6 +625,16 @@ SV *TraceFileReader::read_trace()
             hv_store_ent(source_code, file, SvREFCNT_inc(text), 0);
             break;
         }
+        case TAG_EVAL_SEQ: {
+            SV *text = read_string(aTHX_ in);
+            unsigned long eval_seq = read_varint(in);
+            char file[28]; // 20 for 64-bit int, 7 for (eval ), 1 for null
+            int file_size;
+
+            file_size = sprintf(file, "(eval %lu)", eval_seq);
+            hv_store(source_code, file, file_size, SvREFCNT_inc(text), 0);
+            break;
+        }
         case TAG_MAIN_FRAME: {
             if (!sample)
                 croak("Invalid input file: Found stray sub-frame tag without sample-start tag");
@@ -926,15 +937,9 @@ int TraceFileWriter::end_section(SV *section_name)
 
 int TraceFileWriter::add_eval_source(SV *eval_text, U32 eval_seq)
 {
-    char buffer[28]; // 20 for 64-bit int, 7 for (eval ), 1 for null
-    const char *file;
-    size_t file_size;
     int status = 0;
     int eval_size = SvCUR(eval_text);
     const char *eval = SvPVX(eval_text) ;
-
-    file = buffer;
-    file_size = sprintf(buffer, "(eval %lu)", (unsigned long) eval_seq);
 
     // the code in toke.c:Perl_lex_start appends "\n;" to the string
     // if it does not end in ";" already; this is an heuristic to try
@@ -942,11 +947,11 @@ int TraceFileWriter::add_eval_source(SV *eval_text, U32 eval_seq)
     if (eval_size >= 2 && eval[eval_size - 1] == ';' && eval[eval_size - 2] == '\n')
         eval_size -= 2;
 
-    status += out.write_byte(TAG_EVAL_STRING);
+    status += out.write_byte(TAG_EVAL_SEQ);
     status += write_varint(out, string_size(eval_size) +
-                                string_size(file_size));
+                                varint_size(eval_seq));
     status += write_string(out, eval, eval_size, SvUTF8(eval_text));
-    status += write_string(out, file, file_size, false);
+    status += write_varint(out, eval_seq);
 
     return status;
 }
