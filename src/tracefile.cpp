@@ -424,6 +424,7 @@ TraceFileReader::TraceFileReader(pTHX)
 
 TraceFileReader::~TraceFileReader()
 {
+    SvREFCNT_dec(source_code);
     SvREFCNT_dec(custom_metadata);
     SvREFCNT_dec(sections);
     close();
