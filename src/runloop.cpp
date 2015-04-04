@@ -26,6 +26,7 @@ using namespace devel::statprofiler;
 using namespace std;
 
 extern MGVTBL Devel_StatProfiler_eval_idx_vtbl;
+extern MGVTBL Devel_StatProfiler_save_eval_txt_vtbl;
 
 #define MY_CXT_KEY "Devel::StatProfiler::_guts" XS_VERSION
 
@@ -749,8 +750,28 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
 #endif
     }
     collect_trace(aTHX_ *trace, stack_collect_depth,
-                  source_code_kind == TRACED_EVALS);
+                  source_code_kind != NONE);
     trace->end_sample();
+}
+
+static int
+write_eval_if_needed(pTHX_ SV *evalcv, MAGIC *mg)
+{
+    SV *eval_text = mg->mg_obj;
+    MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
+
+    if (marker) {
+        EvalCollected *collected = (EvalCollected *) marker->mg_ptr;
+
+        if (!collected->saved && collected->sub_gen != PL_breakable_sub_gen) {
+            dMY_CXT;
+
+            TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
+
+            trace->add_eval_source(eval_text, collected->evalseq);
+        }
+        collected->saved = true;
+    }
 }
 
 static void
@@ -761,31 +782,37 @@ enter_eval_hook(pTHX_ OP *o)
 
     dMY_CXT;
 
+    if (source_code_kind != ALL_EVALS_ALWAYS && !MY_CXT.enabled)
+        return;
+
     SV *eval_text = cxstack[cxstack_ix].blk_eval.cur_text;
-    MAGIC *marker = source_code_kind == TRACED_EVALS && SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
+    MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
     EvalCollected *collected;
 
-    if (source_code_kind == TRACED_EVALS && !marker) {
+    if (!marker) {
         EvalCollected data;
 
         marker = sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
                              &Devel_StatProfiler_eval_idx_vtbl,
                              (const char *)&data, sizeof(data));
         collected = (EvalCollected *) marker->mg_ptr;
-    } else if (source_code_kind == TRACED_EVALS) {
+    } else {
         collected = (EvalCollected *) marker->mg_ptr;
 
         // this is going to break in case of recursive evals that are
         // eval()ing the same SV. I'm going to ignore the issue.
+        collected->sub_gen = PL_breakable_sub_gen;
         collected->evalseq = PL_evalseq;
         collected->saved = false;
     }
 
     if (source_code_kind == ALL_EVALS_ALWAYS ||
-            (MY_CXT.enabled && source_code_kind == ALL_EVALS)) {
-        TraceFileWriter *trace = MY_CXT.create_trace(aTHX);
-
-        trace->add_eval_source(cxstack[cxstack_ix].blk_eval.cur_text, PL_evalseq);
+            source_code_kind == ALL_EVALS) {
+        // attach magic to PL_beginav, to have write_eval_if_needed()
+        // called at the end of the eval
+        sv_magicext((SV *) PL_beginav, eval_text, PERL_MAGIC_ext,
+                    &Devel_StatProfiler_save_eval_txt_vtbl,
+                    NULL, 0);
     }
 }
 
@@ -1501,3 +1528,11 @@ test_increment_counter(CounterCxt *cxt)
         }
     }
 }
+
+MGVTBL Devel_StatProfiler_save_eval_txt_vtbl = {
+    NULL, // get
+    NULL, // set
+    NULL, // len
+    NULL, // clear
+    write_eval_if_needed, // free
+};

@@ -15,14 +15,15 @@ my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/;
 sub _e { sprintf '(eval %d)', $_[0] }
 
 for (1..4) {
-    eval "take_sample(); take_sample()";
-    eval "Time::HiRes::sleep(0.000002)";
-    eval "Time::HiRes::sleep(0.000002)";
+    eval "take_sample(); take_sample(); sub {}";
+    Time::HiRes::sleep(0.1); # to make "sure" the next eval is not traced
+    eval "1;";
+    eval "Time::HiRes::sleep(0.000002); sub {}";
 }
 
 my $eval_with_hash_line = <<EOT;
 #line 123 "eval string with #line directive"
-1;
+sub {};
 EOT
 
 eval $eval_with_hash_line;
@@ -33,7 +34,7 @@ Devel::StatProfiler::save_source('none');
 my $source = get_sources($profile_file);
 my %count;
 
-cmp_ok(scalar keys %$source, '>=', 12);
+cmp_ok(scalar keys %$source, '>=', 8);
 
 my @strange = grep !/^\(eval \d+\)$/, keys %$source;
 
@@ -43,17 +44,17 @@ diag("Strange eval source '$_'") for @strange;
 $count{$_}++ for values %$source;
 
 is_deeply(\%count, {
-    'Time::HiRes::sleep(0.000002)' => 8,
-    'take_sample(); take_sample()' => 4,
-    $eval_with_hash_line           => 1,
-    'sub f { (caller 0)[1] } f()'  => 1,
+    'Time::HiRes::sleep(0.000002); sub {}' => 4,
+    'take_sample(); take_sample(); sub {}' => 4,
+    $eval_with_hash_line                   => 1,
+    'sub f { (caller 0)[1] } f()'          => 1,
 });
 
 # check source is associated with the correct (eval ...) string
 is($source->{_e($first_eval_n     )}, 'sub f { (caller 0)[1] } f()');
-is($source->{_e($first_eval_n + 10)}, 'take_sample(); take_sample()');
-is($source->{_e($first_eval_n + 11)}, 'Time::HiRes::sleep(0.000002)');
-is($source->{_e($first_eval_n + 12)}, 'Time::HiRes::sleep(0.000002)');
+is($source->{_e($first_eval_n + 10)}, 'take_sample(); take_sample(); sub {}');
+is($source->{_e($first_eval_n + 11)}, undef);
+is($source->{_e($first_eval_n + 12)}, 'Time::HiRes::sleep(0.000002); sub {}');
 is($source->{_e($first_eval_n + 13)}, $eval_with_hash_line);
 
 done_testing();

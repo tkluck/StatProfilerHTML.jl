@@ -9,10 +9,12 @@ namespace devel {
         class TraceFileWriter;
 
         struct EvalCollected {
+            U32 sub_gen;
             U32 evalseq;
             bool saved;
 
             EvalCollected() :
+                sub_gen(PL_breakable_sub_gen),
                 evalseq(PL_evalseq),
                 saved(false)
             { }

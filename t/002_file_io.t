@@ -6,7 +6,7 @@ use Time::HiRes qw(usleep);
 
 my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
-my $src = "# " . ("FILLER " x 100000) . "\n" . "usleep(1000) for 1..10;\n";
+my $src = "# " . ("FILLER " x 100000) . "\n" . "usleep(10000) for 1..5;\n";
 
 use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 'all_evals';
 
