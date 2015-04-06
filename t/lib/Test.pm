@@ -20,6 +20,7 @@ our @EXPORT = (
   @Test::More::EXPORT,
   @Test::Differences::EXPORT,
   qw(
+        get_process_id
         get_samples
         get_sources
         numify
@@ -89,6 +90,13 @@ if ($IS_DISTRIBUTION) {
     require Devel::StatProfiler;
 
     Devel::StatProfiler::Test::test_enable();
+}
+
+sub get_process_id {
+    my ($file) = @_;
+    my $r = Devel::StatProfiler::Reader->new($file);
+
+    return $r->get_genealogy_info->[0];
 }
 
 sub get_samples {

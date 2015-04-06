@@ -414,15 +414,15 @@ sub _merge_sub_entry {
 }
 
 sub map_source {
-    my ($self, $process_id) = @_;
+    my ($self) = @_;
     my $files = $self->{aggregate}{files};
     my $subs = $self->{aggregate}{subs};
     my $flames = $self->{aggregate}{flames};
     my %eval_map;
-    $process_id ||= $self->{process_id};
 
     for my $file (keys %$files) {
-        my $hash = $self->{source}->get_hash_by_name($process_id, $file);
+        next unless $file =~ m{^qeval:([0-9a-f]+)/(.+)$};
+        my $hash = $self->{source}->get_hash_by_name($1, $2);
 
         $eval_map{$file} = "eval:$hash" if $hash;
     }
@@ -877,6 +877,7 @@ sub output {
     my $file_name = sub {
         # Backwards compatibility for releases before 0.21
         return '(unknown)' if $_[0] eq '';
+        return $1 if $_[0] =~ m{qeval:[0-9a-f]+/(.+)$};
 
         for my $dir (@$at_inc) {
             return substr $_[0], length($dir) + 1

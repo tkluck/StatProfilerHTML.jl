@@ -73,9 +73,9 @@ double test_hires_time();
       %code{%
         const Genealogy_t &genealogy_info = THIS->get_genealogy_info();
         AV *res = newAV();
-        av_push(res, newSVpvn((const char *) genealogy_info.id, sizeof(genealogy_info.id)));
+        av_push(res, newSVpvn((const char *) genealogy_info.id, sizeof(genealogy_info.id) - 1));
         av_push(res, newSVuv(genealogy_info.ordinal));
-        av_push(res, newSVpvn((const char *) genealogy_info.parent_id, sizeof(genealogy_info.parent_id)));
+        av_push(res, newSVpvn((const char *) genealogy_info.parent_id, sizeof(genealogy_info.parent_id) - 1));
         av_push(res, newSVuv(genealogy_info.parent_ordinal));
         RETVAL = newRV_noinc((SV *)res);
       %};

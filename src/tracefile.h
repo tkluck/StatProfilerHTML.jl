@@ -30,7 +30,7 @@ namespace devel {
         };
 
         struct Genealogy_t {
-            char id[ID_SIZE * 4 * 2], parent_id[ID_SIZE * 4 * 2];
+            char id[ID_SIZE * 4 * 2 + 1], parent_id[ID_SIZE * 4 * 2 + 1];
             unsigned int ordinal, parent_ordinal;
         };
 

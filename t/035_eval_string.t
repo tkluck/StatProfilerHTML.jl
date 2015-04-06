@@ -36,10 +36,11 @@ eval "take_sample()";
 Devel::StatProfiler::stop_profile();
 
 my @samples = get_samples($profile_file);
+my $process_id = get_process_id($profile_file);
 
 eq_or_diff($samples[0][2], bless {
     line          => 1,
-    file          => "(eval ${\($index + 1)})",
+    file          => "qeval:$process_id/(eval ${\($index + 1)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[0][3], bless {
     line          => $l2 + 1,
@@ -56,18 +57,18 @@ eq_or_diff($samples[0][4], bless {
 eq_or_diff($samples[1][2], bless {
     line          => 2,
     first_line    => 2,
-    file          => "(eval ${\($index + 2)})",
+    file          => "qeval:$process_id/(eval ${\($index + 2)})",
     package       => 'main',
     sub_name      => 'moo',
     fq_sub_name   => 'main::moo',
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($samples[1][3], bless {
     line          => 5,
-    file          => "(eval ${\($index + 2)})",
+    file          => "qeval:$process_id/(eval ${\($index + 2)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[2][2], bless {
     line          => 1,
-    file          => "(eval ${\($index + 3)})",
+    file          => "qeval:$process_id/(eval ${\($index + 3)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 
 done_testing();

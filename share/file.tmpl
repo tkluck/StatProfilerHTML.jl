@@ -49,7 +49,7 @@
               <?= $format_ratio->($site->{exclusive}, $sub->{exclusive}) ?> (ex.),
               <?= $format_ratio->($site->{inclusive}, $sub->{inclusive}) ?> (incl.)
               when called from
-              <?= $lookup_sub->($site->{caller})->{name} ?>
+              <?= $sub_name->($lookup_sub->($site->{caller})->{name}) ?>
               <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?        }
 ?      }
@@ -86,7 +86,7 @@
               <?= $format_ratio->($site->{exclusive}, $sub->{exclusive}) ?> (ex.),
               <?= $format_ratio->($site->{inclusive}, $sub->{inclusive}) ?> (incl.)
               when called from
-              <?= $lookup_sub->($site->{caller})->{name} ?>
+              <?= $sub_name->($lookup_sub->($site->{caller})->{name}) ?>
               <a href="<?= $file_link->($site->{file}, $site->{line}) ?>">line <?= $site->{line} ?></a><br />
 ?    }
             </div>

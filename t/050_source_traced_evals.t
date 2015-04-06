@@ -45,6 +45,7 @@ for my $sample (@samples) {
 
     $file = _e($first_eval_n + 14)
         if $file =~ /eval string with #line directive/;
+    $file = (split /\//, $file)[1] if $file =~ /^qeval:/;
 
     ok(exists $source->{$file}, 'source code is there');
     like($source->{$file}, qr/take_sample/, 'source code is legit');

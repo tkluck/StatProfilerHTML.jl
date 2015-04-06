@@ -403,6 +403,20 @@ namespace {
 
         return fullname;
     }
+
+    SV *make_fullfile(pTHX_ const Genealogy_t &genealogy, SV *file) {
+        STRLEN len = SvCUR(file);
+
+        if (len >= 8) { // sizeof("(eval 1)") - 1
+            char *s = SvPVX(file);
+
+            if (s[len - 1] == ')' && strncmp(s, "(eval ", 6) == 0) {
+                return newSVpvf("qeval:%s/%"SVf, genealogy.id, file);
+            }
+        }
+
+        return SvREFCNT_inc(file);
+    }
 }
 
 
@@ -502,6 +516,7 @@ void TraceFileReader::read_header()
             for (int i = 0; i < ID_SIZE; ++i)
                 append_hex(genealogy_info.parent_id + i * 8, temp[i]);
 
+            genealogy_info.id[ID_SIZE * 4 * 2] = genealogy_info.parent_id[ID_SIZE * 4 * 2] = 0;
             break;
         }
         case TAG_CUSTOM_META:
@@ -581,7 +596,7 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
             hv_stores(frame, "sub_name", SvREFCNT_inc(name));
-            hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "file", make_fullfile(aTHX_ genealogy_info, file));
             hv_stores(frame, "line", newSViv(line));
             hv_stores(frame, "first_line", newSViv(first_line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
@@ -612,7 +627,7 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             HV *frame = newHV();
 
-            hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "file", make_fullfile(aTHX_ genealogy_info, file));
             hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), esf_stash));
 

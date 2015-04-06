@@ -44,8 +44,11 @@ is(@samples, 8);
 cmp_ok(scalar keys %$source, '>=', 8);
 
 for my $sample (@samples) {
-    ok(exists $source->{$sample->[2]->file}, 'source code is there');
-    like($source->{$sample->[2]->file}, qr/take_sample/, 'source code is legit');
+    my $file = $sample->[2]->file;
+    $file = (split /\//, $file)[1] if $file =~ /^qeval:/;
+
+    ok(exists $source->{$file}, 'source code is there');
+    like($source->{$file}, qr/take_sample/, 'source code is legit');
 }
 
 my @strange = grep !/^\(eval \d+\)$/, keys %$source;
