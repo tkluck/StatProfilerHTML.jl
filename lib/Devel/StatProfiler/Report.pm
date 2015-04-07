@@ -833,6 +833,67 @@ sub _format_ratio {
     }
 }
 
+sub render_flamegraphs {
+    my ($self, $attributes, $directory, $compress) = @_;
+    my $clickable_flames = "clickable_stacks_by_time.svg";
+    my $zoomable_flames = "zoomable_stacks_by_time.svg";
+
+    my $flames = $self->{aggregate}{flames};
+    my $calls_data = File::Spec::Functions::catfile($directory, 'all_stacks_by_time.calls');
+    my $clickable_svg = File::Spec::Functions::catfile($directory, $clickable_flames);
+    my $zoomable_svg = File::Spec::Functions::catfile($directory, $zoomable_flames);
+    my $clickable_nameattr = File::Spec::Functions::catfile($directory, 'clickable_stacks.attrs');
+    my $zoomable_nameattr = File::Spec::Functions::catfile($directory, 'zoomable_stacks.attrs');
+
+    open my $calls_fh, '>', $calls_data;
+    for my $key (keys %$flames) {
+        print $calls_fh $key, ' ', $flames->{$key}, "\n";
+    }
+    close $calls_fh;
+
+    open my $cattrs_fh, '>', $clickable_nameattr;
+    for my $sub (keys %$attributes) {
+        my $attrs = $attributes->{$sub};
+
+        print $cattrs_fh join(
+            "\t",
+            $sub,
+            map("$_=$attrs->{$_}", keys %$attrs),
+        ), "\n";
+    }
+    close $cattrs_fh;
+
+    open my $zattrs_fh, '>', $zoomable_nameattr;
+    for my $sub (keys %$attributes) {
+        my $attrs = $attributes->{$sub};
+
+        print $zattrs_fh join(
+            "\t",
+            $sub,
+            map("$_=$attrs->{$_}", grep $_ ne 'href', keys %$attrs),
+        ), "\n";
+    }
+    close $zattrs_fh;
+
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$clickable_nameattr --hash --title=\"Flame Graph\" $calls_data > $clickable_svg") == 0
+        or die "Generating $clickable_svg failed\n";
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$zoomable_nameattr --hash --title=\"Zoomable Flame Graph\" $calls_data > $zoomable_svg") == 0
+        or die "Generating $zoomable_svg failed\n";
+
+    if ($compress) {
+        $self->_compress_inplace($calls_data);
+        $self->_compress_inplace($clickable_nameattr);
+        $self->_compress_inplace($zoomable_nameattr);
+        $self->_compress_inplace($clickable_svg);
+        $self->_compress_inplace($zoomable_svg);
+    }
+
+    return {
+        clickable   => $clickable_flames,
+        zoomable    => $zoomable_flames,
+    };
+}
+
 sub output {
     my ($self, $directory, $compress) = @_;
     my @diagnostics;
@@ -1075,40 +1136,17 @@ sub output {
     }
 
     # format flame graph
-    my $flamegraph_link;
+    my $flamegraphs;
     if ($self->{flamegraph} && %{$self->{aggregate}{flames}}) {
-        $flamegraph_link = 'all_stacks_by_time.svg';
+        my %attributes;
 
-        my $flames = $self->{aggregate}{flames};
-        my $calls_data = File::Spec::Functions::catfile($directory, 'all_stacks_by_time.calls');
-        my $calls_svg = File::Spec::Functions::catfile($directory, $flamegraph_link);
-        my $nameattr = File::Spec::Functions::catfile($directory, 'all_stacks.attrs');
-
-        open my $calls_fh, '>', $calls_data;
-        for my $key (keys %$flames) {
-            print $calls_fh $key, ' ', $flames->{$key}, "\n";
+        for my $sub (values %{$self->{aggregate}{subs}}) {
+            $attributes{$sub->{uq_name}} = {
+                href        => $sub_link->($sub),
+                function    => $sub_name->($sub->{name}),
+            };
         }
-        close $calls_fh;
-
-        open my $attrs_fh, '>', $nameattr;
-        for my $sub (@subs) {
-            print $attrs_fh join(
-                "\t",
-                $sub->{uq_name},
-                "href=" . $sub_link->($sub),
-                "function=" . $sub_name->($sub->{name}),
-            ), "\n";
-        }
-        close $attrs_fh;
-
-        system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$nameattr $calls_data > $calls_svg") == 0
-            or die "Generating $calls_svg failed\n";
-
-        if ($compress) {
-            $self->_compress_inplace($calls_data);
-            $self->_compress_inplace($nameattr);
-            $self->_compress_inplace($calls_svg);
-        }
+        $flamegraphs = $self->render_flamegraphs(\%attributes, $directory, $compress);
     }
 
     # format subs page
@@ -1142,7 +1180,8 @@ sub output {
         date                => $date,
         files               => \@files,
         subs                => \@subs,
-        flamegraph          => $flamegraph_link,
+        clickable_flamegraph=> $flamegraphs->{clickable},
+        zoomable_flamegraph => $flamegraphs->{zoomable},
         sub_link            => $sub_link,
         sub_name            => $sub_name,
         file_name           => $file_name,
