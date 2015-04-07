@@ -10,7 +10,7 @@ my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
 my $output_dir = File::Spec->catdir(File::Basename::dirname($profile_file), 'report');
 
-use Devel::StatProfiler -file => $profile_file, -interval => 1000;
+use Devel::StatProfiler -file => $profile_file, -interval => 1000, -source => 'traced_evals';
 
 use Test::Begin;
 
