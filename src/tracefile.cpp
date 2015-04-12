@@ -562,8 +562,12 @@ SV *TraceFileReader::read_trace()
     for (;;) {
         int type = in.read_byte();
 
-        if (type == EOF)
+        if (type == EOF) {
+            // treat truncated files as the end of a stream
+            if (!file_ended)
+                file_ended = stream_ended = true;
             return newSV(0);
+        }
 
         int size = read_varint(in);
         switch (type) {
