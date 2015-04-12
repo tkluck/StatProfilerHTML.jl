@@ -323,7 +323,7 @@ sub _map_hash_rx {
             $new_key = $subst->($key);
         }
 
-        if ($new_key) {
+        if ($new_key && $new_key ne $key) {
             if (!exists $hash->{$new_key}) {
                 $hash->{$new_key} = delete $hash->{$key};
             } elsif ($merge) {
@@ -413,47 +413,59 @@ sub _merge_sub_entry {
     }
 }
 
-sub map_source {
-    my ($self) = @_;
+sub remap_names {
+    my ($self, $exact, $prefixes) = @_;
+    return unless ($exact && %$exact) || ($prefixes && %$prefixes);
+
     my $files = $self->{aggregate}{files};
     my $subs = $self->{aggregate}{subs};
     my $flames = $self->{aggregate}{flames};
+
+    my @exact = sort { length($b) <=> length($a) } keys %$exact;
+    my @prefixes = sort { length($b) <=> length($a) } keys %$prefixes;
+
+    my $file_map_rx = '(^|:|;)(?:' . join('|',
+        # ((?!.)) never matches, it's there to preserve capture count
+        (@exact ? '(' . join('|', map "\Q$_\E", @exact) . ')' : '((?!.))'),
+        (@prefixes ? '(?:(' . join('|', map "\Q$_\E", @prefixes) . ')[^:;]+)' : '((?!.))'),
+    ) . ')(:|;|$)';
+    my $file_map_qr = qr/$file_map_rx/;
+    my $file_repl_sub = sub {
+        $_[0] =~ s{$file_map_qr}
+                  {$1 . ($2 ? $exact->{$2} : $prefixes->{$3} ) . $4}gre
+    };
+
+    _map_hash_rx($files, $file_map_qr, $file_repl_sub, $exact, \&_merge_file_entry);
+    _map_hash_rx($subs, $file_map_qr, $file_repl_sub, $exact, \&_merge_sub_entry);
+
+    for my $sub (values %$subs) {
+        _map_hash_rx($sub->{call_sites}, $file_map_qr, $file_repl_sub, $exact, \&_merge_call_sites);
+
+        for my $by_line (values %{$sub->{callees}}) {
+            _map_hash_rx($by_line, $file_map_qr, $file_repl_sub, $exact, \&_merge_callees);
+        }
+    }
+
+    for my $file (values %$files) {
+        _map_hash_rx($_, $file_map_qr, $file_repl_sub, $exact, sub {})
+            for values %{$file->{subs}};
+    }
+
+    _map_hash_rx($flames, $file_map_qr, $file_repl_sub, $exact, \&_merge_file_map_entry);
+}
+
+sub map_source {
+    my ($self) = @_;
     my %eval_map;
 
-    for my $file (keys %$files) {
+    for my $file (keys %{$self->{aggregate}{files}}) {
         next unless $file =~ m{^qeval:([0-9a-f]+)/(.+)$};
         my $hash = $self->{source}->get_hash_by_name($1, $2);
 
         $eval_map{$file} = "eval:$hash" if $hash;
     }
 
-    my @eval_map = sort { length($b) <=> length($a) } keys %eval_map;
-
-    return unless @eval_map;
-
-    my $file_map_rx = '(^|:|;)(' . join('|', map "\Q$_\E", @eval_map) . ')(:|;|$)';
-    my $file_map_qr = qr/$file_map_rx/;
-    my $file_repl_sub = sub {
-        $_[0] =~ s/$file_map_qr/$1$eval_map{$2}$3/gr
-    };
-
-    _map_hash_rx($files, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_entry);
-    _map_hash_rx($subs, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_sub_entry);
-
-    for my $sub (values %$subs) {
-        _map_hash_rx($sub->{call_sites}, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_call_sites);
-
-        for my $by_line (values %{$sub->{callees}}) {
-            _map_hash_rx($by_line, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_callees);
-        }
-    }
-
-    for my $file (values %$files) {
-        _map_hash_rx($_, $file_map_qr, $file_repl_sub, \%eval_map, sub {})
-            for values %{$file->{subs}};
-    }
-
-    _map_hash_rx($flames, $file_map_qr, $file_repl_sub, \%eval_map, \&_merge_file_map_entry);
+    $self->remap_names(\%eval_map);
 }
 
 sub merge {

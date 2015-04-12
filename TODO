@@ -29,6 +29,9 @@
   all evals)
 - try to detect when an eval did not add any sub/sample, and drop it
   during aggregation
+- subs with same optree and different name via Sub::Name are not aggregated;
+  this is a sensible default, but having some way of detect the situation
+  might be nice (CvROOT() might be a starting point)
 
 - detect multiple evals with the same #line directive and different source code
 - closure aggregation
