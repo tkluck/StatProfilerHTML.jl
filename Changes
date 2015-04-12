@@ -2,6 +2,17 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.24      2015-04-12 23:43:40 CEST
+
+    - Generate a zoomable flame graph in addition to the normal one
+    - Add ad-hoc sub mapping (to uniquify subs that are logically the same but
+      have been given different names with Sub::Name for debugging purposes)
+    - Always save evals as "(eval <seq>)" (it was mostly the case already)
+    - Do not save eval text for evals that can never be traced
+    - Treat unterminated files as the last of a stream when doing aggregation
+    - Upgraded flamegraph.pl to the latest version
+    - Misc optimizations for large process trees
+
 0.23      2015-03-29 16:01:23 CEST
 
     - Fixed bug in repeated report merged
