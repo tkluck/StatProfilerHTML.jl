@@ -66,6 +66,8 @@
     inactive time
 - upgrade flamegraph script to the latest version, and submit changes
   upstream
+- test for 372d862d8bd6e5e46b0e08c8ad59aab9837f48b3, and aggregation is still
+  generating way too many "Unable to find reverse file for '$file'" for evals
 
 - sporadic t/032_xsubs.t failure:
   "Invalid input file: Found stray sub-frame tag without sample-start tag"
