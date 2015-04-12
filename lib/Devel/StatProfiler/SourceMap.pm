@@ -149,6 +149,8 @@ sub get_mapping {
 sub get_reverse_mapping {
     my ($self, $file) = @_;
 
+    $file = $2 if $file =~ m{^qeval:([0-9a-f]+)/(.+)$};
+
     return unless $self->{reverse_map}{$file};
     return (keys %{$self->{reverse_map}{$file}})[0];
 }
