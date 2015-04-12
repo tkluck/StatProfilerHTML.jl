@@ -11,17 +11,19 @@ BEGIN { ($profile_dir, $template) = temp_profile_dir(); }
 
 use Devel::StatProfiler -template => $template, -interval => 1000, -source => 'all_evals';
 
-eval "sub { 1 } # in parent process"; # N
+# uses named subs to avoid a segfault in Perl 5.20.1
+# (and maybe other versions)
+eval "sub a { 1 } # in parent process"; # N
 
 spawn(sub {
-    eval "sub { 1 } # in child before spawn"; # N + 1
+    eval "sub b { 1 } # in child before spawn"; # N + 1
 
     spawn(sub {
-        eval "sub { 1 } # in grandchild"; # N + 2
+        eval "sub c { 1 } # in grandchild"; # N + 2
     })->join;
 
     eval "sub {}";
-    eval "sub { 1 } # in child, after spawn"; # N + 3
+    eval "sub d { 1 } # in child, after spawn"; # N + 3
 })->join;
 
 eval "sub {}"; eval "sub {}";
@@ -94,7 +96,7 @@ sub _e { sprintf '(eval %d)', $_[0] }
 for my $rs ($rs1, $rs2, $rs3) {
     # same process
     is($rs->get_source_by_name($parent_id, _e($first_eval_n)),
-       'sub { 1 } # in parent process', 'direct hit');
+       'sub a { 1 } # in parent process', 'direct hit');
     is($rs->get_source_by_name($parent_id, _e($first_eval_n + 1)),
        'sub {}', 'direct hit, empty source');
     is($rs->get_source_by_name($parent_id, _e($first_eval_n + 2)),
@@ -102,11 +104,11 @@ for my $rs ($rs1, $rs2, $rs3) {
     is($rs->get_source_by_name($parent_id, _e($first_eval_n + 3)),
        'sub { 1 } # in parent, after spawn', 'direct hit');
     is($rs->get_source_by_name($parent_id, _e($first_eval_n)),
-       'sub { 1 } # in parent process', 'same process, subsequent ordinal');
+       'sub a { 1 } # in parent process', 'same process, subsequent ordinal');
     is($rs->get_source_by_name($child_id, _e($first_eval_n + 3)),
-       'sub { 1 } # in child, after spawn', 'same process, subsequent ordinal');
+       'sub d { 1 } # in child, after spawn', 'same process, subsequent ordinal');
     is($rs->get_source_by_name($grandchild_id, _e($first_eval_n + 2)),
-       'sub { 1 } # in grandchild', 'same process, subsequent ordinal');
+       'sub c { 1 } # in grandchild', 'same process, subsequent ordinal');
 
     # same process but previous ordinal
     is($rs->get_source_by_name($parent_id, _e($first_eval_n + 4)),
@@ -114,9 +116,9 @@ for my $rs ($rs1, $rs2, $rs3) {
 
     # follow genealogy, found in ancestor
     is($rs->get_source_by_name($child_id, _e($first_eval_n)),
-       'sub { 1 } # in parent process', 'parent process');
+       'sub a { 1 } # in parent process', 'parent process');
     is($rs->get_source_by_name($grandchild_id, _e($first_eval_n)),
-       'sub { 1 } # in parent process', 'grandparent process');
+       'sub a { 1 } # in parent process', 'grandparent process');
 
     # in ancestor, but after spawn point
     is($rs->get_source_by_name($child_id, _e($first_eval_n + 4)),
