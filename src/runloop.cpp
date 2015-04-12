@@ -790,7 +790,7 @@ enter_eval_hook(pTHX_ OP *o)
     EvalCollected *collected;
 
     if (!marker) {
-        EvalCollected data(aTHX);
+        EvalCollected data(PL_breakable_sub_gen, PL_evalseq);
 
         marker = sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
                              &Devel_StatProfiler_eval_idx_vtbl,
