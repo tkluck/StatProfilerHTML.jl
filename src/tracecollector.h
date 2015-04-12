@@ -13,7 +13,7 @@ namespace devel {
             U32 evalseq;
             bool saved;
 
-            EvalCollected() :
+            EvalCollected(pTHX) :
                 sub_gen(PL_breakable_sub_gen),
                 evalseq(PL_evalseq),
                 saved(false)
