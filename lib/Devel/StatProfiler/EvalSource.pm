@@ -97,10 +97,10 @@ sub _pack_data {
 }
 
 sub _save {
-    my ($self, $is_part) = @_;
-    my $state_dir = state_dir($self, $is_part);
+    my ($self, $state_dir, $is_part) = @_;
     my $source_dir = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
 
+    $state_dir //= state_dir($self);
     File::Path::mkpath([$state_dir, $source_dir]);
 
     $self->_pack_data;
@@ -122,8 +122,8 @@ sub _save {
     }
 }
 
-sub save_part { $_[0]->_save(1) }
-sub save_merged { $_[0]->_save(0) }
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_merged { $_[0]->_save(undef, 0) }
 
 sub _merge_source {
     my ($self, $all) = @_;

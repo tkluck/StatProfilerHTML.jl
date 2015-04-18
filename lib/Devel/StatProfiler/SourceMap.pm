@@ -115,16 +115,16 @@ sub add_sources_from_reader {
 }
 
 sub _save {
-    my ($self, $is_part) = @_;
-    my $state_dir = state_dir($self, $is_part);
+    my ($self, $state_dir, $is_part) = @_;
 
+    $state_dir //= state_dir($self);
     File::Path::mkpath($state_dir);
 
     write_data_any($is_part, $self, $state_dir, 'sourcemap', $self->{map});
 }
 
-sub save_part { $_[0]->_save(1) }
-sub save_merged { $_[0]->_save(0) }
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_merged { $_[0]->_save(undef, 0) }
 
 sub load_and_merge {
     my ($self, $file) = @_;

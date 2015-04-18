@@ -85,8 +85,9 @@ $_->add_metadata({release => '1.3'}) for $main1, $content1, $list1;
 $_->add_metadata({tag => 'test-1.3'}) for $main1, $content1, $list1;
 
 my $a1 = TestAggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    shard          => 'shard1',
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
+    shard           => 'shard1',
 );
 $a1->add_global_metadata({tag => 'test-1.3'});
 for my $file (@files) {
@@ -108,8 +109,9 @@ for my $file (@files) {
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
         my $a = TestAggregator->new(
-            root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-            shard          => 'shard1',
+            root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+            parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+            shard           => 'shard1',
         );
         $a->add_global_metadata({tag => 'test-1.3'});
         $a->load;
@@ -119,8 +121,9 @@ for my $file (@files) {
     }
 }
 my $a2 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    shard          => 'shard1',
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+    shard           => 'shard1',
 );
 my ($main3, $content3, $list3) = map $a2->merge_report($_, 'with_metadata'), qw(
     __main__ content list

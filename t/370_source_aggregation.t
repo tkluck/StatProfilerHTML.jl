@@ -40,17 +40,19 @@ my $r1 = Devel::StatProfiler::Report->new(
 $r1->add_trace_file($_) for @files;
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    shard          => 'shard1',
-    mixed_process  => 1,
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
+    shard           => 'shard1',
+    mixed_process   => 1,
 );
 $a1->process_trace_files(@files);
 $a1->save_part;
 my $r2 = $a1->merge_report('__main__', 'with_metadata');
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    shard          => 'shard1',
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
+    shard           => 'shard1',
 );
 my $r3 = $a2->merge_report('__main__', 'with_metadata');
 

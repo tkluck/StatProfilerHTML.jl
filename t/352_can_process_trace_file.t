@@ -25,9 +25,10 @@ my @files = glob "$template.*";
 my $process_id;
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    shard          => 'shard1',
-    slowops        => [qw(ftdir unstack)],
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
 );
 for my $file (@files) {
     die "can_process_trace_file() incorrectly returned false"
@@ -40,9 +41,10 @@ $a1->save_part;
 my $r1 = $a1->merge_report('__main__');
 
 my $a2 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    shard          => 'shard1',
-    slowops        => [qw(ftdir unstack)],
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
 );
 for my $file (@files) {
     die "can_process_trace_file() incorrectly returned false"

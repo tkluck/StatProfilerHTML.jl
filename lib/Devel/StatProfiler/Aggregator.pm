@@ -40,6 +40,7 @@ sub new {
     my $genealogy = {};
     my $self = bless {
         root_dir     => $opts{root_directory},
+        parts_dir    => $opts{parts_directory} // $opts{root_directory},
         shard        => $opts{shard},
         shards       => $opts{shards},
         slowops      => $opts{slowops},
@@ -183,13 +184,13 @@ sub save_part {
         }
     }
 
-    $self->{metadata}->save_part;
-    $self->{source}->save_part;
-    $self->{sourcemap}->save_part;
+    $self->{metadata}->save_part($parts_dir);
+    $self->{source}->save_part($parts_dir);
+    $self->{sourcemap}->save_part($parts_dir);
 
     for my $key (keys %{$self->{reports}}) {
         my $report_dir = File::Spec::Functions::catdir(
-            $self->{root_dir}, $key, 'parts',
+            $self->{parts_dir}, $key, 'parts',
         );
         # writes some genealogy and source data twice, but it's OK for now
         $self->{reports}{$key}->save_part($report_dir);
@@ -381,8 +382,8 @@ sub merge_report {
 
     $self->_load_all_metadata('parts') if $with_metadata;
 
-    my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
-    my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{root_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
+    my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
+    my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
     my $report_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
     my $metadata_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$self->{shard}");
 
@@ -511,7 +512,7 @@ sub report_names {
 sub add_report_metadata {
     my ($self, $report_id, $metadata) = @_;
 
-    my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id, 'parts');
+    my $report_dir = File::Spec::Functions::catdir($self->{parts_dir}, $report_id, 'parts');
     my $report_metadata = Devel::StatProfiler::Metadata->new(
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},

@@ -50,8 +50,8 @@ sub _save {
 
 sub save_report_part { $_[0]->_save($_[1], 1) }
 sub save_report_merged { $_[0]->_save($_[1], 0) }
-sub save_part { $_[0]->_save(undef, 1) }
-sub save_merged { $_[0]->_save(undef, 0) }
+sub save_part { $_[0]->_save($_[1], 1) }
+sub save_merged { $_[0]->_save($_[1], 0) }
 
 sub load_and_merge {
     my ($self, $file) = @_;

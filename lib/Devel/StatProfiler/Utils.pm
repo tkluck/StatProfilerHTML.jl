@@ -33,7 +33,11 @@ sub state_dir {
     die ref($obj), " passed to state_dir() is missing the root_dir attribute"
         unless $obj->{root_dir};
 
-    File::Spec::Functions::catdir($obj->{root_dir}, '__state__', ('parts') x !!$is_part);
+    if ($is_part) {
+        File::Spec::Functions::catdir($obj->{parts_dir} // $obj->{root_dir}, '__state__', 'parts');
+    } else {
+        File::Spec::Functions::catdir($obj->{root_dir}, '__state__');
+    }
 }
 
 sub _state_file {
@@ -42,7 +46,11 @@ sub _state_file {
     die ref($obj), " passed to state_file() is missing the root_dir attribute"
         unless $obj->{root_dir};
 
-    File::Spec::Functions::catfile($obj->{root_dir}, '__state__', ('parts') x !!$is_part, $file);
+    if ($is_part) {
+        File::Spec::Functions::catfile($obj->{parts_dir} // $obj->{root_dir}, '__state__', 'parts', $file);
+    } else {
+        File::Spec::Functions::catfile($obj->{root_dir}, '__state__', $file);
+    }
 }
 
 sub state_file {
@@ -54,7 +62,11 @@ sub state_file {
         unless $obj->{shard};
 
     my $file_base = $file =~ s/\.\*$// ? "$file.$obj->{shard}.*" : "$file.$obj->{shard}";
-    File::Spec::Functions::catfile($obj->{root_dir}, '__state__', ('parts') x !!$is_part, $file_base);
+    if ($is_part) {
+        File::Spec::Functions::catfile($obj->{parts_dir} // $obj->{root_dir}, '__state__', 'parts', $file_base);
+    } else {
+        File::Spec::Functions::catfile($obj->{root_dir}, '__state__', $file_base);
+    }
 }
 
 sub check_serializer {

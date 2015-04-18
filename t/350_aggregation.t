@@ -30,9 +30,10 @@ my $r1 = Devel::StatProfiler::Report->new(
 $r1->add_trace_file($_) for @files;
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    shard          => 'shard1',
-    slowops        => [qw(ftdir unstack)],
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
 );
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
@@ -51,9 +52,10 @@ for my $file (@files) {
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
         my $a = Devel::StatProfiler::Aggregator->new(
-            root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-            shard          => 'shard1',
-            slowops        => [qw(ftdir unstack)],
+            root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+            parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+            shard           => 'shard1',
+            slowops         => [qw(ftdir unstack)],
         );
         $a->process_trace_files($sr);
         $a->save_part;
@@ -62,17 +64,19 @@ for my $file (@files) {
     }
 }
 my $a2 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    shard          => 'shard1',
-    slowops        => [qw(ftdir unstack)],
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
 );
 $a2->merge_metadata;
 my $r3 = $a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
-    root_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    shards         => ['shard1'],
-    slowops        => [qw(ftdir unstack)],
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
+    shards          => ['shard1'],
+    slowops         => [qw(ftdir unstack)],
 );
 my $r4 = $a3->merged_report('__main__', 'map_source');
 
