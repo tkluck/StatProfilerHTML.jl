@@ -170,8 +170,10 @@ sub save_part {
     my $parts_dir = state_dir($self, 1);
     File::Path::mkpath([$state_dir, $parts_dir]);
 
-    write_data_part($self, $parts_dir, 'genealogy', $self->{genealogy});
-    write_data_part($self, $parts_dir, 'last_sample', $self->{last_sample});
+    write_data_part($self, $parts_dir, 'genealogy', $self->{genealogy})
+        if %{$self->{genealogy}};
+    write_data_part($self, $parts_dir, 'last_sample', $self->{last_sample})
+        if %{$self->{last_sample}};
 
     for my $process_id (keys %{$self->{processed}}) {
         my $processed = $self->{processed}{$process_id};

@@ -45,7 +45,8 @@ sub _save {
     $dir //= state_dir($self, $is_part);
     File::Path::mkpath([$dir]);
 
-    write_data_any($is_part, $self, $dir, 'metadata', $self->{metadata});
+    write_data_any($is_part, $self, $dir, 'metadata', $self->{metadata})
+        if %{$self->{metadata}};
 }
 
 sub save_report_part { $_[0]->_save($_[1], 1) }

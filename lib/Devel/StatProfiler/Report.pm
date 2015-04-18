@@ -606,7 +606,8 @@ sub _save {
 
     # the merged metadata is saved separately
     if ($is_part) {
-        write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy});
+        write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy})
+            if %{$self->{genealogy}};
         $self->{metadata}->save_report_part($report_dir);
         $self->{source}->save_part if $self->{source};
     } else {

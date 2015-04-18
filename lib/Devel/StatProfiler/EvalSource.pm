@@ -106,7 +106,8 @@ sub _save {
     $self->_pack_data;
 
     # $self->{seen_in_process} can be reconstructed fomr $self->{all}
-    write_data_any($is_part, $self, $state_dir, 'source', $self->{all});
+    write_data_any($is_part, $self, $state_dir, 'source', $self->{all})
+        if %{$self->{all}};
 
     for my $hash (keys %{$self->{hashed}}) {
         my $unpacked = unpack "H*", $hash;
