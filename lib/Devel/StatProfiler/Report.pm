@@ -421,18 +421,25 @@ sub remap_names {
     my $subs = $self->{aggregate}{subs};
     my $flames = $self->{aggregate}{flames};
 
-    my @exact = sort { length($b) <=> length($a) } keys %$exact;
+    my @exact = sort { length($b) <=> length($a) }
+                grep !/^qeval:/,
+                     keys %$exact;
     my @prefixes = sort { length($b) <=> length($a) } keys %$prefixes;
 
     my $file_map_rx = '(^|:|;)(?:' . join('|',
         # ((?!.)) never matches, it's there to preserve capture count
+        '(qeval:[0-9a-f]+/\(eval [0-9]+\))',
         (@exact ? '(' . join('|', map "\Q$_\E", @exact) . ')' : '((?!.))'),
         (@prefixes ? '(?:(' . join('|', map "\Q$_\E", @prefixes) . ')[^:;]+)' : '((?!.))'),
     ) . ')(:|;|$)';
     my $file_map_qr = qr/$file_map_rx/;
     my $file_repl_sub = sub {
         $_[0] =~ s{$file_map_qr}
-                  {$1 . ($2 ? $exact->{$2} : $prefixes->{$3} ) . $4}gre
+                  {$1 . (
+                      $2 ? ($exact->{$2} // $2) :
+                      $3 ? $exact->{$3} :
+                           $prefixes->{$4}
+                   ) . $5}gre
     };
 
     _map_hash_rx($files, $file_map_qr, $file_repl_sub, $exact, \&_merge_file_entry);
