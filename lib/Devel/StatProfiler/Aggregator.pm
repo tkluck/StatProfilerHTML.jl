@@ -294,9 +294,7 @@ sub _load_metadata {
     );
     my ($metadata_parts, $metadata_merged) = _all_data_files($self, $parts, 'metadata');
 
-    $metadata->load_and_merge($_)
-        for @$metadata_merged, @$metadata_parts;
-
+    $metadata->load_and_merge(@$metadata_merged, @$metadata_parts);
     push @{$self->{parts}}, @$metadata_parts;
 }
 
@@ -330,9 +328,7 @@ sub _load_source {
     );
     my ($source_parts, $source_merged) = _all_data_files($self, $parts, 'source');
 
-    $source->load_and_merge($_)
-        for @$source_merged, @$source_parts;
-
+    $source->load_and_merge(@$source_merged, @$source_parts);
     push @{$self->{parts}}, @$source_parts;
 }
 
@@ -345,9 +341,7 @@ sub _load_sourcemap {
     );
     my ($sourcemap_parts, $sourcemap_merged) = _all_data_files($self, $parts, 'sourcemap');
 
-    $sourcemap->load_and_merge($_)
-        for @$sourcemap_merged, @$sourcemap_parts;
-
+    $sourcemap->load_and_merge(@$sourcemap_merged, @$sourcemap_parts);
     push @{$self->{parts}}, @$sourcemap_parts;
 }
 

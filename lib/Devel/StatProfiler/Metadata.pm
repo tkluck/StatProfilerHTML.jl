@@ -55,12 +55,12 @@ sub save_part { $_[0]->_save($_[1], 1) }
 sub save_merged { $_[0]->_save($_[1], 0) }
 
 sub load_and_merge {
-    my ($self, $file) = @_;
+    my ($self, @files) = @_;
 
     $self->{metadata} = {
         %{$self->{metadata}},
-        %{read_data($self->{serializer}, $file)},
-    };
+        %{read_data($self->{serializer}, $_)},
+    } for @files;
 }
 
 sub merge {

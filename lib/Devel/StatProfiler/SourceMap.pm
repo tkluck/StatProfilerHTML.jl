@@ -128,6 +128,12 @@ sub save_part { $_[0]->_save($_[1], 1) }
 sub save_merged { $_[0]->_save(undef, 0) }
 
 sub load_and_merge {
+    my ($self, @files) = @_;
+
+    $self->_load_and_merge($_) for @files;
+}
+
+sub _load_and_merge {
     my ($self, $file) = @_;
     my $data = read_data($self->{serializer}, $file);
 

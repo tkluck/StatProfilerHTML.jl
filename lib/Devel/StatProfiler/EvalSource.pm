@@ -205,14 +205,15 @@ sub _merge_source {
             }
         }
     }
-
-    $self->_pack_data;
 }
 
 sub load_and_merge {
-    my ($self, $file) = @_;
+    my ($self, @files) = @_;
 
-    $self->_merge_source(read_data($self->{serializer}, $file));
+    $self->_merge_source(read_data($self->{serializer}, $_))
+        for @files;
+
+    $self->_pack_data;
 }
 
 sub _get_source_by_hash {
