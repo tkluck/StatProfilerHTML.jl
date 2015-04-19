@@ -113,7 +113,7 @@ namespace {
         pid_t pid, tid;
         TraceFileWriter *trace;
         HV *sections;
-        bool restore_sections;
+        bool restore_sections, id_written;
 
         Cxt();
         Cxt(const Cxt &cxt);
@@ -251,6 +251,7 @@ Cxt::Cxt() :
     tid(new_thread_id()),
     sections(NULL),
     restore_sections(false),
+    id_written(false),
     trace(NULL)
 {
     dTHX;
@@ -276,6 +277,7 @@ Cxt::Cxt(const Cxt &cxt) :
     tid(new_thread_id()),
     sections(NULL),
     restore_sections(true),
+    id_written(false),
     trace(NULL)
 {
     dTHX;
@@ -304,8 +306,11 @@ Cxt::~Cxt() {
 void
 Cxt::restart()
 {
-    parent_ordinal = ordinal;
-    memcpy(parent_id, id, sizeof(id));
+    if (id_written) {
+        parent_ordinal = ordinal;
+        memcpy(parent_id, id, sizeof(id));
+        id_written = false;
+    }
 
     ordinal = 0;
     new_id();
@@ -324,6 +329,7 @@ Cxt::create_trace(pTHX)
         if (trace->is_valid()) {
             trace->write_header(sampling_interval, stack_collect_depth,
                                 id, ordinal, parent_id, parent_ordinal);
+            id_written = true;
 
             if (restore_sections) {
                 restore_sections = false;
@@ -409,8 +415,11 @@ Cxt::new_id()
 void
 Cxt::pid_changed()
 {
-    memcpy(parent_id, id, sizeof(parent_id));
-    parent_ordinal = ordinal;
+    if (id_written) {
+        memcpy(parent_id, id, sizeof(parent_id));
+        parent_ordinal = ordinal;
+        id_written = false;
+    }
 
     pid = getpid();
     tid = new_thread_id();
@@ -441,6 +450,8 @@ reopen_output_file(pTHX_ pMY_CXT)
                        MY_CXT.id, MY_CXT.ordinal);
     MY_CXT.trace->write_header(sampling_interval, stack_collect_depth,
                                MY_CXT.id, MY_CXT.ordinal, MY_CXT.parent_id, MY_CXT.parent_ordinal);
+    MY_CXT.id_written = true;
+
     // XXX check if we need to write other metadata
 }
 
