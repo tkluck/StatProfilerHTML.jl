@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.25      2015-04-19 19:28:05 CEST
+
+    - Preserve parent-child relationship when forking with profiling disabled
+    - Various performance improvements for aggregation/report generation
+
 0.24      2015-04-12 23:43:40 CEST
 
     - Generate a zoomable flame graph in addition to the normal one
