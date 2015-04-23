@@ -100,7 +100,7 @@ for my $file (@files) {
     }
 }
 $a1->save_part;
-my ($main2, $content2, $list2) = map $a1->merge_report($_, 'with_metadata'), qw(
+my ($main2, $content2, $list2) = map $a1->merge_report($_, with_metadata => 1), qw(
     __main__ content list
 );
 
@@ -125,7 +125,7 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
     parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
     shard           => 'shard1',
 );
-my ($main3, $content3, $list3) = map $a2->merge_report($_, 'with_metadata'), qw(
+my ($main3, $content3, $list3) = map $a2->merge_report($_, with_metadata => 1), qw(
     __main__ content list
 );
 

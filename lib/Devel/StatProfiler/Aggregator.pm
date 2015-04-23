@@ -374,9 +374,9 @@ sub merge_metadata {
 }
 
 sub merge_report {
-    my ($self, $report_id, $with_metadata) = @_;
+    my ($self, $report_id, %args) = @_;
 
-    $self->_load_all_metadata('parts') if $with_metadata;
+    $self->_load_all_metadata('parts') if $args{with_metadata};
 
     my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "report.*.$self->{shard}.*");
     my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "metadata.$self->{shard}.*");
@@ -404,7 +404,7 @@ sub merge_report {
     my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
     $res->save_aggregate($report_dir);
 
-    $res->add_metadata($self->global_metadata) if $with_metadata;
+    $res->add_metadata($self->global_metadata) if $args{with_metadata};
 
     for my $part (@report_parts, @metadata_parts) {
         unlink $part;
