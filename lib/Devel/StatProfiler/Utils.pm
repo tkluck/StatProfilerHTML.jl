@@ -186,6 +186,10 @@ sub _output_file {
         my $path = File::Spec::Functions::catfile($dir, "$file_base.$suffix");
 
         if (sysopen my $fh, $tmppath, O_WRONLY|O_CREAT|O_EXCL) {
+            if (-f $path) {
+                unlink $tmppath;
+                next;
+            }
             return ($fh, $tmppath, $path);
         }
         if ($! != Errno::EEXIST) {
