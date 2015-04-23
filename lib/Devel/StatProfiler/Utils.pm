@@ -120,8 +120,10 @@ sub write_data_part {
     die ref($obj), " passed to write_data_part() is missing the shard attribute"
         unless $obj->{shard};
 
-    my ($fh, $tmppath, $path) = _output_file($dir, "$file_base.$obj->{shard}");
+    my $subdir = File::Spec::Functions::catdir($dir, sprintf "%02x", $$ % 256);
+    File::Path::mkpath([$subdir]);
 
+    my ($fh, $tmppath, $path) = _output_file($subdir, "$file_base.$obj->{shard}");
     _write_and_rename($obj->{serializer}, $fh, $tmppath, $path, $data);
 }
 

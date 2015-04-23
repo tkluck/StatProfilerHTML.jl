@@ -280,7 +280,7 @@ sub _all_data_files {
         my $merged = state_file($info, 0, $kind);
         push @merged, (-f $merged ? $merged : ());
     }
-    my @parts = $parts ? bsd_glob state_file($self, 1, $kind . '.*') : ();
+    my @parts = $parts ? bsd_glob state_file($self, 1, "*/$kind.*") : ();
 
     return (\@parts, \@merged);
 }
@@ -378,8 +378,8 @@ sub merge_report {
 
     $self->_load_all_metadata('parts') if $with_metadata;
 
-    my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', "report.*.$self->{shard}.*");
-    my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', "metadata.$self->{shard}.*");
+    my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "report.*.$self->{shard}.*");
+    my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "metadata.$self->{shard}.*");
     my $report_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
     my $metadata_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$self->{shard}");
 
