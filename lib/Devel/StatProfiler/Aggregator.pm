@@ -384,18 +384,28 @@ sub merge_report {
     my $metadata_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$self->{shard}");
 
     my $res = $self->_fresh_report(mixed_process => 1);
+    my $parts = $self->_fresh_report(mixed_process => 1);
 
     # TODO fix this incestuous relation
     $res->{source} = $self->{source};
     $res->{sourcemap} = $self->{sourcemap};
     $res->{genealogy} = $self->{genealogy};
 
-    for my $file (grep -f $_, ($report_merged, @report_parts)) {
+    if (-f $report_merged) {
+        my $report = $self->_fresh_report;
+
+        $report->load($report_merged);
+        $res->merge($report);
+    }
+    for my $file (grep -f $_, @report_parts) {
         my $report = $self->_fresh_report;
 
         $report->load($file);
-        $res->merge($report);
+        $parts->merge($report);
     }
+    $parts->remap_names(@{$args{remap}})
+        if $args{remap};
+    $res->merge($parts) if $parts->{tick};
 
     for my $file (grep -f $_, ($metadata_merged, @metadata_parts)) {
         $res->load_and_merge_metadata($file);
