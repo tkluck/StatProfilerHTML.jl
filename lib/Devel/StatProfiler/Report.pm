@@ -104,7 +104,7 @@ sub _get_template {
     my $path = File::ShareDir::dist_file('Devel-StatProfiler', $basename);
     my $tmpl = do {
         local $/;
-        open my $fh, '<', $path or die "Unable to open '$path': $!";
+        open my $fh, '<:utf8', $path or die "Unable to open '$path': $!";
         readline $fh;
     };
 
@@ -113,12 +113,13 @@ sub _get_template {
 
 sub _write_template {
     my ($self, $sub, $data, $dir, $file, $compress) = @_;
-    my $text = $sub->($data);
+    my $text = $sub->($data) . "";
     my $target = File::Spec::Functions::catfile($dir, $file);
 
+    utf8::encode($text) if utf8::is_utf8($text);
     open my $fh, '>', $compress ? "$target.gz" : $target;
     if ($compress) {
-        IO::Compress::Gzip::gzip(\"$text", $fh)
+        IO::Compress::Gzip::gzip(\$text, $fh)
               or die "gzip failed: $IO::Compress::Gzip::GzipError";
     } else {
         print $fh $text;
