@@ -691,6 +691,11 @@ sub _fetch_source {
         return [], ['Dummy file to stick orphan XSUBs in...'];
     }
 
+    # unmapped evals
+    if ($path =~ /^qeval:/) {
+        return [], $NO_SOURCE;
+    }
+
     # eval source code
     if ($self->{source} && $path =~ /^eval:([0-9a-fA-F]+)$/) {
         if (my $source = $self->{source}->get_source_by_hash($1)) {
