@@ -474,7 +474,7 @@ sub map_source {
         $eval_map{$file} = "eval:$hash" if $hash;
     }
 
-    $self->remap_names(\%eval_map);
+    $self->remap_names(\%eval_map) if %eval_map;
 }
 
 sub merge {
