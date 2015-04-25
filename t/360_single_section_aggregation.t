@@ -130,7 +130,7 @@ my ($main3, $content3, $list3) = map $a2->merge_report($_, with_metadata => 1), 
 );
 
 # we test source code in another test
-delete @{$_}{qw(source sourcemap genealogy root_dir shard)}, delete @{$_->{metadata}}{qw(shard root_dir)}
+delete @{$_}{qw(source sourcemap genealogy root_dir parts_dir shard)}, delete @{$_->{metadata}}{qw(shard root_dir)}
     for $main1, $content1, $list1,
         $main2, $content2, $list2,
         $main3, $content3, $list3;

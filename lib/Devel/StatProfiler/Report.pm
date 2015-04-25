@@ -86,6 +86,7 @@ sub new {
         fetchers      => $opts{fetchers} || [[undef, 'fetch_source_from_file']],
         shard         => $opts{shard},
         root_dir      => $opts{root_directory},
+        parts_dir     => $opts{parts_directory} // $opts{root_directory},
         shard         => $opts{shard},
     }, $class;
 

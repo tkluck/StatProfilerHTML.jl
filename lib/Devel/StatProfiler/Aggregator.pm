@@ -499,6 +499,7 @@ sub _fresh_report {
         serializer     => $self->{serializer},
         sources        => 0,
         root_directory => $self->{root_dir},
+        parts_directory=> $self->{parts_dir},
         shard          => $self->{shard},
         mixed_process  => $opts{mixed_process} // $self->{mixed_process},
         fetchers       => $self->{fetchers},
