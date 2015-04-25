@@ -180,7 +180,7 @@ sub save_part {
 
         next unless $processed->{modified};
         if ($processed->{ended}) {
-            unlink state_file($self, 0, 'processed.$process_id');
+            unlink state_file($self, 0, "processed.$process_id");
         } else {
             write_data($self, $state_dir, "processed.$process_id", $processed);
         }
