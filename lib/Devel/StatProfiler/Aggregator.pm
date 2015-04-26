@@ -124,29 +124,39 @@ sub process_trace_files {
             $r->set_reader_state($reader_state);
         }
 
-        while ($sc->read_traces) {
-            last if !$sc->sections_changed && %{$sc->get_active_sections};
-            my ($report_keys, $metadata) = $self->handle_section_change($sc, $sc->get_custom_metadata);
-            my $entry = $self->{partial}{"@$report_keys"} ||= {
-                report_keys => $report_keys,
-                report      => $self->_fresh_report,
-            };
-            if ($state->{report}) {
-                $entry->{report}->merge($state->{report});
-                $state->{report} = undef;
+        my ($died, $error);
+        eval {
+            while ($sc->read_traces) {
+                last if !$sc->sections_changed && %{$sc->get_active_sections};
+                my ($report_keys, $metadata) = $self->handle_section_change($sc, $sc->get_custom_metadata);
+                my $entry = $self->{partial}{"@$report_keys"} ||= {
+                    report_keys => $report_keys,
+                    report      => $self->_fresh_report,
+                };
+                if ($state->{report}) {
+                    $entry->{report}->merge($state->{report});
+                    $state->{report} = undef;
+                }
+                $entry->{report}->add_trace_file($sc);
+                $entry->{report}->add_metadata($metadata) if $metadata && %$metadata;
             }
-            $entry->{report}->add_trace_file($sc);
-            $entry->{report}->add_metadata($metadata) if $metadata && %$metadata;
-        }
 
-        if (!$sc->empty) {
-            $state->{report} ||= $self->_fresh_report;
-            $state->{report}->add_trace_file($sc);
-        }
-        $state->{ordinal} = $process_ordinal;
-        $state->{reader_state} = $r->get_reader_state;
-        $state->{modified} = 1;
-        $state->{ended} = $r->is_stream_ended;
+            if (!$sc->empty) {
+                $state->{report} ||= $self->_fresh_report;
+                $state->{report}->add_trace_file($sc);
+            }
+            $state->{ordinal} = $process_ordinal;
+            $state->{reader_state} = $r->get_reader_state;
+            $state->{modified} = 1;
+            $state->{ended} = $r->is_stream_ended;
+
+            1;
+        } or do {
+            $died = 1;
+            $error = $@;
+
+            $state->{ended} = 1;
+        };
 
         $self->{source}->add_sources_from_reader($r);
         $self->{sourcemap}->add_sources_from_reader($r);
@@ -154,6 +164,8 @@ sub process_trace_files {
         my $metadata = $r->get_custom_metadata;
         $self->{metadata}->set_at_inc($metadata->{"\x00at_inc"})
             if $metadata->{"\x00at_inc"};
+
+        die $error if $died;
     }
 }
 
