@@ -906,9 +906,9 @@ sub render_flamegraphs {
     }
     close $zattrs_fh;
 
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$clickable_nameattr --hash --title=\"Flame Graph\" $calls_data > $clickable_svg") == 0
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$clickable_nameattr --title=\"Flame Graph\" $calls_data > $clickable_svg") == 0
         or die "Generating $clickable_svg failed\n";
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$zoomable_nameattr --hash --title=\"Zoomable Flame Graph\" $calls_data > $zoomable_svg") == 0
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$zoomable_nameattr --title=\"Zoomable Flame Graph\" $calls_data > $zoomable_svg") == 0
         or die "Generating $zoomable_svg failed\n";
 
     if ($compress) {
