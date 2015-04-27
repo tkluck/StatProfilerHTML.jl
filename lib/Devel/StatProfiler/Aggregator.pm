@@ -495,6 +495,14 @@ sub merged_report_metadata {
     return $res;
 }
 
+sub all_reports {
+    my ($self) = @_;
+
+    my @dirs = grep {
+        $_ eq '__main__' || $_ !~ /^__/
+    } map File::Basename::basename($_), grep -d $_, glob $self->{root_dir} . '/*';
+}
+
 sub _merge_report {
     my ($self, $report_id, $report) = @_;
 
