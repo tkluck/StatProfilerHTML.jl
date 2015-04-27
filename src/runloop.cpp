@@ -907,6 +907,7 @@ trampoline(pTHX)
 	/* FALL THROUGH */
     default:
 	JMPENV_POP;
+        MY_CXT.using_trampoline = false;
         PL_runops = trampoline;
         if (entered)
             MY_CXT.leave_runloop();
@@ -916,6 +917,7 @@ trampoline(pTHX)
     }
 
     JMPENV_POP;
+    MY_CXT.using_trampoline = false;
     PL_runops = trampoline;
     if (entered)
         MY_CXT.leave_runloop();
@@ -927,9 +929,11 @@ trampoline(pTHX)
 static bool
 switch_runloop(pTHX_ pMY_CXT_ bool enable)
 {
-    if (enable == MY_CXT.enabled)
-        return false;
+    bool actually_running = MY_CXT.outer_runloop;
+
     MY_CXT.enabled = enable;
+    if (enable == actually_running)
+        return false;
 
     // the easy case, just let the trampoline handle the switch
     if (MY_CXT.using_trampoline)
@@ -975,7 +979,7 @@ switch_runloop(pTHX_ pMY_CXT_ bool enable)
         JMPENV_POP;
         // for embedded interpreters where the code is called via call_sv,
         // preserve the tracing status between call_sv invocations
-        if (MY_CXT.enabled)
+        if (MY_CXT.enabled && MY_CXT.outer_runloop)
             PL_runops = trampoline;
         else
             PL_runops = MY_CXT.original_runloop;
