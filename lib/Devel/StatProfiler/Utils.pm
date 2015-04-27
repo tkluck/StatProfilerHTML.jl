@@ -96,7 +96,7 @@ sub read_data {
         my ($data, $read);
 
         1 while ($read = $fh->read($data, 256 * 1024, length $data));
-        die "Error while reading Sereal-ized data" if !defined $read;
+        die "Error while reading Sereal-ized data from '$file'" if !defined $read;
 
         return $SEREAL_DECODER->decode($data);
     } else {
@@ -148,7 +148,7 @@ sub write_file {
     my ($fh, $tmppath, undef) = _output_file($dir, $file);
 
     binmode $fh, ':utf8' if $utf8;
-    $fh->print($data) or die "Error while writing file data";
+    $fh->print($data) or die "Error while writing file data to '$file'";
     close $fh;
     rename $tmppath, File::Spec::Functions::catfile($dir, $file);
 }
@@ -167,10 +167,10 @@ sub _write_and_rename {
 
     if ($serializer eq 'storable') {
         Storable::nstore_fd($data, $fh)
-            or die "Internal error in Storable::nstore_fd"
+            or die "Internal error in Storable::nstore_fd to '$path'"
     } elsif ($serializer eq 'sereal') {
         $fh->print($SEREAL_ENCODER->encode($data))
-            or die "Error while writing Sereal-ized data";
+            or die "Error while writing Sereal-ized data to '$path'";
     } else {
         die "Unsupported serializer format '$serializer'";
     }
