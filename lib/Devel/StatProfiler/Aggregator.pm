@@ -489,8 +489,7 @@ sub merged_report_metadata {
         }
     }
 
-    my $global_metadata = $self->global_metadata;
-    $res->add_entry($_ => $global_metadata->{$_}) for keys %$global_metadata;
+    $res->add_entries($self->global_metadata);
 
     return $res;
 }
@@ -545,7 +544,7 @@ sub add_report_metadata {
         root_directory => $self->{root_dir},
         shard          => $self->{shard},
     );
-    $report_metadata->add_entry($_ => $metadata->{$_}) for keys %$metadata;
+    $report_metadata->add_entries($metadata);
     $report_metadata->save_report_part($report_dir);
 }
 

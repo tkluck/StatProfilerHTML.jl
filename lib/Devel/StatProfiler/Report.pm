@@ -661,7 +661,7 @@ sub metadata {
 sub add_metadata {
     my ($self, $metadata) = @_;
 
-    $self->{metadata}->add_entry($_, $metadata->{$_}) for keys %$metadata;
+    $self->{metadata}->add_entries($metadata);
 }
 
 sub _fileify {

@@ -25,6 +25,12 @@ sub new {
     return $self;
 }
 
+sub add_entries {
+    my ($self, $entries) = @_;
+
+    $self->{metadata}{$_} = $entries->{$_} for keys %$entries;
+}
+
 sub add_entry {
     my ($self, $key, $value) = @_;
 
