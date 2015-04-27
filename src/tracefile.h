@@ -179,7 +179,8 @@ namespace devel {
             int write_header(unsigned int sampling_interval,
                              unsigned int stack_collect_depth,
                              uint32_t id[ID_SIZE], unsigned int ordinal,
-                             uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal);
+                             uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal,
+                             HV *global_metadata);
 
             int start_sample(unsigned int weight, OP *current_op);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
@@ -192,6 +193,7 @@ namespace devel {
 
         private:
             int write_perl_version();
+            int write_custom_metadata(const char *key, I32 klen, SV *value);
 
             OutputBuffer out;
             std::string output_file;

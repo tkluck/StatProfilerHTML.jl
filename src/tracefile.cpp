@@ -847,7 +847,8 @@ int TraceFileWriter::write_perl_version()
 int TraceFileWriter::write_header(unsigned int sampling_interval,
                                   unsigned int stack_collect_depth,
                                   uint32_t id[ID_SIZE], unsigned int ordinal,
-                                  uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal)
+                                  uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal,
+                                  HV *global_metadata)
 {
     int status = 0;
     status += out.write_raw_bytes(FILE_MAGIC, sizeof(FILE_MAGIC) - 1);
@@ -867,6 +868,16 @@ int TraceFileWriter::write_header(unsigned int sampling_interval,
     status += write_varint(out, parent_ordinal);
     status += out.write_bytes(id, sizeof(id[0]) * ID_SIZE);
     status += out.write_bytes(parent_id, sizeof(parent_id[0]) * ID_SIZE);
+
+    if (global_metadata) {
+        char *key;
+        I32 length;
+
+        hv_iterinit(global_metadata);
+        while (SV *value = hv_iternextsv(global_metadata, &key, &length)) {
+            write_custom_metadata(key, length, value);
+        }
+    }
 
     status += out.write_byte(TAG_HEADER_SEPARATOR);
 
@@ -1076,6 +1087,17 @@ int TraceFileWriter::end_sample()
     status += out.write_byte(TAG_SAMPLE_END);
     status += write_varint(out, 0);
     force_empty_frame = false;
+    return status;
+}
+
+int TraceFileWriter::write_custom_metadata(const char *key, I32 klen, SV *value)
+{
+    int status = 0;
+    status += out.write_byte(TAG_CUSTOM_META);
+    status += write_varint(out, abs(klen) + SvCUR(value));
+    status += write_string(out, key, abs(klen), klen < 0);
+    status += write_string(aTHX_ out, value);
+    force_empty_frame = true;
     return status;
 }
 

@@ -112,7 +112,7 @@ namespace {
         unsigned int ordinal, parent_ordinal;
         pid_t pid, tid;
         TraceFileWriter *trace;
-        HV *sections;
+        HV *sections, *global_metadata;
         bool restore_sections, id_written;
 
         Cxt();
@@ -250,6 +250,7 @@ Cxt::Cxt() :
     pid(getpid()),
     tid(new_thread_id()),
     sections(NULL),
+    global_metadata(NULL),
     restore_sections(false),
     id_written(false),
     trace(NULL)
@@ -276,6 +277,7 @@ Cxt::Cxt(const Cxt &cxt) :
     pid(cxt.pid),
     tid(new_thread_id()),
     sections(NULL),
+    global_metadata(NULL),
     restore_sections(true),
     id_written(false),
     trace(NULL)
@@ -286,14 +288,19 @@ Cxt::Cxt(const Cxt &cxt) :
     memcpy(parent_id, cxt.id, sizeof(id));
 
     sections = newHV();
-
     copy_hv(aTHX_ cxt.sections, sections);
+
+    if (cxt.global_metadata) {
+        global_metadata = newHV();
+        copy_hv(aTHX_ cxt.global_metadata, global_metadata);
+    }
 }
 
 Cxt::~Cxt() {
     dTHX;
 
     SvREFCNT_dec(sections);
+    SvREFCNT_dec(global_metadata);
     if (outer_runloop)
         Perl_croak(aTHX_ "Devel::StatProfiler: deleting context for a running runloop");
     if (original_runloop)
@@ -328,7 +335,8 @@ Cxt::create_trace(pTHX)
         trace->open(filename, is_template, id, ordinal);
         if (trace->is_valid()) {
             trace->write_header(sampling_interval, stack_collect_depth,
-                                id, ordinal, parent_id, parent_ordinal);
+                                id, ordinal, parent_id, parent_ordinal,
+                                global_metadata);
             id_written = true;
 
             if (restore_sections) {
@@ -449,7 +457,8 @@ reopen_output_file(pTHX_ pMY_CXT)
     MY_CXT.trace->open(MY_CXT.filename, MY_CXT.is_template,
                        MY_CXT.id, MY_CXT.ordinal);
     MY_CXT.trace->write_header(sampling_interval, stack_collect_depth,
-                               MY_CXT.id, MY_CXT.ordinal, MY_CXT.parent_id, MY_CXT.parent_ordinal);
+                               MY_CXT.id, MY_CXT.ordinal, MY_CXT.parent_id, MY_CXT.parent_ordinal,
+                               MY_CXT.global_metadata);
     MY_CXT.id_written = true;
 
     // XXX check if we need to write other metadata
@@ -1247,6 +1256,16 @@ devel::statprofiler::set_save_source(unsigned int save_source)
     dMY_CXT;
 
     source_code_kind = (SourceCodeKind) save_source;
+}
+
+void
+devel::statprofiler::set_global_metadata(pTHX_ HV *metadata)
+{
+    dMY_CXT;
+
+    SvREFCNT_dec(MY_CXT.global_metadata);
+    MY_CXT.global_metadata = newHV();
+    copy_hv(aTHX_ metadata, MY_CXT.global_metadata);
 }
 
 void

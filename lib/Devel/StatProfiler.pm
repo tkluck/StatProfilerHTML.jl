@@ -19,6 +19,7 @@ my %args = (
     -depth    => 1,
     -source   => 1,
     -maxsize  => 1,
+    -metadata => 1,
 );
 
 my %source_args = (
@@ -62,6 +63,8 @@ sub import {
             set_stack_collection_depth($value);
         } elsif ($arg eq '-maxsize') {
             set_max_output_file_size($value);
+        } elsif ($arg eq '-metadata') {
+            set_global_metadata($value);
         } elsif ($arg eq '-source') {
             _croak("Invalid value for -source option") unless exists $source_args{$value};
             set_save_source($source_args{$value});
@@ -190,6 +193,12 @@ when profiling is disabled.
 =head3 -depth <stack depth> (default 20)
 
 Sets the maximum number of stack frames saved for each sample.
+
+=head3 -metadata HASHREF
+
+Emit custom metadata in the header section of each profile file; this
+metadata will be available right after calling C<<
+Devel::StatProfiler::Reader->new >>.
 
 =head3 -file <path>
 

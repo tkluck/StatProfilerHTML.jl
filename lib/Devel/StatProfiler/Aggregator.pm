@@ -119,6 +119,7 @@ sub process_trace_files {
 
         $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
         $self->{last_sample}{$process_id} = time;
+        $self->{metadata}->add_entries($r->get_custom_metadata);
 
         if (my $reader_state = delete $state->{reader_state}) {
             $r->set_reader_state($reader_state);

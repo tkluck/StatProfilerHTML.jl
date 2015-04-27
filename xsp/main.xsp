@@ -17,6 +17,8 @@ void set_sampling_interval(unsigned int interval);
 void set_stack_collection_depth(unsigned int num_stack_frames);
 void set_max_output_file_size(size_t max_size);
 void set_save_source(unsigned int save_source);
+void set_global_metadata(HV *metadata)
+  %code{% set_global_metadata(aTHX_ metadata); %};
 
 void write_custom_metadata(SV *key, SV *value)
   %code{% write_custom_metadata(aTHX_ key, value); %};
