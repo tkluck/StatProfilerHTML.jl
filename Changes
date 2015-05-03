@@ -2,6 +2,15 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.26      2015-05-03 18:34:57 CEST
+
+    - Add global custom profile metadata (e.g. for VCS tags)
+    - Fix for enabling/disabling tracing when Devel::StatProfiler
+      is loaded at runtime from a do/eval
+    - Better handling for truncated profile files
+    - Various performance improvements
+    - Revert to default color scheme for flame graphs
+
 0.25      2015-04-19 19:28:05 CEST
 
     - Preserve parent-child relationship when forking with profiling disabled
