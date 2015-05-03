@@ -683,7 +683,7 @@ sub fetch_source_from_file {
 }
 
 sub _fetch_source {
-    my ($self, $path) = @_;
+    my ($self, $path, $fetchers) = @_;
     my @lines;
 
     # synthesized XS entries
@@ -704,7 +704,7 @@ sub _fetch_source {
     }
 
     my ($input, $fh);
-    for my $fetcher (@{$self->{fetchers}}) {
+    for my $fetcher (@{$fetchers // $self->{fetchers}}) {
         my ($prefix, $code) = @$fetcher;
 
         next if $prefix && rindex($path, $prefix, 0) == -1;
@@ -926,7 +926,7 @@ sub render_flamegraphs {
 }
 
 sub output {
-    my ($self, $directory, $compress) = @_;
+    my ($self, $directory, $compress, $fetchers) = @_;
     my @diagnostics;
 
     die "Unable to create report without a source map and an eval map"
@@ -1101,7 +1101,7 @@ sub output {
     @extra_reverse_files{@first_pass} = ();
     while (@first_pass) {
         my $file = shift @first_pass;
-        my ($ends, $code) = $self->_fetch_source($file);
+        my ($ends, $code) = $self->_fetch_source($file, $fetchers);
 
         # TODO merge xs:<file> with real file entry, if there is one
         if ($code eq $NO_SOURCE) {
