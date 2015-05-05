@@ -139,6 +139,21 @@ namespace {
         CounterCxt(unsigned int delay) :
             start_delay(delay) { }
     };
+
+    struct GloballyDestroyed {
+    public:
+        static bool destroyed;
+
+        GloballyDestroyed() {
+            destroyed = false;
+        }
+
+        ~GloballyDestroyed() {
+            destroyed = true;
+        }
+    };
+
+    bool GloballyDestroyed::destroyed = true;
 }
 
 typedef struct Cxt my_cxt_t;
@@ -154,8 +169,6 @@ copy_hv(pTHX_ HV *src, HV *dest);
 
 static void
 restore_section_state(pTHX_ pMY_CXT);
-
-START_MY_CXT;
 
 namespace {
 #if !defined(_WIN32)
@@ -193,12 +206,18 @@ namespace {
     bool seeded = false;
     // hooks for saving eval text
     BHK scope_hooks;
+    // global "we're being destroyed" flag
+    GloballyDestroyed destroyed;
 
     // used for testing, but so small we always allocate them
     Mutex test_counter_increment_mutex;
     unsigned int test_counter_increment = 0;
     void (* increment_counter_function)(CounterCxt *cxt) = &increment_counter;
 }
+
+// this must be after the variables above, otherwise it gets destroyed
+// later, and it depends (at least) on the refcount mutex
+START_MY_CXT;
 
 static void
 copy_hv(pTHX_ HV *src, HV *dest)
@@ -538,6 +557,11 @@ increment_counter(CounterCxt *cxt)
         delay_sec = sampling_interval / 1000000;
         delay_nsec = sampling_interval % 1000000 * 1000;
 #endif
+
+        // TODO here we probably need a memory barrier, to ensure the
+        // write in the other thread is seen
+        if (GloballyDestroyed::destroyed)
+            return;
 
         // we only synchronize when checking whether the thread needs
         // to really terminate, but there is no need to lock around
