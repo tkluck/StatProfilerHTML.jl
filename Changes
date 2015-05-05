@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.27      2015-05-05 21:51:50 CEST
+
+    - Add a method to garbage-collect the data for old processes
+    - Don't try to lock destroyed mutexes during global destruction
+
 0.26      2015-05-03 18:34:57 CEST
 
     - Add global custom profile metadata (e.g. for VCS tags)
