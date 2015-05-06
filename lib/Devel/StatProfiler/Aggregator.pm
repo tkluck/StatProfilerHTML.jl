@@ -500,7 +500,9 @@ sub all_reports {
 
     my @dirs = grep {
         $_ eq '__main__' || $_ !~ /^__/
-    } map File::Basename::basename($_), grep -d $_, glob $self->{root_dir} . '/*';
+    } map  File::Basename::basename($_),
+      grep -d $_,
+           bsd_glob $self->{root_dir} . '/*';
 }
 
 sub discard_expired_process_data {
