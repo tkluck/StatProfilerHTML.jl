@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.29      2015-05-06 18:01:53 CEST
+
+    - Fix another bug for reports with spaces in their names
+
 0.28      2015-05-06 14:48:09 CEST
 
     - Fix bug for reports with spaces in their names
