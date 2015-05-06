@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.28      2015-05-06 14:48:09 CEST
+
+    - Fix bug for reports with spaces in their names
+
 0.27      2015-05-05 21:51:50 CEST
 
     - Add a method to garbage-collect the data for old processes
