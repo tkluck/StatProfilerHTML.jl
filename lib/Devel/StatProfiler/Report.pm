@@ -3,7 +3,7 @@ package Devel::StatProfiler::Report;
 
 use strict;
 use warnings;
-use autodie qw(open close);
+use autodie qw(open close chdir);
 
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::EvalSource;
@@ -906,10 +906,13 @@ sub render_flamegraphs {
     }
     close $zattrs_fh;
 
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$clickable_nameattr --title=\"Flame Graph\" $calls_data > $clickable_svg") == 0
+    my $pwd = Cwd::cwd;
+    chdir $directory;
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=clickable_stacks.attrs --title=\"Flame Graph\" all_stacks_by_time.calls > $clickable_flames") == 0
         or die "Generating $clickable_svg failed\n";
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=$zoomable_nameattr --title=\"Zoomable Flame Graph\" $calls_data > $zoomable_svg") == 0
+    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=zoomable_stacks.attrs --title=\"Zoomable Flame Graph\" all_stacks_by_time.calls > $zoomable_flames") == 0
         or die "Generating $zoomable_svg failed\n";
+    chdir $pwd;
 
     if ($compress) {
         $self->_compress_inplace($calls_data);
