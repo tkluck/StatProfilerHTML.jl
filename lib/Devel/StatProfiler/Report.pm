@@ -253,6 +253,7 @@ sub add_trace_file {
             }, 'Devel::StatProfiler::StackFrame';
         }
 
+        my @for_flamegraph;
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
             my $line = $frame->line;
@@ -269,6 +270,7 @@ sub add_trace_file {
             $sub->{inclusive} += $weight;
             $file->{lines}{inclusive}[$line] += $weight if $line > 0;
             $file->{subs}{$sub->{start_line}}{$sub->{uq_name}} = undef;
+            push @for_flamegraph, $sub->{uq_name} if $flames;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -300,11 +302,8 @@ sub add_trace_file {
             }
         }
 
-        if ($flames && @$frames) {
-            my $key = join ';', map $_->uq_sub_name, reverse @$frames;
-
-            $flames->{$key} += $weight;
-        }
+        $flames->{join ';', reverse @for_flamegraph} += $weight
+            if @for_flamegraph;
     }
 
     $self->{source}->add_sources_from_reader($r) if $self->{source};
