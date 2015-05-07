@@ -274,8 +274,13 @@ sub add_trace_file {
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
-                my $caller = $self->_sub($call_site);
                 my $call_line = $call_site->line;
+                my $caller;
+                if ($call_line == -1) {
+                    $caller = $self->_xssub($call_site);
+                } else {
+                    $caller = $self->_sub($call_site);
+                }
                 my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
                     caller    => $caller->{uq_name},
                     exclusive => 0,
