@@ -253,19 +253,19 @@ sub add_trace_file {
             }, 'Devel::StatProfiler::StackFrame';
         }
 
-        my @for_flamegraph;
+        my ($next_sub, @for_flamegraph);
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
             my $line = $frame->line;
 
             # XS vs. normal sub or opcode
-            my ($sub, $file);
+            my $sub = $next_sub;
             if ($line == -1) {
-                $sub = $self->_xssub($frame);
+                $sub //= $self->_xssub($frame);
             } else {
-                $sub = $self->_sub($frame);
+                $sub //= $self->_sub($frame);
             }
-            $file = $self->_file($sub->{file});
+            my $file = $self->_file($sub->{file});
 
             $sub->{inclusive} += $weight;
             $file->{lines}{inclusive}[$line] += $weight if $line > 0;
@@ -277,9 +277,9 @@ sub add_trace_file {
                 my $call_line = $call_site->line;
                 my $caller;
                 if ($call_line == -1) {
-                    $caller = $self->_xssub($call_site);
+                    $caller = $next_sub = $self->_xssub($call_site);
                 } else {
-                    $caller = $self->_sub($call_site);
+                    $caller = $next_sub = $self->_sub($call_site);
                 }
                 my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
                     caller    => $caller->{uq_name},
