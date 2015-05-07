@@ -46,7 +46,7 @@ my %SPECIAL_SUBS = map { $_ => 1 } qw(
 
 sub new {
     my ($class, %opts) = @_;
-    my $genealogy = {};
+    my $genealogy = $opts{sources} ? {} : undef;
     my $self = bless {
         aggregate     => {
             total     => 0,
@@ -224,7 +224,8 @@ sub add_trace_file {
 
     my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
         @{$r->get_genealogy_info};
-    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
+    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal]
+        if $self->{genealogy};
 
     $self->_check_consistency(
         $r->get_source_tick_duration,
@@ -311,7 +312,7 @@ sub add_trace_file {
 
     my $metadata = $r->get_custom_metadata;
     $self->{metadata}->set_at_inc($metadata->{"\x00at_inc"})
-        if $metadata->{"\x00at_inc"};
+        if $self->{source} && $metadata->{"\x00at_inc"};
 }
 
 sub _map_hash_rx {
@@ -489,7 +490,7 @@ sub merge {
 
     $self->{aggregate}{total} += $report->{aggregate}{total};
 
-    for my $process_id (keys %{$report->{genealogy}}) {
+    for my $process_id (keys %{$report->{genealogy} || {}}) {
         for my $process_ordinal (keys %{$report->{genealogy}{$process_id}}) {
             $self->{genealogy}{$process_id}{$process_ordinal} ||= $report->{genealogy}{$process_id}{$process_ordinal};
         }
@@ -616,7 +617,7 @@ sub _save {
     # the merged metadata is saved separately
     if ($is_part) {
         write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy})
-            if %{$self->{genealogy}};
+            if $self->{genealogy} && %{$self->{genealogy}};
         $self->{metadata}->save_report_part($report_dir);
         $self->{source}->save_part if $self->{source};
     } else {
