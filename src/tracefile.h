@@ -182,7 +182,7 @@ namespace devel {
                              uint32_t parent_id[ID_SIZE], unsigned int parent_ordinal,
                              HV *global_metadata);
 
-            int start_sample(unsigned int weight, OP *current_op);
+            int start_sample(unsigned int weight, const char *op_name);
             int add_frame(FrameType frame_type, CV *sub, GV *sub_name, COP *line);
             int add_eval_source(SV *eval_text, U32 eval_seq);
             int end_sample();

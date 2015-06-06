@@ -923,12 +923,11 @@ void TraceFileWriter::flush()
     out.flush();
 }
 
-int TraceFileWriter::start_sample(unsigned int weight, OP *current_op)
+int TraceFileWriter::start_sample(unsigned int weight, const char *op_name)
 {
     // TODO maybe track whether we're already in a sample so we can barf if we
     // generate nested samples in error? This would also allow for forbidding
     // adding section info within a sample, which makes no sense.
-    const char *op_name = current_op ? OP_NAME(current_op) : NULL;
     int status = 0;
 
     status += out.write_byte(TAG_SAMPLE_START);

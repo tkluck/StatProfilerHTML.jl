@@ -22,7 +22,6 @@
 - decide what to do for multiple distinct evals mapping to the same
   logical file (with overlapping and non-overlapping line ranges)
   (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
-- add a separate "op" type for xsubs
 - subs with same optree and different name via Sub::Name are not aggregated;
   this is a sensible default, but having some way of detect the situation
   might be nice (CvROOT() might be a starting point)

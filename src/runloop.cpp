@@ -777,9 +777,10 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
         // Start new output file
         reopen_output_file(aTHX_ aMY_CXT);
     }
-    trace->start_sample(counter - pred_counter, prev_op);
-    // for outer runloops, see comment at the start of this function
-    MY_CXT.pred_counter = counter;
+
+    const char *op_name = prev_op ? OP_NAME(prev_op) : NULL;
+    GV *xsub_cv_name = NULL;
+    CV *xsub_cv = NULL;
 
     // this condition is going to be always true for the OP_ENTERSUB
     // created by Perl_call_sv, which means the if () is going
@@ -791,13 +792,13 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
         // if the sub call is a normal Perl sub, op should be
         // pointing to CvSTART(), the fact is points to
         // op_next implies the call was to an XSUB
-        GV *cv_name;
-        CV *cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &cv_name);
+        xsub_cv = get_cv_from_sv(aTHX_ prev_op, called_sv, &xsub_cv_name);
 
-        if (cv && CvISXSUB(cv))
-            trace->add_frame(FRAME_XSUB, cv, cv_name, NULL);
+        if (xsub_cv && CvISXSUB(xsub_cv)) {
+            op_name = "_xsub";
+        } else {
+            xsub_cv = NULL;
 #if 0 // DEBUG
-        else {
             const char *package = "__ANON__", *name = "(unknown)";
 
             if (cv_name) {
@@ -806,12 +807,19 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
             }
 
             warn("Called sub %s::%s is not an XSUB", package, name);
-        }
 #endif
+        }
     }
+
+    trace->start_sample(counter - pred_counter, op_name);
+    if (xsub_cv)
+        trace->add_frame(FRAME_XSUB, xsub_cv, xsub_cv_name, NULL);
     collect_trace(aTHX_ *trace, stack_collect_depth,
                   source_code_kind != NONE);
     trace->end_sample();
+
+    // for outer runloops, see comment at the start of this function
+    MY_CXT.pred_counter = counter;
 }
 
 static int
