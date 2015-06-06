@@ -768,6 +768,10 @@ collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter,
         reopen_output_file(aTHX_ aMY_CXT);
     }
     trace->start_sample(counter - pred_counter, prev_op);
+
+    // this condition is going to be always true for the OP_ENTERSUB
+    // created by Perl_call_sv, which means the if () is going
+    // to be entered for some non-XSUBs as well
     if (prev_op &&
         (prev_op->op_type == OP_ENTERSUB ||
          prev_op->op_type == OP_GOTO) &&
@@ -889,6 +893,13 @@ runloop(pTHX)
         prev_op = op;
         OP_ENTRY_PROBE(OP_NAME(op));
     }
+
+    // this is here so XS subs called using Perl_call_sv are correctly
+    // tracked (example: tied hash implemented in XS)
+    if (UNLIKELY( counter != pred_counter ) && trace->is_valid()) {
+        collect_sample(aTHX_ aMY_CXT_ trace, pred_counter, op, prev_op, called_sv);
+    }
+
     PERL_ASYNC_CHECK();
 
     TAINT_NOT;
@@ -1505,6 +1516,9 @@ win32_nanosleep_busywait(unsigned nsec) {
 void
 devel::statprofiler::test_force_sample(unsigned int increment)
 {
+    if (increment_counter_function != &test_increment_counter)
+        return;
+
     dTHX;
     dMY_CXT;
 

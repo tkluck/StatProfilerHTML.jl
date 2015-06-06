@@ -1,0 +1,19 @@
+%module{Devel::StatProfiler};
+%package{Devel::StatProfiler::Test::TiedHash};
+
+%{
+
+SV*
+FETCH(SV* self, int key)
+  CODE:
+#if defined(_WIN32)
+    Sleep(key / 1000);
+#else
+    timespec sleep = {0, key * 1000};
+    while (nanosleep(&sleep, &sleep) == EINTR)
+        ;
+#endif
+    devel::statprofiler::test_hires_usleep(key);
+
+%}
+
