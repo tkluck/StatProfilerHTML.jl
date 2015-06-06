@@ -114,6 +114,7 @@ namespace {
         TraceFileWriter *trace;
         HV *sections, *global_metadata;
         bool restore_sections, id_written;
+        unsigned int pred_counter;
 
         Cxt();
         Cxt(const Cxt &cxt);
@@ -272,6 +273,7 @@ Cxt::Cxt() :
     global_metadata(NULL),
     restore_sections(false),
     id_written(false),
+    pred_counter(0),
     trace(NULL)
 {
     dTHX;
@@ -299,6 +301,7 @@ Cxt::Cxt(const Cxt &cxt) :
     global_metadata(NULL),
     restore_sections(true),
     id_written(false),
+    pred_counter(0),
     trace(NULL)
 {
     dTHX;
@@ -763,11 +766,20 @@ get_cv_from_sv(pTHX_ OP* op, SV *sv, GV **name)
 static void
 collect_sample(pTHX_ pMY_CXT_ TraceFileWriter *trace, unsigned int pred_counter, OP *op, OP *prev_op, SV *called_sv)
 {
+    // Makes sure we assign the correct weight to a trace (possibly 0)
+    // when an inner runloop already collected a trace for this line
+    if (MY_CXT.pred_counter > pred_counter) {
+        pred_counter = MY_CXT.pred_counter;
+        if (pred_counter == counter)
+            return;
+    }
     if (trace->position() > max_output_file_size && MY_CXT.is_template) {
         // Start new output file
         reopen_output_file(aTHX_ aMY_CXT);
     }
     trace->start_sample(counter - pred_counter, prev_op);
+    // for outer runloops, see comment at the start of this function
+    MY_CXT.pred_counter = counter;
 
     // this condition is going to be always true for the OP_ENTERSUB
     // created by Perl_call_sv, which means the if () is going

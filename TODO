@@ -19,8 +19,6 @@
 - some serious benchmarking
   - add a fast benchmark to be used during development and a slow more
     realistic one for release
-- find a solution to correctly report exclusive/inclusive time for XSUBs
-  with callbacks (might not be possible)
 - decide what to do for multiple distinct evals mapping to the same
   logical file (with overlapping and non-overlapping line ranges)
   (t/382_evil_source_mapping.t cases in evil-source-mapping branch)
