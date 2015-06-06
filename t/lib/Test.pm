@@ -21,6 +21,7 @@ our @EXPORT = (
   @Test::Differences::EXPORT,
   qw(
         get_process_id
+        get_traces
         get_samples
         get_sources
         numify
@@ -100,22 +101,29 @@ sub get_process_id {
     return $r->get_genealogy_info->[0];
 }
 
-sub get_samples {
-    my ($file) = @_;
+sub get_traces {
+    my ($file, $ops) = @_;
     my $r = Devel::StatProfiler::Reader->new($file);
-    my @samples;;
+    my @traces;
 
     while (my $trace = $r->read_trace) {
         my $frames = $trace->frames;
         next unless @$frames;
         next unless
             $frames->[0]->fq_sub_name eq 'Time::HiRes::usleep' ||
-            $frames->[0]->package =~ /^Devel::StatProfiler::Test::/;
+            $frames->[0]->package =~ /^Devel::StatProfiler::Test::/ ||
+            ($ops && exists $ops->{$trace->op_name});
 
-        push @samples, $frames;
+        push @traces, $trace;
     }
 
-    return @samples;
+    return @traces;
+}
+
+sub get_samples {
+    my ($file, $ops) = @_;
+
+    return map $_->frames, get_traces($file, $ops);
 }
 
 sub get_sources {
