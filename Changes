@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.32      2015-06-08 12:26:30 CEST
+
+    - Compilation fix
+
 0.31      2015-06-08 09:43:05 CEST
 
     - Fix collected data for XSUBs called via Perl_call_sv (e.g. tie/overload)
