@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.33      2015-06-08 12:45:05 CEST
+
+    - No changes, only bumped the version
+
 0.32      2015-06-08 12:26:30 CEST
 
     - Compilation fix
