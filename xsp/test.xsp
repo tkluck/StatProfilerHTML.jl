@@ -1,3 +1,7 @@
+#define _DEVEL_STATPROFILER_XSP
+
+#include "runloop.h"
+
 %module{Devel::StatProfiler};
 %package{Devel::StatProfiler::Test::TiedHash};
 

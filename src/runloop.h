@@ -37,6 +37,12 @@ namespace devel {
     }
 }
 
+namespace devel {
+    namespace statprofiler {
+        extern double test_hires_usleep(unsigned int usec);
+    }
+}
+
 #ifdef _DEVEL_STATPROFILER_XSP
 using namespace devel::statprofiler;
 #endif
