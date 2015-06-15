@@ -545,7 +545,7 @@ sub discard_expired_process_data {
             my $parent_id = $parent->[0];
 
             unless ($parent_id) {
-                warn "Broken genealogy: '$process_id' has no parent";
+                # warn "Broken genealogy: '$process_id' has no parent";
                 next;
             }
             next if $parent_id eq "00" x 24;
