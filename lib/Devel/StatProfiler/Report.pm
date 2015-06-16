@@ -247,7 +247,7 @@ sub add_trace_file {
             }, 'Devel::StatProfiler::StackFrame';
         }
 
-        my ($next_sub, @for_flamegraph);
+        my ($next_sub, @for_flamegraph, %tracked_sub, %tracked_cs, %tracked_callee);
         for my $i (0 .. $#$frames) {
             my $frame = $frames->[$i];
             my $line = $frame->line;
@@ -261,8 +261,9 @@ sub add_trace_file {
             }
             my $file = $self->_file($sub->{file});
             my $uq_sub_name = $sub->{uq_name};
+            my $recursive = ++$tracked_sub{$uq_sub_name} > 1;
 
-            $sub->{inclusive} += $weight;
+            $sub->{inclusive} += $weight unless $recursive;
             $file->{lines}{inclusive}[$line] += $weight if $line > 0;
             $file->{subs}{$sub->{start_line}}{$uq_sub_name} = undef;
             push @for_flamegraph, $uq_sub_name if $flames;
@@ -284,8 +285,10 @@ sub add_trace_file {
                     file      => $call_site->file,
                     line      => $call_line,
                 };
+                my $recursive_cs = ++$tracked_cs{$cs_id} > 1;
+                my $recursive_callee = ++$tracked_callee{"$uq_sub_name:$call_line"} > 1;
 
-                $site->{inclusive} += $weight;
+                $site->{inclusive} += $weight if !$recursive_cs;
                 $site->{exclusive} += $weight if !$i;
 
                 my $callee = $caller->{callees}{$call_line}{$uq_sub_name} ||= {
@@ -293,7 +296,7 @@ sub add_trace_file {
                     inclusive => 0,
                 };
 
-                $callee->{inclusive} += $weight;
+                $callee->{inclusive} += $weight if !$recursive_callee;
             }
 
             if (!$i) {

@@ -28,7 +28,6 @@
 
 - detect multiple evals with the same #line directive and different source code
 - closure aggregation
-- recursive sub aggregation
 - aggregate evals without source code, based on caller/callees
 - handle overlapping/nested sections
 - make aggregation code reusable both as a script and in a web application
