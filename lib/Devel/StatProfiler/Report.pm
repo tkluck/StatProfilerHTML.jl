@@ -136,12 +136,6 @@ sub _compress_inplace {
     unlink $path;
 }
 
-sub _call_site_id {
-    my ($frame) = @_;
-
-    return sprintf '%s:%d', $frame->file, $frame->line;
-}
-
 sub _sub {
     my ($self, $frame, $file) = @_;
     my $uq_name = $frame->uq_sub_name;
@@ -276,13 +270,14 @@ sub add_trace_file {
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
                 my $call_line = $call_site->line;
+                my $cs_id = sprintf '%s:%d', $call_site->file, $call_site->line;
                 my $caller;
                 if ($call_line == -1) {
                     $caller = $next_sub = $self->_xssub($call_site);
                 } else {
                     $caller = $next_sub = $self->_sub($call_site);
                 }
-                my $site = $sub->{call_sites}{_call_site_id($call_site)} ||= {
+                my $site = $sub->{call_sites}{$cs_id} ||= {
                     caller    => $caller->{uq_name},
                     exclusive => 0,
                     inclusive => 0,
