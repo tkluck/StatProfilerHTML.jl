@@ -78,7 +78,10 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
             // ignore the set-up but-not-entered-yet stack frame
             // also ignore the call frame set up for BEGIN blocks
             bool is_eval_block = CxTRYBLOCK(sub);
-            if (line != caller->blk_oldcop && line != &PL_compiling &&
+            if ((line != caller->blk_oldcop ||
+                        CxTYPE(sub) != CXt_SUB ||
+                        PL_op != CvSTART(sub->blk_sub.cv)) &&
+                    line != &PL_compiling &&
                     !is_eval_block) {
                 if (CxTYPE(sub) != CXt_EVAL) {
                     trace.add_frame(FRAME_SUB, sub->blk_sub.cv, NULL, line);
