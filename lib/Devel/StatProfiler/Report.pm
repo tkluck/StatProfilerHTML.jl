@@ -266,11 +266,12 @@ sub add_trace_file {
                 $sub //= $self->_sub($frame);
             }
             my $file = $self->_file($sub->{file});
+            my $uq_sub_name = $sub->{uq_name};
 
             $sub->{inclusive} += $weight;
             $file->{lines}{inclusive}[$line] += $weight if $line > 0;
-            $file->{subs}{$sub->{start_line}}{$sub->{uq_name}} = undef;
-            push @for_flamegraph, $sub->{uq_name} if $flames;
+            $file->{subs}{$sub->{start_line}}{$uq_sub_name} = undef;
+            push @for_flamegraph, $uq_sub_name if $flames;
 
             if ($i != $#$frames) {
                 my $call_site = $frames->[$i + 1];
@@ -292,8 +293,8 @@ sub add_trace_file {
                 $site->{inclusive} += $weight;
                 $site->{exclusive} += $weight if !$i;
 
-                my $callee = $caller->{callees}{$call_line}{$sub->{uq_name}} ||= {
-                    callee    => $sub->{uq_name},
+                my $callee = $caller->{callees}{$call_line}{$uq_sub_name} ||= {
+                    callee    => $uq_sub_name,
                     inclusive => 0,
                 };
 
