@@ -2,6 +2,12 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.35      2015-06-17 11:11:13 CEST
+
+    - Improved aggregation of recursive subroutines (but it might be
+      changed again in the future)
+    - Fixed a bug that ignore inner frames for recursive subroutines
+
 0.34      2015-06-15 20:45:03 CEST
 
     - Remove non-actionable warning
