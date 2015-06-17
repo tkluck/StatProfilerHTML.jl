@@ -495,15 +495,21 @@ sub merged_report_metadata {
     return $res;
 }
 
-sub all_reports {
-    my ($self) = @_;
-
-    my @dirs = grep {
+sub _all_reports {
+    my ($self, @dirs) = @_;
+    my @reports = grep {
         $_ eq '__main__' || $_ !~ /^__/
     } map  File::Basename::basename($_),
       grep -d $_,
-           bsd_glob $self->{root_dir} . '/*';
+      map  bsd_glob($_ . '/*'),
+           @dirs;
+    my %uniq; @uniq{@reports} = ();
+
+    return keys %uniq;
 }
+
+sub all_reports { my ($self) = @_; return $self->_all_reports($self->{root_dir}) }
+sub all_unmerged_reports { my ($self) = @_; return $self->_all_reports($self->{parts_dir}) }
 
 sub discard_expired_process_data {
     my ($self, $expiration) = @_;
