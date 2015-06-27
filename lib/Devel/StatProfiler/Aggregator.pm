@@ -410,6 +410,8 @@ sub merge_report {
         $report->load($report_merged);
         $res->merge($report);
     }
+    $res->remap_names(@{$args{remap}})
+        if $args{remap} && $args{remap_again};
     for my $file (grep -f $_, @report_parts) {
         my $report = $self->_fresh_report;
 
