@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.36      2015-06-28 22:17:44 CEST
+
+    - Some tweaks to visualization of XS/opcodes
+
 0.35      2015-06-17 11:11:13 CEST
 
     - Improved aggregation of recursive subroutines (but it might be
