@@ -82,7 +82,7 @@
           <td></td>
           <td>
             <div class="call-sites">
-              <?= $sub->{inclusive} ?> samples spent in <?= $sub->{name} ?><br />
+              <?= $format_total_ratio->($sub->{inclusive}) ?> samples spent in <?= $sub->{name} ?><br />
 ?    for my $site (sort {$a->{inclusive} <=> $b->{inclusive}} values %{$sub->{call_sites}}) {
               <?= $format_ratio->($site->{exclusive}, $sub->{exclusive}) ?> (ex.),
               <?= $format_ratio->($site->{inclusive}, $sub->{inclusive}) ?> (incl.)
