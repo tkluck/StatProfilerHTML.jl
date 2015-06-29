@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.37      2015-06-29 11:49:58 CEST
+
+    - Actually merged the visualization changes mentioned in 0.36
+
 0.36      2015-06-28 22:17:44 CEST
 
     - Some tweaks to visualization of XS/opcodes
