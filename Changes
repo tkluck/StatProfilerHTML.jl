@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.38      2015-09-17 08:54:01 CEST
+
+    - Add basic support for expiring old aggregated data
+
 0.37      2015-06-29 11:49:58 CEST
 
     - Actually merged the visualization changes mentioned in 0.36
