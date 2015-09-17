@@ -22,7 +22,7 @@ for (my $count = 1000; ; $count *= 2) {
 Devel::StatProfiler::stop_profile();
 
 my @files = glob "$template.*";
-my $process_id;
+my ($process_id, $samples);
 
 my $r1 = Devel::StatProfiler::Report->new(
     slowops => [qw(ftdir unstack)],
@@ -31,7 +31,6 @@ $r1->add_trace_file($_) for @files;
 
 my $a1 = Devel::StatProfiler::Aggregator->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
     shard           => 'shard1',
     slowops         => [qw(ftdir unstack)],
 );
@@ -41,44 +40,61 @@ for my $file (@files) {
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
         $a1->process_trace_files($sr);
+        ++$samples;
         last if $sr->done;
     }
 }
 $a1->save_part;
 my $r2 = $a1->merge_report('__main__');
 
+my $a2 = Devel::StatProfiler::Aggregator->new(
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
+    timebox         => 1,
+);
+my $sample_split = int($samples / 2);
+my $sample_count;
 for my $file (@files) {
     my $r = Devel::StatProfiler::Reader->new($file);
     for (;;) {
         my $sr = t::lib::Test::SingleReader->new($r);
-        my $a = Devel::StatProfiler::Aggregator->new(
-            root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-            parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
-            shard           => 'shard1',
-            slowops         => [qw(ftdir unstack)],
-        );
-        $a->process_trace_files($sr);
-        $a->save_part;
-        $a->merge_report('__main__');
+        $a2->process_trace_files($sr);
+        if ($sample_count++ == $sample_split) {
+            $a2->save_part;
+            $a2->merge_report('__main__');
+            sleep 2; # different box
+            $a2 = Devel::StatProfiler::Aggregator->new(
+                root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+                shard           => 'shard1',
+                slowops         => [qw(ftdir unstack)],
+                timebox         => 1,
+            );
+        }
         last if $sr->done;
     }
 }
-my $a2 = Devel::StatProfiler::Aggregator->new(
-    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
-    shard           => 'shard1',
-    slowops         => [qw(ftdir unstack)],
-);
-$a2->merge_metadata;
-my $r3 = $a2->merge_report('__main__');
+$a2->save_part;
+$a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregator->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
-    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr2p'),
-    shards          => ['shard1'],
+    shard           => 'shard1',
     slowops         => [qw(ftdir unstack)],
+    timebox         => 1,
 );
-my $r4 = $a3->merged_report('__main__', 'map_source');
+$a3->merge_metadata;
+my $r3 = $a3->merged_report('__main__');
+
+my $a4 = Devel::StatProfiler::Aggregator->new(
+    root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
+    shard           => 'shard1',
+    slowops         => [qw(ftdir unstack)],
+    timebox         => 1,
+);
+# only to check that the in-place rewrite logic works
+$a4->discard_expired_process_data(time + 3600);
+my $r4 = $a4->merged_report('__main__');
 
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }

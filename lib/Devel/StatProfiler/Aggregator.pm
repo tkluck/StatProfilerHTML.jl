@@ -70,6 +70,8 @@ sub new {
         last_sample  => {},
         parts        => [],
         fetchers     => $opts{fetchers},
+        now          => time,
+        timebox      => $opts{timebox},
     }, $class;
 
     check_serializer($self->{serializer});
@@ -391,9 +393,10 @@ sub merge_report {
 
     $self->_load_all_metadata('parts') if $args{with_metadata};
 
+    my $suffix = $self->_suffix;
     my @report_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "report.*.$self->{shard}.*");
     my @metadata_parts = bsd_glob File::Spec::Functions::catfile($self->{parts_dir}, $report_id, 'parts', '*', "metadata.$self->{shard}.*");
-    my $report_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$self->{shard}");
+    my $report_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$suffix.$self->{shard}");
     my $metadata_merged = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$self->{shard}");
 
     my $res = $self->_fresh_report(mixed_process => 1);
@@ -452,19 +455,19 @@ sub merged_report {
 
     my $first = 1;
     for my $shard (@{$self->{shards}}) {
-        my $data = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.$shard");
+        my $data_glob = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.*.$shard");
         my $metadata = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$shard");
 
-        if (-f $data) {
+        for my $data (bsd_glob $data_glob) {
             my $report = $first ? $res : $self->_fresh_report;
 
             $report->load($data);
             $res->merge($report) if !$first && $report->{tick}; # TODO add accessor
+            $first = 0;
         }
         if (-f $metadata) {
             $res->load_and_merge_metadata($metadata);
         }
-        $first = 0;
     }
 
     $res->add_metadata($self->global_metadata);
@@ -530,15 +533,22 @@ sub discard_expired_process_data {
     # Burn-in eval mapping, so we can discard eval map
     for my $report_id ($self->all_reports) {
         my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
-        my $report = $self->merged_report($report_id);
+        my $data_glob = File::Spec::Functions::catfile($report_dir, "report.*.$self->{shard}");
 
-        # TODO fix this incestuous relation
-        $report->{source} = $aggregator->{source};
-        $report->{sourcemap} = $aggregator->{sourcemap};
-        $report->{genealogy} = $aggregator->{genealogy};
+        for my $data (bsd_glob $data_glob) {
+            my ($suffix) = $data =~ m/\breport\.(\d+)\.\Q$self->{shard}\E$/;
+            my $report = $self->_fresh_report(suffix => $suffix);
 
-        $report->map_source;
-        $report->save_aggregate($report_dir);
+            $report->load($data);
+
+            # TODO fix this incestuous relation
+            $report->{source} = $aggregator->{source};
+            $report->{sourcemap} = $aggregator->{sourcemap};
+            $report->{genealogy} = $aggregator->{genealogy};
+
+            $report->map_source;
+            $report->save_remapped($report_dir);
+        }
     }
 
     my $last_sample = $aggregator->{last_sample};
@@ -590,6 +600,12 @@ sub _merge_report {
     $self->{reports}{$report_id}->merge($report);
 }
 
+sub _suffix {
+    my ($self) = @_;
+
+    return $self->{timebox} ? $self->{now} - $self->{now} % $self->{timebox} : 0;
+}
+
 sub _fresh_report {
     my ($self, %opts) = @_;
 
@@ -603,6 +619,7 @@ sub _fresh_report {
         shard          => $self->{shard},
         mixed_process  => $opts{mixed_process} // $self->{mixed_process},
         fetchers       => $self->{fetchers},
+        suffix         => $opts{suffix} // $self->_suffix,
     );
 }
 

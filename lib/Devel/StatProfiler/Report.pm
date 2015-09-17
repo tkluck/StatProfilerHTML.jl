@@ -88,6 +88,7 @@ sub new {
         root_dir      => $opts{root_directory},
         parts_dir     => $opts{parts_directory} // $opts{root_directory},
         shard         => $opts{shard},
+        suffix        => $opts{suffix},
     }, $class;
 
     if ($self->{flamegraph}) {
@@ -613,7 +614,6 @@ sub merge {
 sub _save {
     my ($self, $report_dir, $is_part) = @_;
     my $state_dir = state_dir($self, $is_part);
-    my $report_base = $is_part ? sprintf('report.%s', $self->{process_id}) : 'report';
 
     File::Path::mkpath([$state_dir, $report_dir]);
 
@@ -626,6 +626,14 @@ sub _save {
     } else {
         $self->{metadata}->save_report_merged($report_dir);
     }
+    $self->_save_data($report_dir, $is_part);
+}
+
+sub _save_data {
+    my ($self, $report_dir, $is_part) = @_;
+    my $report_base = $is_part ? sprintf('report.%s', $self->{process_id}) :
+                                 sprintf('report.%s', $self->{suffix});
+
     write_data_any($is_part, $self, $report_dir, $report_base, [
         $self->{tick},
         $self->{stack_depth},
@@ -637,6 +645,7 @@ sub _save {
 
 sub save_part { $_[0]->_save($_[1], 1) }
 sub save_aggregate { $_[0]->_save($_[1], 0) }
+sub save_remapped { $_[0]->_save_data($_[1], 0) }
 
 sub load {
     my ($self, $report) = @_;
