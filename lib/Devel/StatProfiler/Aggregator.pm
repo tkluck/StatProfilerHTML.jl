@@ -10,6 +10,7 @@ use Devel::StatProfiler::Report;
 use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Metadata;
+use Devel::StatProfiler::Aggregate;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
@@ -26,14 +27,6 @@ use Errno;
 
 my $MAIN_REPORT_ID = ['__main__'];
 
-
-sub shards {
-    my ($class, $root_dir) = @_;
-    my $state_dir = state_dir({root_dir => $root_dir});
-    my @files = bsd_glob File::Spec::Functions::catfile($state_dir, 'shard.*');
-
-    return map m{[/\\]shard\.([^/\\]+)$}, @files;
-}
 
 sub new {
     my ($class, %opts) = @_;
@@ -75,7 +68,6 @@ sub new {
     }, $class;
 
     check_serializer($self->{serializer});
-    $self->load;
 
     return $self;
 }
@@ -219,11 +211,11 @@ sub save_part {
     }
 }
 
-sub load {
-    my ($self) = @_;
+sub _merge_report {
+    my ($self, $report_id, $report) = @_;
 
-    # nothing to do here anymore, still it's better to leave the hook
-    # in place
+    $self->{reports}{$report_id} ||= $self->_fresh_report;
+    $self->{reports}{$report_id}->merge($report);
 }
 
 sub _state {
@@ -363,7 +355,7 @@ sub _load_sourcemap {
 sub _load_all_metadata {
     my ($self, $parts) = @_;
 
-    return if %{$self->{genealogy}};
+    return if $self->{genealogy} && %{$self->{genealogy}};
 
     $self->_load_metadata($parts);
     $self->_load_genealogy($parts);
@@ -441,165 +433,6 @@ sub merge_report {
     return $res;
 }
 
-sub merged_report {
-    my ($self, $report_id, $map_source) = @_;
-
-    $self->_load_all_metadata;
-
-    my $res = $self->_fresh_report(mixed_process => 1);
-
-    # TODO fix this incestuous relation
-    $res->{source} = $self->{source};
-    $res->{sourcemap} = $self->{sourcemap};
-    $res->{genealogy} = $self->{genealogy};
-
-    my $first = 1;
-    for my $shard (@{$self->{shards}}) {
-        my $data_glob = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "report.*.$shard");
-        my $metadata = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$shard");
-
-        for my $data (bsd_glob $data_glob) {
-            my $report = $first ? $res : $self->_fresh_report;
-
-            $report->load($data);
-            $res->merge($report) if !$first && $report->{tick}; # TODO add accessor
-            $first = 0;
-        }
-        if (-f $metadata) {
-            $res->load_and_merge_metadata($metadata);
-        }
-    }
-
-    $res->add_metadata($self->global_metadata);
-    $res->map_source if $map_source;
-
-    return $res;
-}
-
-sub merged_report_metadata {
-    my ($self, $report_id) = @_;
-
-    $self->_load_metadata;
-
-    my $res = Devel::StatProfiler::Metadata->new(
-        serializer     => $self->{serializer},
-        root_directory => $self->{root_dir},
-        shard          => $self->{shard},
-    );
-
-    for my $shard (@{$self->{shards}}) {
-        my $metadata = File::Spec::Functions::catfile($self->{root_dir}, $report_id, "metadata.$shard");
-
-        if (-f $metadata) {
-            $res->load_and_merge($metadata);
-        }
-    }
-
-    $res->add_entries($self->global_metadata);
-
-    return $res;
-}
-
-sub _all_reports {
-    my ($self, @dirs) = @_;
-    my @reports = grep {
-        $_ eq '__main__' || $_ !~ /^__/
-    } map  File::Basename::basename($_),
-      grep -d $_,
-      map  bsd_glob($_ . '/*'),
-           @dirs;
-    my %uniq; @uniq{@reports} = ();
-
-    return keys %uniq;
-}
-
-sub all_reports { my ($self) = @_; return $self->_all_reports($self->{root_dir}) }
-sub all_unmerged_reports { my ($self) = @_; return $self->_all_reports($self->{parts_dir}) }
-
-sub discard_expired_process_data {
-    my ($self, $expiration) = @_;
-
-    $self->_load_all_metadata;
-
-    my @shards = __PACKAGE__->shards($self->{root_dir});
-    my $aggregator = __PACKAGE__->new(
-        root_directory => $self->{root_dir},
-        shards         => \@shards,
-        serializer     => $self->{serializer},
-    );
-
-    $aggregator->_load_all_metadata;
-
-    # Burn-in eval mapping, so we can discard eval map
-    for my $report_id ($self->all_reports) {
-        my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
-        my $data_glob = File::Spec::Functions::catfile($report_dir, "report.*.$self->{shard}");
-
-        for my $data (bsd_glob $data_glob) {
-            my ($suffix) = $data =~ m/\breport\.(\d+)\.\Q$self->{shard}\E$/;
-            my $report = $self->_fresh_report(suffix => $suffix);
-
-            $report->load($data);
-
-            # TODO fix this incestuous relation
-            $report->{source} = $aggregator->{source};
-            $report->{sourcemap} = $aggregator->{sourcemap};
-            $report->{genealogy} = $aggregator->{genealogy};
-
-            $report->map_source;
-            $report->save_remapped($report_dir);
-        }
-    }
-
-    my $last_sample = $aggregator->{last_sample};
-    my $genealogy = $aggregator->{genealogy};
-
-    my @queue = keys %{$self->{last_sample}};
-    while (@queue) {
-        my %updated;
-
-        for my $process_id (@queue) {
-            my $parent = $genealogy->{$process_id}{1};
-            my $parent_id = $parent->[0];
-
-            unless ($parent_id) {
-                # warn "Broken genealogy: '$process_id' has no parent";
-                next;
-            }
-            next if $parent_id eq "00" x 24;
-            $updated{$parent_id} = undef;
-            $last_sample->{$parent_id} = $last_sample->{$process_id}
-                if ($last_sample->{$parent_id} // 0) < $last_sample->{$process_id};
-        }
-
-        @queue = keys %updated;
-    }
-
-    for my $process_id (keys %$genealogy) {
-        next if ($last_sample->{$process_id} // 0) > $expiration;
-
-        # garbage-collect process-related metadata, under the
-        # assumption that if that neither the process nor its childs
-        # produced any samples in the given timeframe, they are "dead"
-        delete $self->{genealogy}{$process_id};
-        delete $self->{last_sample}{$process_id};
-        $self->{source}->delete_process($process_id);
-    }
-
-    # TODO Garbage-collect eval source code
-
-    write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
-    write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
-    $self->{source}->save_merged;
-}
-
-sub _merge_report {
-    my ($self, $report_id, $report) = @_;
-
-    $self->{reports}{$report_id} ||= $self->_fresh_report;
-    $self->{reports}{$report_id}->merge($report);
-}
-
 sub _suffix {
     my ($self) = @_;
 
@@ -618,19 +451,8 @@ sub _fresh_report {
         parts_directory=> $self->{parts_dir},
         shard          => $self->{shard},
         mixed_process  => $opts{mixed_process} // $self->{mixed_process},
-        fetchers       => $self->{fetchers},
-        suffix         => $opts{suffix} // $self->_suffix,
+        suffix         => $self->_suffix,
     );
-}
-
-sub report_names {
-    my ($self) = @_;
-    my @dirs = grep $_ ne '__state__' && $_ ne '__source__',
-        map  File::Basename::basename($_),
-        grep -d $_,
-        bsd_glob File::Spec::Functions::catfile($self->{root_dir}, '*');
-
-    return \@dirs;
 }
 
 sub add_report_metadata {
@@ -663,5 +485,9 @@ sub handle_section_change {
 
     return $MAIN_REPORT_ID;
 }
+
+# temporary during refactoring
+*all_unmerged_reports = \&Devel::StatProfiler::Aggregate::all_unmerged_reports;
+*_all_reports = \&Devel::StatProfiler::Aggregate::_all_reports;
 
 1;

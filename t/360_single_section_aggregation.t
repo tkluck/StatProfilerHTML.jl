@@ -114,7 +114,6 @@ for my $file (@files) {
             shard           => 'shard1',
         );
         $a->add_global_metadata({tag => 'test-1.3'});
-        $a->load;
         $a->process_trace_files($sr);
         $a->save_part;
         last if $sr->done;

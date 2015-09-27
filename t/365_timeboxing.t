@@ -77,19 +77,16 @@ for my $file (@files) {
 $a2->save_part;
 $a2->merge_report('__main__');
 
-my $a3 = Devel::StatProfiler::Aggregator->new(
+my $a3 = Devel::StatProfiler::Aggregate->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
     shard           => 'shard1',
-    slowops         => [qw(ftdir unstack)],
-    timebox         => 1,
 );
-$a3->merge_metadata;
+#$a3->merge_metadata;
 my $r3 = $a3->merged_report('__main__');
 
-my $a4 = Devel::StatProfiler::Aggregator->new(
+my $a4 = Devel::StatProfiler::Aggregate->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
     shard           => 'shard1',
-    slowops         => [qw(ftdir unstack)],
     timebox         => 1,
 );
 # only to check that the in-place rewrite logic works
@@ -104,7 +101,7 @@ $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
 numify($_) for $r2, $r3, $r4;
 
 # we test source code in another test
-delete @{$_}{qw(source sourcemap process_id genealogy root_dir parts_dir shard suffix)}, delete @{$_->{metadata}}{qw(shard root_dir)}
+delete @{$_}{qw(source sourcemap process_id genealogy root_dir parts_dir shard suffix slowops)}, delete @{$_->{metadata}}{qw(shard root_dir)}
     for $r1, $r2, $r3, $r4;
 
 eq_or_diff($r2, $r1);

@@ -56,9 +56,8 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 $a2->merge_metadata;
 my $r4 = $a2->merge_report('__main__');
 
-my $a3 = Devel::StatProfiler::Aggregator->new(
+my $a3 = Devel::StatProfiler::Aggregate->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
-    parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
     shards          => ['shard1'],
 );
 my $r5 = $a3->merged_report('__main__', 'map_source');
