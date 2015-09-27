@@ -56,12 +56,9 @@ my $a2 = Devel::StatProfiler::Aggregator->new(
 );
 my $r3 = $a2->merge_report('__main__', with_metadata => 1);
 
-my ($parent_id) = grep $r1->{genealogy}{$_}{1}[0] eq "00" x 24,
-                       keys %{$r1->{genealogy}};
-my ($child_id) = grep $r1->{genealogy}{$_}{1}[0] eq $parent_id,
-                      keys %{$r1->{genealogy}};
-my ($grandchild_id) = grep $r1->{genealogy}{$_}{1}[0] eq $child_id,
-                           keys %{$r1->{genealogy}};
+my ($parent_id, $tree) = get_process_tree(@files);
+my ($child_id) = get_childs($tree, $parent_id);
+my ($grandchild_id) = get_childs($tree, $child_id);
 
 my $rs1 = $r1->{source};
 my $rs2 = $r2->{source};

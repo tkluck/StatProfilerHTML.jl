@@ -28,6 +28,8 @@ our @EXPORT = (
         precision_factor
         run_ctests
         spawn
+        get_process_tree
+        get_childs
         take_sample
         temp_profile_dir
         temp_profile_file
@@ -240,6 +242,26 @@ sub spawn {
     } else {
         die "Neither fork() nor threads available";
     }
+}
+
+sub get_process_tree {
+    my (@files) = @_;
+    my %genealogy;
+
+    for my $file (@files) {
+        my $r = Devel::StatProfiler::Reader->new($file);
+        my ($id, $xxx, $parent, $ordinal) = @{$r->get_genealogy_info};
+
+        $genealogy{$parent}{$id} = $ordinal;
+    }
+
+    return ((keys %{delete $genealogy{"00" x 24}})[0], \%genealogy);
+}
+
+sub get_childs {
+    my ($tree, $id) = @_;
+
+    return keys %{$tree->{$id}};
 }
 
 package t::lib::Test::ForkSpawn;
