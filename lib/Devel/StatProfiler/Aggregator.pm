@@ -85,7 +85,7 @@ sub can_process_trace_file {
             if ($error !~ /^Failed to open file/ || $errno != Errno::ENOENT) {
                 die;
             }
-            undef;
+            0;
         };
 
         if ($r) {
@@ -93,7 +93,8 @@ sub can_process_trace_file {
                 @{$r->get_genealogy_info};
             my $state = $self->_state($process_id) // { ordinal => 0 };
 
-            $process_ordinal == $state->{ordinal} + 1;
+            $process_ordinal == $state->{ordinal} + 1 &&
+                $self->_is_processed($parent_id, $parent_ordinal);
         } else {
             0;
         }
@@ -257,6 +258,30 @@ sub _state {
     };
 }
 
+sub _is_processed {
+    my ($self, $process_id, $process_ordinal) = @_;
+
+    return 1 if $process_id eq "00" x 24;
+
+    return 1 if $self->{genealogy} &&
+        $self->{genealogy}{$process_id} &&
+        $self->{genealogy}{$process_id}{$process_ordinal};
+
+    unless ($self->{merged_metadata}) {
+        my @shards = Devel::StatProfiler::Aggregate->shards($self->{root_dir});
+        $self->{merged_metadata} = Devel::StatProfiler::Aggregate->new(
+            root_directory  => $self->{root_dir},
+            shards          => \@shards,
+            serializer      => $self->{serializer},
+        );
+        $self->{merged_metadata}->_load_genealogy;
+    }
+
+    return $self->{merged_metadata}{genealogy} &&
+        $self->{merged_metadata}{genealogy}{$process_id} &&
+        $self->{merged_metadata}{genealogy}{$process_id}{$process_ordinal};
+}
+
 sub _merge_genealogy {
     my ($self, $genealogy) = @_;
 
@@ -369,11 +394,13 @@ sub merge_metadata {
 
     $self->_load_all_metadata('parts');
 
-    write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
-    write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
     $self->{metadata}->save_merged;
     $self->{source}->save_merged;
     $self->{sourcemap}->save_merged;
+    write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
+    # genealogy needs to be saved last, because can_process_trace_files
+    # assumes that if there is the genalogy the rest has been saved
+    write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
 
     for my $part (@{$self->{parts}}) {
         unlink $part;
