@@ -3,6 +3,7 @@
 use t::lib::Test;
 
 use Devel::StatProfiler::Aggregator;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(usleep);
 
 my ($profile_dir, $template);
@@ -36,12 +37,16 @@ my $r1 = Devel::StatProfiler::Report->new(sources => 1);
 $r1->add_trace_file($profile_file);
 my $a1 = $r1->{aggregate};
 
-my $r2 = Devel::StatProfiler::Report->new(sources => 1);
-$r2->add_trace_file($profile_file);
-$r2->remap_names(
-    { 'bar'  => 'foo' },
-    { 'foo_' => 'foo_*' },
+my $map = Devel::StatProfiler::NameMap->new(
+    names => {
+        'main' => {
+            'bar'   => 'foo',
+            'foo_'  => 'foo_*',
+        },
+    },
 );
+my $r2 = Devel::StatProfiler::Report->new(sources => 1, mapper => $map);
+$r2->add_trace_file($profile_file);
 my $a2 = $r2->{aggregate};
 
 my $main1 = $a1->{files}{'t/384_custom_mapping.t'};
@@ -100,7 +105,5 @@ eq_or_diff([sort keys %{$a2->{subs}{'t/384_custom_mapping.t:main::foo_*:15'}{cal
     't/384_custom_mapping.t:27',
     't/384_custom_mapping.t:28',
 ]);
-
-#use Data::Dumper; print Dumper($a2);
 
 done_testing();

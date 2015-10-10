@@ -109,7 +109,7 @@ namespace devel {
         {
         public:
             // Note: Constructor does not open the file!
-            TraceFileReader(pTHX);
+            TraceFileReader(pTHX_ SV *mapper);
             ~TraceFileReader();
 
             void open(const std::string &path);
@@ -141,6 +141,7 @@ namespace devel {
         private:
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
+            SV *map_name(SV *package, SV *name);
 
             InputBuffer in;
             // TODO maybe introduce a header struct or class for cleanliness?
@@ -155,6 +156,8 @@ namespace devel {
             HV *st_stash, *sf_stash, *msf_stash, *esf_stash;
             bool sections_changed, metadata_changed;
             bool stream_ended, file_ended;
+            SV *mapper;
+            HV *sub_prefix_rx;
 
             DECL_THX_MEMBER
         };

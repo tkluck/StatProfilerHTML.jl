@@ -81,6 +81,7 @@ sub new {
         tick          => 0,
         stack_depth   => 0,
         perl_version  => undef,
+        mapper        => $opts{mapper},
         process_id    => $opts{mixed_process} ? 'mixed' : undef,
         serializer    => $opts{serializer} || 'storable',
         fetchers      => $opts{fetchers} || [[undef, 'fetch_source_from_file']],
@@ -212,7 +213,8 @@ EOT
 
 sub add_trace_file {
     my ($self, $file) = @_;
-    my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file);
+    my $mapper = $self->{mapper} && $self->{mapper}->can_map_sub ? $self->{mapper} : undef;
+    my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file, $mapper);
     my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
     my $slowops = $self->{slowops};
 

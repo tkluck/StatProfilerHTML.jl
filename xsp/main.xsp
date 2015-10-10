@@ -40,12 +40,12 @@ double test_hires_time();
 
 %name{Devel::StatProfiler::Reader} class TraceFileReader
 {
-    TraceFileReader(SV *path)
+    TraceFileReader(SV *path, SV *mapper = NULL)
       %code{%
           STRLEN len;
           const char *str = SvPV(path, len);
           const std::string pathstr(str, len);
-          RETVAL = new TraceFileReader(aTHX);
+          RETVAL = new TraceFileReader(aTHX_ mapper);
           RETVAL->open(pathstr);
       %};
     ~TraceFileReader();

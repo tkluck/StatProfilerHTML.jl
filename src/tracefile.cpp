@@ -420,10 +420,10 @@ namespace {
 }
 
 
-TraceFileReader::TraceFileReader(pTHX)
+TraceFileReader::TraceFileReader(pTHX_ SV *_mapper)
   : file_format_version(0), sections(NULL),
     sections_changed(false), metadata_changed(false),
-    stream_ended(false), file_ended(false)
+    stream_ended(false), file_ended(false), sub_prefix_rx(NULL)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -435,6 +435,13 @@ TraceFileReader::TraceFileReader(pTHX)
     sf_stash = gv_stashpv("Devel::StatProfiler::StackFrame", 0);
     msf_stash = gv_stashpv("Devel::StatProfiler::MainStackFrame", 0);
     esf_stash = gv_stashpv("Devel::StatProfiler::EvalStackFrame", 0);
+    mapper = _mapper && SvOK(_mapper) ? SvREFCNT_inc(_mapper) : NULL;
+
+    if (mapper) {
+        SV **_rx = hv_fetchs((HV *) SvRV(mapper), "rx", 0);
+
+        sub_prefix_rx = _rx ? (HV *) SvRV(*_rx) : NULL;
+    }
 }
 
 TraceFileReader::~TraceFileReader()
@@ -442,6 +449,7 @@ TraceFileReader::~TraceFileReader()
     SvREFCNT_dec(source_code);
     SvREFCNT_dec(custom_metadata);
     SvREFCNT_dec(sections);
+    SvREFCNT_dec(mapper);
     close();
 }
 
@@ -547,6 +555,31 @@ void TraceFileReader::close()
     in.close();
 }
 
+SV *TraceFileReader::map_name(SV *package, SV *name) {
+    // duplicates logic in the mapper, to avoid unnecessary method calls
+    HE *e = hv_fetch_ent(sub_prefix_rx, package, 0, 0);
+
+    if (!e)
+        return name;
+
+    dSP;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    PUSHs(mapper);
+    PUSHs(package);
+    PUSHs(name);
+    PUTBACK;
+
+    call_method("map_sub", G_SCALAR);
+
+    SPAGAIN;
+    SV *newname = POPs;
+    PUTBACK;
+
+    return newname;
+}
+
 SV *TraceFileReader::read_trace()
 {
     HV *sample = NULL;
@@ -597,6 +630,9 @@ SV *TraceFileReader::read_trace()
             int first_line = read_varint(in);
             HV *frame = newHV();
 
+            if (sub_prefix_rx)
+                name = map_name(package, name);
+
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
             hv_stores(frame, "sub_name", SvREFCNT_inc(name));
@@ -613,6 +649,9 @@ SV *TraceFileReader::read_trace()
             SV *package = read_string(aTHX_ in);
             SV *name = read_string(aTHX_ in);
             HV *frame = newHV();
+
+            if (sub_prefix_rx)
+                name = map_name(package, name);
 
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
