@@ -31,6 +31,7 @@ my $MAIN_REPORT_ID = ['__main__'];
 sub new {
     my ($class, %opts) = @_;
     my $genealogy = {};
+    my $mapper = $opts{mapper} && $opts{mapper}->can_map_sub ? $opts{mapper} : undef;
     my $self = bless {
         root_dir     => $opts{root_directory},
         parts_dir    => $opts{parts_directory} // $opts{root_directory},
@@ -58,6 +59,7 @@ sub new {
             root_directory => $opts{root_directory},
             shard          => $opts{shard},
         ),
+        mapper       => $mapper,
         mixed_process=> $opts{mixed_process},
         genealogy    => $genealogy,
         last_sample  => {},
@@ -77,7 +79,7 @@ sub can_process_trace_file {
 
     return grep {
         my $r = eval {
-            ref $_ ? $_ : Devel::StatProfiler::Reader->new($_)
+            ref $_ ? $_ : Devel::StatProfiler::Reader->new($_, $self->{mapper})
         } or do {
             my $errno = $!;
             my $error = $@;
@@ -105,7 +107,7 @@ sub process_trace_files {
     my ($self, @files) = @_;
 
     for my $file (@files) {
-        my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file);
+        my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file, $self->{mapper});
         my $sc = Devel::StatProfiler::SectionChangeReader->new($r);
         my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
             @{$r->get_genealogy_info};
