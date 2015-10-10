@@ -25,7 +25,7 @@ enum {
     TAG_EVAL_FRAME              = 4,
     TAG_XSUB_FRAME              = 5,
     TAG_MAIN_FRAME              = 6,
-    TAG_EVAL_STRING             = 7,
+    TAG_EVAL_STRING             = 7, // unused
     TAG_EVAL_SEQ                = 8,
     TAG_FILE_END                = 196,
     TAG_STREAM_END              = 197,
@@ -674,13 +674,6 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), esf_stash));
 
-            break;
-        }
-        case TAG_EVAL_STRING: {
-            SV *text = read_string(aTHX_ in);
-            SV *file = read_string(aTHX_ in);
-
-            hv_store_ent(source_code, file, SvREFCNT_inc(text), 0);
             break;
         }
         case TAG_EVAL_SEQ: {
