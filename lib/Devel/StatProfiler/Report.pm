@@ -141,9 +141,11 @@ sub _compress_inplace {
 sub _sub {
     my ($self, $frame, $file) = @_;
     my $uq_name = $frame->uq_sub_name;
+    my $name = $frame->fq_sub_name || $uq_name;
 
     return $self->{aggregate}{subs}{$uq_name} ||= {
-        name       => $frame->fq_sub_name || $uq_name,
+        name       => $name,
+        name_pretty=> $frame->sub_name_pretty || $name,
         uq_name    => $uq_name,
         package    => $frame->package,
         file       => $file // $frame->file,
@@ -511,6 +513,7 @@ sub merge {
             my $other_sub = $other_subs->{$id};
             my $my_sub = $my_subs->{$id} ||= {
                 name       => $other_sub->{name},
+                name_pretty=> $other_sub->{name_pretty},
                 uq_name    => $other_sub->{uq_name},
                 package    => $other_sub->{package},
                 file       => $other_sub->{file},

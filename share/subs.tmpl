@@ -25,7 +25,7 @@
           <td sorttable_customkey="<?= $sub->{exclusive} ?>"><?= $format_total_ratio->($sub->{exclusive}) ?></td>
           <td sorttable_customkey="<?= $sub->{inclusive} ?>"><?= $format_total_ratio->($sub->{inclusive}) ?></td>
           <td>
-            <a href="<?= $sub_link->($sub) ?>"><?= $sub_name->($sub->{name}) ?></a>
+            <a href="<?= $sub_link->($sub) ?>"><?= $sub_name->($sub->{name_pretty}) ?></a>
 ?    if ($sub->{kind} == 2) {
             (opcode)
 ?    } elsif ($sub->{kind} == 1) {

@@ -30,6 +30,7 @@ sub line { $_[0]->{line} }
 
 sub package { $_[0]->{package} }
 sub sub_name { $_[0]->{sub_name} }
+sub sub_name_pretty { undef }
 sub fq_sub_name { $_[0]->{fq_sub_name} }
 sub uq_sub_name {
     ($_[0]->{file} || '(unknown)') . ':' .
@@ -51,6 +52,7 @@ sub line { $_[0]->{line} }
 
 sub package { '' }
 sub sub_name { '' }
+sub sub_name_pretty { '' }
 sub fq_sub_name { '' }
 sub uq_sub_name { $_[0]->{file} . ':main' }
 sub first_line { 1 }
@@ -62,6 +64,7 @@ package Devel::StatProfiler::EvalStackFrame;
 
 our @ISA = qw(Devel::StatProfiler::MainStackFrame);
 
+sub sub_name_pretty { $_[0]->{file_pretty} }
 sub uq_sub_name { $_[0]->{file} . ':eval' }
 sub is_main { 0 }
 sub is_eval { 1 }

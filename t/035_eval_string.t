@@ -82,6 +82,7 @@ eq_or_diff($samples[3][2], bless {
     line          => 1,
     first_line    => 1,
     file          => "qeval:$process_id/(eval ${\($index + 4)})",
+    file_pretty   => "qeval:$process_id/(eval ${\($index + 4)})",
     package       => 'main',
     sub_name      => 'BEGIN',
     fq_sub_name   => 'main::BEGIN',
@@ -89,6 +90,7 @@ eq_or_diff($samples[3][2], bless {
 eq_or_diff($samples[3][3], bless {
     line          => $l3,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 done_testing();
