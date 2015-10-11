@@ -141,7 +141,10 @@ namespace devel {
         private:
             void read_header();
             void read_custom_meta_record(const int size, HV *extra_output_hash = NULL);
+            bool can_map_evals();
             SV *map_name(SV *package, SV *name);
+            SV *map_eval(SV *eval_name);
+            SV *maybe_map_eval(SV *eval_name);
 
             InputBuffer in;
             // TODO maybe introduce a header struct or class for cleanliness?
@@ -158,6 +161,7 @@ namespace devel {
             bool stream_ended, file_ended;
             SV *mapper;
             HV *sub_prefix_rx;
+            bool map_evals;
 
             DECL_THX_MEMBER
         };

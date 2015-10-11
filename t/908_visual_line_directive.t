@@ -3,6 +3,7 @@
 use t::lib::Test ':visual';
 
 use Devel::StatProfiler::Report;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(usleep);
 
 my $profile_file;
@@ -50,13 +51,15 @@ Devel::StatProfiler::write_inc_path;
 Devel::StatProfiler::stop_profile();
 
 my $r = Devel::StatProfiler::Report->new(
+    mapper        => Devel::StatProfiler::NameMap->new(
+        source => Devel::StatProfiler::EvalSource->new,
+    ),
     slowops    => [qw(ftdir unstack)],
     flamegraph => 1,
     sources    => 1,
 );
 $r->add_trace_file($profile_file);
 $r->_file('t/lib/Test/LineMap.pm'); # ensure we read the file
-$r->map_source;
 
 $r->output($output_dir);
 

@@ -31,7 +31,7 @@ my $MAIN_REPORT_ID = ['__main__'];
 sub new {
     my ($class, %opts) = @_;
     my $genealogy = {};
-    my $mapper = $opts{mapper} && $opts{mapper}->can_map_sub ? $opts{mapper} : undef;
+    my $mapper = $opts{mapper} && $opts{mapper}->can_map ? $opts{mapper} : undef;
     my $self = bless {
         root_dir     => $opts{root_directory},
         parts_dir    => $opts{parts_directory} // $opts{root_directory},
@@ -105,6 +105,7 @@ sub can_process_trace_file {
 
 sub process_trace_files {
     my ($self, @files) = @_;
+    my $eval_mapper = $self->{mapper} && $self->{mapper}->can_map_eval ? $self->{mapper} : undef;
 
     for my $file (@files) {
         my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file, $self->{mapper});
@@ -117,6 +118,8 @@ sub process_trace_files {
         $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
         $self->{last_sample}{$process_id} = time;
         $self->{metadata}->add_entries($r->get_custom_metadata);
+        $eval_mapper->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
+            if $eval_mapper;
 
         if (my $reader_state = delete $state->{reader_state}) {
             $r->set_reader_state($reader_state);

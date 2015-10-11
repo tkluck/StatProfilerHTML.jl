@@ -37,6 +37,10 @@
 - test case for 8cca10b0053cf3a2e741fae7adc7f0ed3a1fea3c
 - merge xs:<file> with real file entries, if there is a matching one
 - split the Aggregator class in two (aggregation and loading of the final report)
+- rewrite NameMap in C++ (leaving the loading/saving/merging in Perl for convenience)
+- add test for NameMap eval mapping
+- revisit the way the mutable genealogy hash is shared
+  (provide an API and/or rewrite in C++)
 - add an API to read traces by section, and remove the horrible hack of returning
   a fake empty trace when a section starts/ends
     - add some kind of ->watch_sections("name1", "name2") to the reader,

@@ -51,6 +51,12 @@ sub add_sources_from_reader {
     }
 }
 
+sub update_genealogy {
+    my ($self, $process_id, $process_ordinal, $parent_id, $parent_ordinal) = @_;
+
+    $self->{genealogy}{$process_id}{$process_ordinal} = [$parent_id, $parent_ordinal];
+}
+
 # this tries to optimize for the case where we dumped all evals, the number
 # of evals is unlikely to be an issue when we only dump traced ones
 sub _pack_data {

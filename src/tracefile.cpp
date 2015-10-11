@@ -5,6 +5,7 @@
 #endif
 
 #include <ctime>
+#include <vector>
 
 using namespace devel::statprofiler;
 using namespace std;
@@ -423,7 +424,8 @@ namespace {
 TraceFileReader::TraceFileReader(pTHX_ SV *_mapper)
   : file_format_version(0), sections(NULL),
     sections_changed(false), metadata_changed(false),
-    stream_ended(false), file_ended(false), sub_prefix_rx(NULL)
+    stream_ended(false), file_ended(false), sub_prefix_rx(NULL),
+    map_evals(false)
 {
     SET_THX_MEMBER
     source_perl_version.revision = 0;
@@ -441,6 +443,7 @@ TraceFileReader::TraceFileReader(pTHX_ SV *_mapper)
         SV **_rx = hv_fetchs((HV *) SvRV(mapper), "rx", 0);
 
         sub_prefix_rx = _rx ? (HV *) SvRV(*_rx) : NULL;
+        map_evals = can_map_evals();
     }
 }
 
@@ -555,6 +558,23 @@ void TraceFileReader::close()
     in.close();
 }
 
+bool TraceFileReader::can_map_evals() {
+    dSP;
+
+    PUSHMARK(SP);
+    XPUSHs(mapper);
+    PUTBACK;
+
+    call_method("can_map_eval", G_SCALAR);
+
+    SPAGAIN;
+    SV *res = POPs;
+    bool result = SvTRUE(res);
+    PUTBACK;
+
+    return result;
+}
+
 SV *TraceFileReader::map_name(SV *package, SV *name) {
     // duplicates logic in the mapper, to avoid unnecessary method calls
     HE *e = hv_fetch_ent(sub_prefix_rx, package, 0, 0);
@@ -580,10 +600,74 @@ SV *TraceFileReader::map_name(SV *package, SV *name) {
     return newname;
 }
 
+SV *TraceFileReader::map_eval(SV *eval_name) {
+    dSP;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 4);
+    PUSHs(mapper);
+    PUSHs(newSVpvn_flags((const char *) genealogy_info.id, sizeof(genealogy_info.id) - 1, SVs_TEMP));
+    mPUSHs(newSVuv(genealogy_info.ordinal));
+    PUSHs(eval_name);
+    PUTBACK;
+
+    call_method("map_eval_name", G_SCALAR);
+
+    SPAGAIN;
+    SV *newname = POPs;
+    PUTBACK;
+
+    return newname;
+}
+
+static SV *sha1_hex(pTHX_ SV *source) {
+    dSP;
+
+    PUSHMARK(SP);
+    XPUSHs(source);
+    PUTBACK;
+
+    call_pv("Digest::SHA::sha1_hex", G_SCALAR);
+
+    SPAGAIN;
+    SV *res = POPs;
+    PUTBACK;
+
+    return res;
+}
+
+SV *TraceFileReader::maybe_map_eval(SV *file) {
+    STRLEN len = SvCUR(file);
+    char *s = SvPVX(file);
+
+    if (s[len - 1] == ')' && strncmp(s, "(eval ", 6) == 0) {
+        HE *source = hv_fetch_ent(source_code, file, 0, 0);
+
+        if (source) {
+            SV *digest = sha1_hex(aTHX_ HeVAL(source));
+            SV *res = sv_2mortal(newSV(5 + len));
+            char *buffer = SvPVX(res);
+
+            memcpy(buffer, "eval:", 5);
+            SvPOK_on(res);
+            SvCUR_set(res, 5);
+            sv_catsv(res, digest);
+
+            return res;
+        }
+
+        return map_eval(file);
+    }
+
+    return file;
+}
+
 SV *TraceFileReader::read_trace()
 {
     HV *sample = NULL;
     AV *frames;
+    vector<SV *> try_eval_remap;
+    bool eval_remap = false;
 
     // As we read more meta data, we'll build up this hash (which is
     // created lazily below). If there's any, that hash will be returned
@@ -630,9 +714,14 @@ SV *TraceFileReader::read_trace()
             int first_line = read_varint(in);
             HV *frame = newHV();
             SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
+            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
 
             if (sub_prefix_rx)
                 name = map_name(package, name);
+            if (map_evals) {
+                eval_remap = eval_remap || maybe_eval;
+                try_eval_remap.push_back(maybe_eval ? file : NULL);
+            }
 
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
@@ -654,6 +743,8 @@ SV *TraceFileReader::read_trace()
 
             if (sub_prefix_rx)
                 name = map_name(package, name);
+            if (map_evals)
+                try_eval_remap.push_back(NULL);
 
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
@@ -672,6 +763,12 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             HV *frame = newHV();
             SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
+            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
+
+            if (map_evals) {
+                eval_remap = eval_remap || maybe_eval;
+                try_eval_remap.push_back(maybe_eval ? file : NULL);
+            }
 
             hv_stores(frame, "file", full_file);
             hv_stores(frame, "file_pretty", SvREFCNT_inc(full_file));
@@ -696,6 +793,12 @@ SV *TraceFileReader::read_trace()
             SV *file = read_string(aTHX_ in);
             int line = read_varint(in);
             HV *frame = newHV();
+            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
+
+            if (map_evals) {
+                eval_remap = eval_remap || maybe_eval;
+                try_eval_remap.push_back(maybe_eval ? file : NULL);
+            }
 
             hv_stores(frame, "file", SvREFCNT_inc(file));
             hv_stores(frame, "file_pretty", SvREFCNT_inc(file));
@@ -708,6 +811,27 @@ SV *TraceFileReader::read_trace()
             if (!sample)
                 croak("Invalid input file: Found stray sample-end tag without sample-start tag");
             in.skip_bytes(size);
+
+            if (eval_remap) {
+                // the source code for an eval might be emitted after
+                // the first stack frame referring to the eval, so we
+                // need to perform the remapping at the end of the
+                // stack frame
+                for (size_t i = 0, n = try_eval_remap.size(); i < n; ++i) {
+                    SV *file = try_eval_remap[i];
+                    if (!file)
+                        continue;
+
+                    SV *mapped = maybe_map_eval(file);
+                    SV *frame = *av_fetch(frames, i, 0);
+
+                    hv_stores((HV *) SvRV(frame), "file", make_fullfile(aTHX_ genealogy_info, mapped));
+                }
+            }
+            if (map_evals) {
+                eval_remap = false;
+                try_eval_remap.clear();
+            }
 
             if (new_metadata)
                 hv_stores(sample, "metadata", newRV_inc((SV *)new_metadata));

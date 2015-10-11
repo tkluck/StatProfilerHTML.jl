@@ -3,6 +3,7 @@
 use t::lib::Test;
 
 use Devel::StatProfiler::Report;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(usleep);
 use Storable;
 
@@ -55,8 +56,14 @@ my $r1 = Devel::StatProfiler::Report->new(
 );
 $r1->add_trace_file($profile_file);
 
-my $r2 = Storable::dclone($r1);
-$r2->map_source;
+my $r2 = Devel::StatProfiler::Report->new(
+    mapper        => Devel::StatProfiler::NameMap->new(
+        source => Devel::StatProfiler::EvalSource->new,
+    ),
+    sources       => 1,
+    flamegraph    => 1,
+);
+$r2->add_trace_file($profile_file);
 
 my $a1 = $r1->{aggregate};
 my $a2 = $r2->{aggregate};
@@ -126,12 +133,12 @@ my $a2 = $r2->{aggregate};
     is($s2e1foo->{exclusive}, $s1e1foo->{exclusive} + $s1e2foo->{exclusive});
     is($s2e1foo->{inclusive}, $s1e1foo->{inclusive} + $s1e2foo->{inclusive});
 
-    ok($s1e1foo->{call_sites}{__FILE__ . ':25'});
-    ok($s1e2foo->{call_sites}{__FILE__ . ':33'});
-    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':25'},
-               $s1e1foo->{call_sites}{__FILE__ . ':25'});
-    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':33'},
-               $s1e2foo->{call_sites}{__FILE__ . ':33'});
+    ok($s1e1foo->{call_sites}{__FILE__ . ':26'});
+    ok($s1e2foo->{call_sites}{__FILE__ . ':34'});
+    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':26'},
+               $s1e1foo->{call_sites}{__FILE__ . ':26'});
+    eq_or_diff($s2e1foo->{call_sites}{__FILE__ . ':34'},
+               $s1e2foo->{call_sites}{__FILE__ . ':34'});
 
     {
         my $s1c1 = $s1e1foo->{callees}{5}{_e($process_id, $first_eval_n + 1) . ':main::foo:2'};

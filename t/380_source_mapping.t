@@ -3,6 +3,7 @@
 use t::lib::Test;
 
 use Devel::StatProfiler::Aggregator;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(usleep);
 
 my ($profile_dir, $template);
@@ -57,10 +58,13 @@ $a2->merge_metadata;
 my $r4 = $a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregate->new(
+    mapper        => Devel::StatProfiler::NameMap->new(
+        source => Devel::StatProfiler::EvalSource->new,
+    ),
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
     shards          => ['shard1'],
 );
-my $r5 = $a3->merged_report('__main__', 'map_source');
+my $r5 = $a3->merged_report('__main__');
 
 my %eval_map = (
     'eval:6b3cd1d74ca85645e1b7441e303697abb2167799' => [

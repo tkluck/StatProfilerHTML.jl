@@ -4,6 +4,7 @@ use t::lib::Test;
 use t::lib::Slowops;
 
 use Devel::StatProfiler::Aggregator;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(time);
 
 my ($profile_dir, $template);
@@ -73,10 +74,13 @@ $a2->merge_metadata;
 my $r3 = $a2->merge_report('__main__');
 
 my $a3 = Devel::StatProfiler::Aggregate->new(
+    mapper        => Devel::StatProfiler::NameMap->new(
+        source => Devel::StatProfiler::EvalSource->new,
+    ),
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr2'),
     shards          => ['shard1'],
 );
-my $r4 = $a3->merged_report('__main__', 'map_source');
+my $r4 = $a3->merged_report('__main__');
 
 # we fake the ordinals in t::lib::Test::SingleReader
 $_->{genealogy}{$process_id} = { 1 => $_->{genealogy}{$process_id}{1} }
