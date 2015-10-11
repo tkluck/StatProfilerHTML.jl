@@ -957,9 +957,6 @@ sub output {
     my @files = sort { $b->{exclusive} <=> $a->{exclusive} }
                     values %$files;
 
-    # Backwards compatibility for releases before 0.21
-    $_->{report} //= sprintf('%s-line.html', _fileify($_->{name}))
-	for @files;
     $_->{file} //= 'xs:unknown' for @subs;
 
     my $date = POSIX::strftime('%c', localtime(time));
@@ -983,8 +980,6 @@ sub output {
     };
 
     my $file_name = sub {
-        # Backwards compatibility for releases before 0.21
-        return '(unknown)' if $_[0] eq '';
         return $1 if $_[0] =~ m{qeval:[0-9a-f]+/(.+)$};
 
         for my $dir (@$at_inc) {
