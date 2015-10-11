@@ -1094,6 +1094,7 @@ sub output {
             callees                 => $callees,
             sub_link                => $sub_link,
             sub_name                => $sub_name,
+            file_name               => $file_name,
             file_link               => $file_link,
             format_total_ratio      => $format_total_samples,
             format_ratio            => \&_format_ratio,
