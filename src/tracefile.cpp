@@ -629,6 +629,7 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             int first_line = read_varint(in);
             HV *frame = newHV();
+            SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
 
             if (sub_prefix_rx)
                 name = map_name(package, name);
@@ -636,7 +637,8 @@ SV *TraceFileReader::read_trace()
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
             hv_stores(frame, "package", SvREFCNT_inc(package));
             hv_stores(frame, "sub_name", SvREFCNT_inc(name));
-            hv_stores(frame, "file", make_fullfile(aTHX_ genealogy_info, file));
+            hv_stores(frame, "file", full_file);
+            hv_stores(frame, "file_pretty", SvREFCNT_inc(full_file));
             hv_stores(frame, "line", newSViv(line));
             hv_stores(frame, "first_line", newSViv(first_line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), sf_stash));
@@ -669,8 +671,10 @@ SV *TraceFileReader::read_trace()
             SV *file = read_string(aTHX_ in);
             int line = read_varint(in);
             HV *frame = newHV();
+            SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
 
-            hv_stores(frame, "file", make_fullfile(aTHX_ genealogy_info, file));
+            hv_stores(frame, "file", full_file);
+            hv_stores(frame, "file_pretty", SvREFCNT_inc(full_file));
             hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), esf_stash));
 
@@ -694,6 +698,7 @@ SV *TraceFileReader::read_trace()
             HV *frame = newHV();
 
             hv_stores(frame, "file", SvREFCNT_inc(file));
+            hv_stores(frame, "file_pretty", SvREFCNT_inc(file));
             hv_stores(frame, "line", newSViv(line));
             av_push(frames, sv_bless(newRV_noinc((SV *) frame), msf_stash));
 

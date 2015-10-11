@@ -26,6 +26,7 @@ my @traces = get_traces($profile_file, {
 
 eq_or_diff($traces[0]->frames->[1], bless {
     file          => 't/lib/Devel/StatProfiler/Test.pm',
+    file_pretty   => 't/lib/Devel/StatProfiler/Test.pm',
     first_line    => 17,
     fq_sub_name   => 'Devel::StatProfiler::Test::TiedScalar::FETCH',
     line          => 17,
@@ -34,6 +35,7 @@ eq_or_diff($traces[0]->frames->[1], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($traces[0]->frames->[2], bless {
     file          => __FILE__,
+    file_pretty   => __FILE__,
     line          => $l1,
 }, 'Devel::StatProfiler::MainStackFrame');
 

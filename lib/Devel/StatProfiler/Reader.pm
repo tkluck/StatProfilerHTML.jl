@@ -25,6 +25,7 @@ sub set_reader_state {
 package Devel::StatProfiler::StackFrame;
 
 sub file { $_[0]->{file} }
+sub file_pretty { $_[0]->{file_pretty} // $_[0]->{file} }
 sub line { $_[0]->{line} }
 
 sub package { $_[0]->{package} }
@@ -45,6 +46,7 @@ sub is_eval { 0 }
 package Devel::StatProfiler::MainStackFrame;
 
 sub file { $_[0]->{file} }
+sub file_pretty { $_[0]->{file_pretty} }
 sub line { $_[0]->{line} }
 
 sub package { '' }

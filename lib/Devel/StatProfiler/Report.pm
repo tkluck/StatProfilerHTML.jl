@@ -147,6 +147,7 @@ sub _sub {
         uq_name    => $uq_name,
         package    => $frame->package,
         file       => $file // $frame->file,
+        file_pretty=> $file // $frame->file_pretty,
         inclusive  => 0,
         exclusive  => 0,
         callees    => {},
@@ -166,10 +167,10 @@ sub _xssub {
 }
 
 sub _file {
-    my ($self, $file) = @_;
+    my ($self, $file, $file_pretty) = @_;
 
     return $self->{aggregate}{files}{$file} ||= {
-        name      => $file,
+        name      => $file_pretty,
         lines     => {
             exclusive       => [],
             inclusive       => [],
@@ -261,7 +262,7 @@ sub add_trace_file {
             } else {
                 $sub //= $self->_sub($frame);
             }
-            my $file = $self->_file($sub->{file});
+            my $file = $self->_file($sub->{file}, $sub->{file_pretty});
             my $uq_sub_name = $sub->{uq_name};
             my $recursive = ++$tracked_sub{$uq_sub_name} > 1;
 
@@ -513,6 +514,7 @@ sub merge {
                 uq_name    => $other_sub->{uq_name},
                 package    => $other_sub->{package},
                 file       => $other_sub->{file},
+                file_pretty=> $other_sub->{file_pretty},
                 inclusive  => 0,
                 exclusive  => 0,
                 callees    => {},

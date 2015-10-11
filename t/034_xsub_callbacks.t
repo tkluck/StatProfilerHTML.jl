@@ -32,6 +32,7 @@ my ($block) = grep $_->[2]->line == $l2, @samples;
 
 eq_or_diff($sub->[2], bless {
     file          => __FILE__,
+    file_pretty   => __FILE__,
     line          => $l1,
     first_line    => $l1,
     package       => 'main',
@@ -40,11 +41,13 @@ eq_or_diff($sub->[2], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($sub->[3], bless {
     file          => __FILE__,
+    file_pretty   => __FILE__,
     line          => $l4,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 eq_or_diff($block->[2], bless {
     file          => __FILE__,
+    file_pretty   => __FILE__,
     line          => $l2,
     first_line    => $l2,
     package       => 'main',
@@ -53,6 +56,7 @@ eq_or_diff($block->[2], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($block->[3], bless {
     file          => __FILE__,
+    file_pretty   => __FILE__,
     line          => $l3,
 }, 'Devel::StatProfiler::MainStackFrame');
 

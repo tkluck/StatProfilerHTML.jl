@@ -34,6 +34,7 @@ eq_or_diff($samples[0][0], bless {
 }, 'Devel::StatProfiler::StackFrame');
 eq_or_diff($samples[0][1], bless {
     file          => 't/lib/Devel/StatProfiler/Test.pm',
+    file_pretty   => 't/lib/Devel/StatProfiler/Test.pm',
     first_line    => 17,
     fq_sub_name   => 'Devel::StatProfiler::Test::TiedScalar::FETCH',
     line          => 17,
@@ -43,6 +44,7 @@ eq_or_diff($samples[0][1], bless {
 eq_or_diff($samples[0][2], bless {
     line          => $l1,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 eq_or_diff($samples[1][0], bless {
@@ -56,6 +58,7 @@ eq_or_diff($samples[1][0], bless {
 eq_or_diff($samples[1][1], bless {
     line          => $l2,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 done_testing();

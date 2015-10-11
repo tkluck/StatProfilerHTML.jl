@@ -43,11 +43,13 @@ my $process_id = get_process_id($profile_file);
 eq_or_diff($samples[0][2], bless {
     line          => 1,
     file          => "qeval:$process_id/(eval ${\($index + 1)})",
+    file_pretty   => "qeval:$process_id/(eval ${\($index + 1)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[0][3], bless {
     line          => $l2 + 1,
     first_line    => $l2 + 1,
     file          => __FILE__,
+    file_pretty   => __FILE__,
     package       => 'main',
     sub_name      => 'foo',
     fq_sub_name   => 'main::foo',
@@ -55,11 +57,13 @@ eq_or_diff($samples[0][3], bless {
 eq_or_diff($samples[0][4], bless {
     line          => $l1,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 eq_or_diff($samples[1][2], bless {
     line          => 2,
     first_line    => 2,
     file          => "qeval:$process_id/(eval ${\($index + 2)})",
+    file_pretty   => "qeval:$process_id/(eval ${\($index + 2)})",
     package       => 'main',
     sub_name      => 'moo',
     fq_sub_name   => 'main::moo',
@@ -67,10 +71,12 @@ eq_or_diff($samples[1][2], bless {
 eq_or_diff($samples[1][3], bless {
     line          => 5,
     file          => "qeval:$process_id/(eval ${\($index + 2)})",
+    file_pretty   => "qeval:$process_id/(eval ${\($index + 2)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[2][2], bless {
     line          => 1,
     file          => "qeval:$process_id/(eval ${\($index + 3)})",
+    file_pretty   => "qeval:$process_id/(eval ${\($index + 3)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
 eq_or_diff($samples[3][2], bless {
     line          => 1,

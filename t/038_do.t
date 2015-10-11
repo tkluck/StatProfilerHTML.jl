@@ -20,6 +20,7 @@ eq_or_diff($samples[0][2], bless {
     line          => 2,
     first_line    => 2,
     file          => 't/lib/do.pl',
+    file_pretty   => 't/lib/do.pl',
     package       => 'main',
     sub_name      => 'moo',
     fq_sub_name   => 'main::moo',
@@ -27,19 +28,23 @@ eq_or_diff($samples[0][2], bless {
 eq_or_diff($samples[0][3], bless {
     line          => 5,
     file          => 't/lib/do.pl',
+    file_pretty   => 't/lib/do.pl',
 }, 'Devel::StatProfiler::MainStackFrame');
 eq_or_diff($samples[0][4], bless {
     line          => $l1,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 eq_or_diff($samples[1][2], bless {
     line          => 6,
     file          => 't/lib/do.pl',
+    file_pretty   => 't/lib/do.pl',
 }, 'Devel::StatProfiler::MainStackFrame');
 eq_or_diff($samples[1][3], bless {
     line          => $l1,
     file          => __FILE__,
+    file_pretty   => __FILE__,
 }, 'Devel::StatProfiler::MainStackFrame');
 
 done_testing();
