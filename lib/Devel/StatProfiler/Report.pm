@@ -169,7 +169,6 @@ sub _file {
 
     return $self->{aggregate}{files}{$file} ||= {
         name      => $file,
-        basename  => $file ? File::Basename::basename($file) : '',
         lines     => {
             exclusive       => [],
             inclusive       => [],
@@ -364,7 +363,6 @@ sub _merge_file_entry {
     my ($a, $b) = @_;
 
     $a->{name} = $b->{name} if $a->{name} gt $b->{name};
-    $a->{basename} = $b->{basename} if $a->{basename} gt $b->{basename};
     $a->{exclusive} += $b->{exclusive};
 
     _merge_lines($a->{lines}{exclusive}, $b->{lines}{exclusive});
@@ -567,7 +565,6 @@ sub merge {
             my $other_file = $other_files->{$file_id};
             my $file = $my_files->{$file_id} ||= {
                 name      => $other_file->{name},
-                basename  => $other_file->{basename},
                 report    => $other_file->{report},
                 lines     => {
                     exclusive       => [],
@@ -766,7 +763,6 @@ sub _merged_entry {
     my $base = $self->{aggregate}{files}{$file};
     my $merged = {
         name      => $base && $base->{name},
-        basename  => $base && $base->{basename},
         lines     => {
             exclusive       => [],
             inclusive       => [],
@@ -797,7 +793,6 @@ sub _merged_entry {
         next unless $entry;
 
         $merged->{name} ||= $entry->{name};
-        $merged->{basename} ||= $entry->{basename};
         $merged->{report} ||= $entry->{report};
 
         my @ranges = sort { $a->[1] <=> $b->[1] } @{$line_ranges{$key}};
@@ -1086,7 +1081,6 @@ sub output {
             include                 => $include,
             date                    => $date,
             name                    => $entry->{name},
-            basename                => $entry->{basename},
             lines                   => $code,
             subs                    => \%subs,
             exclusive               => $entry->{lines}{exclusive},

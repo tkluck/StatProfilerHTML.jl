@@ -122,7 +122,6 @@ eq_or_diff([sort keys %{$take_sample->{call_sites}}],
 
 # t/lib/Test.pm
 is($test_pm->{name}, 't/lib/Test.pm');
-is($test_pm->{basename}, 'Test.pm');
 is($test_pm->{report}, 'Test-pm-b9b148b22b2161075314-line.html');
 cmp_ok($test_pm->{exclusive}, '<=', 5 / precision_factor);
 # WTF cmp_ok($test_pm->{inclusive}, '>=', 20);
