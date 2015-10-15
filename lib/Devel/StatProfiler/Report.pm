@@ -516,11 +516,13 @@ sub merge {
             my $other_sub = $other_subs->{$id};
             my $my_sub = $my_subs->{$id} ||= {
                 name       => $other_sub->{name},
-                name_pretty=> $other_sub->{name_pretty},
+                # Compatibility with version 0.38
+                name_pretty=> $other_sub->{name_pretty} // $other_sub->{name},
                 uq_name    => $other_sub->{uq_name},
                 package    => $other_sub->{package},
                 file       => $other_sub->{file},
-                file_pretty=> $other_sub->{file_pretty},
+                # Compatibility with version 0.38
+                file_pretty=> $other_sub->{file_pretty} // $other_sub->{file},
                 inclusive  => 0,
                 exclusive  => 0,
                 callees    => {},
