@@ -77,13 +77,18 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
             // when called between an entersub and the following nextstate,
             // ignore the set-up but-not-entered-yet stack frame
             // also ignore the call frame set up for BEGIN blocks
+            int cxt = CxTYPE(sub);
             bool is_eval_block = CxTRYBLOCK(sub);
+                // check the stack frame has been entered
             if ((line != caller->blk_oldcop ||
-                        CxTYPE(sub) != CXt_SUB ||
+                        // but make sure it's not a recursive sub
+                        cxt != CXt_SUB ||
                         PL_op != CvSTART(sub->blk_sub.cv)) &&
+                    // ignore stack frames set up by BEGIN blocks
                     line != &PL_compiling &&
+                    // ignore eval BLOCK
                     !is_eval_block) {
-                if (CxTYPE(sub) != CXt_EVAL) {
+                if (cxt != CXt_EVAL) {
                     trace.add_frame(FRAME_SUB, sub->blk_sub.cv, NULL, line);
                 } else if (CxOLD_OP_TYPE(sub) != OP_ENTEREVAL) {
                     trace.add_frame(FRAME_MAIN, NULL, NULL, line);
