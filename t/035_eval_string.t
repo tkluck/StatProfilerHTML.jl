@@ -8,7 +8,7 @@ my $profile_file;
 BEGIN { $profile_file = temp_profile_file(); }
 
 use Devel::StatProfiler -file => $profile_file, -interval => 1000;
-my ($l1, $l2);
+my ($l1, $l2, $l3);
 (eval 'eval { (caller 0)[1] }') =~ /\(eval (\d+)\)/ or die "WTF";
 my $index = $1;
 
@@ -32,6 +32,8 @@ EOT
 foo(); BEGIN { $l1 = __LINE__ + 0 }
 bar();
 eval "take_sample()";
+
+eval "BEGIN { take_sample() }"; BEGIN { $l3 = __LINE__ + 0 }
 
 Devel::StatProfiler::stop_profile();
 
@@ -70,5 +72,17 @@ eq_or_diff($samples[2][2], bless {
     line          => 1,
     file          => "qeval:$process_id/(eval ${\($index + 3)})",
 }, 'Devel::StatProfiler::EvalStackFrame');
+eq_or_diff($samples[3][2], bless {
+    line          => 1,
+    first_line    => 1,
+    file          => "qeval:$process_id/(eval ${\($index + 4)})",
+    package       => 'main',
+    sub_name      => 'BEGIN',
+    fq_sub_name   => 'main::BEGIN',
+}, 'Devel::StatProfiler::StackFrame');
+eq_or_diff($samples[3][3], bless {
+    line          => $l3,
+    file          => __FILE__,
+}, 'Devel::StatProfiler::MainStackFrame');
 
 done_testing();
