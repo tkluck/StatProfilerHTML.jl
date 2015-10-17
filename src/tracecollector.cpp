@@ -122,4 +122,32 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
         trace.add_frame(FRAME_MAIN, NULL, NULL, line);
 }
 
+EvalCollected *
+devel::statprofiler::get_or_attach_evalcollected(pTHX_ SV *eval_text)
+{
+    MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
+    EvalCollected *collected;
+
+    if (!marker) {
+        EvalCollected data(PL_breakable_sub_gen, PL_evalseq);
+
+        marker = sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
+                             &Devel_StatProfiler_eval_idx_vtbl,
+                             (const char *)&data, sizeof(data));
+        collected = (EvalCollected *) marker->mg_ptr;
+    } else {
+        collected = (EvalCollected *) marker->mg_ptr;
+
+        // this is going to break in case of recursive evals that are
+        // eval()ing the same SV. I'm going to ignore the issue.
+        if (collected->evalseq != PL_evalseq) {
+            collected->sub_gen = PL_breakable_sub_gen;
+            collected->evalseq = PL_evalseq;
+            collected->saved = false;
+        }
+    }
+
+    return collected;
+}
+
 MGVTBL Devel_StatProfiler_eval_idx_vtbl;

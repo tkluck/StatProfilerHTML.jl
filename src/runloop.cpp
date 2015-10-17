@@ -854,25 +854,8 @@ enter_eval_hook(pTHX_ OP *o)
         return;
 
     SV *eval_text = cxstack[cxstack_ix].blk_eval.cur_text;
-    MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
-    EvalCollected *collected;
 
-    if (!marker) {
-        EvalCollected data(PL_breakable_sub_gen, PL_evalseq);
-
-        marker = sv_magicext(eval_text, NULL, PERL_MAGIC_ext,
-                             &Devel_StatProfiler_eval_idx_vtbl,
-                             (const char *)&data, sizeof(data));
-        collected = (EvalCollected *) marker->mg_ptr;
-    } else {
-        collected = (EvalCollected *) marker->mg_ptr;
-
-        // this is going to break in case of recursive evals that are
-        // eval()ing the same SV. I'm going to ignore the issue.
-        collected->sub_gen = PL_breakable_sub_gen;
-        collected->evalseq = PL_evalseq;
-        collected->saved = false;
-    }
+    get_or_attach_evalcollected(aTHX_ eval_text);
 
     if (source_code_kind == ALL_EVALS_ALWAYS ||
             source_code_kind == ALL_EVALS) {
