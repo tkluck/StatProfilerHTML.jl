@@ -37,6 +37,18 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 }
 
 
+static void
+save_eval_once(pTHX_ TraceFileWriter &trace, const PERL_CONTEXT *frame) {
+    SV *eval_text = frame->blk_eval.cur_text;
+    EvalCollected *collected = get_or_attach_evalcollected(aTHX_ eval_text);
+
+    if (!collected->saved) {
+        trace.add_eval_source(eval_text, collected->evalseq);
+        collected->saved = true;
+    }
+}
+
+
 // needs to be kept in sync with Perl_caller_cx in op.c
 void
 devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool eval_source)
@@ -93,25 +105,23 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
                 } else if (CxOLD_OP_TYPE(sub) != OP_ENTEREVAL) {
                     trace.add_frame(FRAME_MAIN, NULL, NULL, line);
                 } else {
-                    if (eval_source) {
-                        SV *eval_text = sub->blk_eval.cur_text;
-                        MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
-
-                        if (marker) {
-                            EvalCollected *collected = (EvalCollected *) marker->mg_ptr;
-
-                            if (!collected->saved) {
-                                trace.add_eval_source(eval_text, collected->evalseq);
-                                collected->saved = true;
-                            }
-                        }
-                    }
+                    if (eval_source)
+                        // this branch should always be entered with an
+                        // EvalCollector attached to the source
+                        save_eval_once(aTHX_ trace, sub);
 
                     trace.add_frame(FRAME_EVAL, NULL, NULL, line);
                 }
             }
-            else
+            else {
                 ++depth;
+
+                // BEGIN block in an eval ""
+                if (cxt == CXt_EVAL && CxOLD_OP_TYPE(sub) == OP_ENTEREVAL) {
+                    if (eval_source)
+                        save_eval_once(aTHX_ trace, sub);
+                }
+            }
             if (!is_eval_block)
                 line = caller->blk_oldcop;
 

@@ -31,14 +31,16 @@ EOT
 
 eval $eval_with_hash_line;
 
+eval "BEGIN { take_sample() }";
+
 Devel::StatProfiler::stop_profile();
 
 my @samples = get_samples($profile_file);
 my $source = get_sources($profile_file);
 
-cmp_ok(scalar @samples, '>=', 8);
-cmp_ok(scalar keys %$source, '>=', 4);
-cmp_ok(scalar keys %$source, '<=', 8);
+cmp_ok(scalar @samples, '>=', 9);
+cmp_ok(scalar keys %$source, '>=', 5);
+cmp_ok(scalar keys %$source, '<=', 9);
 
 for my $sample (@samples) {
     my $file = $sample->[2]->file;
@@ -55,5 +57,7 @@ ok(!grep /# I am not traced/, values %$source);
 ok(!exists $source->{'eval string with #line directive'});
 like($source->{_e($first_eval_n + 14)}, 
      qr/^#line 123 "eval string with #line directive"$/m);
+like($source->{_e($first_eval_n + 15)},
+     qr/^\QBEGIN { take_sample() }\E$/m);
 
 done_testing();
