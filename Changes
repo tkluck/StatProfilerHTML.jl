@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.39      2015-10-18 18:51:00 CEST
+
+    - Fix eval STRING source code collection for evals containing
+      BEGIN blocks
+    - Fix eval STRING source code collection for recursive evals
+      (for example the "use base" in a multi-level hierarchy)
+
 0.38      2015-09-17 08:54:01 CEST
 
     - Add basic support for expiring old aggregated data
