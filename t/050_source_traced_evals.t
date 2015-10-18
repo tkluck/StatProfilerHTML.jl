@@ -33,14 +33,20 @@ eval $eval_with_hash_line;
 
 eval "BEGIN { take_sample() }";
 
+sub recursive_eval {
+    eval "take_sample(); $_[0];";
+}
+
+recursive_eval(q[recursive_eval(q[recursive_eval(q[1])])]);
+
 Devel::StatProfiler::stop_profile();
 
 my @samples = get_samples($profile_file);
 my $source = get_sources($profile_file);
 
-cmp_ok(scalar @samples, '>=', 9);
-cmp_ok(scalar keys %$source, '>=', 5);
-cmp_ok(scalar keys %$source, '<=', 9);
+cmp_ok(scalar @samples, '>=', 12);
+cmp_ok(scalar keys %$source, '>=', 8);
+cmp_ok(scalar keys %$source, '<=', 12);
 
 for my $sample (@samples) {
     my $file = $sample->[2]->file;
@@ -59,5 +65,11 @@ like($source->{_e($first_eval_n + 14)},
      qr/^#line 123 "eval string with #line directive"$/m);
 like($source->{_e($first_eval_n + 15)},
      qr/^\QBEGIN { take_sample() }\E$/m);
+like($source->{_e($first_eval_n + 16)},
+     qr/^\Qtake_sample(); recursive_eval(q[recursive_eval(q[1])]);\E$/m);
+like($source->{_e($first_eval_n + 17)},
+     qr/^\Qtake_sample(); recursive_eval(q[1]);\E$/m);
+like($source->{_e($first_eval_n + 18)},
+     qr/^\Qtake_sample(); 1;\E$/m);
 
 done_testing();

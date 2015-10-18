@@ -855,7 +855,7 @@ enter_eval_hook(pTHX_ OP *o)
 
     SV *eval_text = cxstack[cxstack_ix].blk_eval.cur_text;
 
-    get_or_attach_evalcollected(aTHX_ eval_text);
+    get_or_attach_evalcollected(aTHX_ eval_text, true); // overwrite OK
 
     if (source_code_kind == ALL_EVALS_ALWAYS ||
             source_code_kind == ALL_EVALS) {

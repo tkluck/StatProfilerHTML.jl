@@ -21,7 +21,7 @@ namespace devel {
         };
 
         void collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool eval_source);
-        EvalCollected *get_or_attach_evalcollected(pTHX_ SV *eval_text);
+        EvalCollected *get_or_attach_evalcollected(pTHX_ SV *eval_text, bool overwrite_if_needed);
     }
 }
 

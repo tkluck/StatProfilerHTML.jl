@@ -40,7 +40,7 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 static void
 save_eval_once(pTHX_ TraceFileWriter &trace, const PERL_CONTEXT *frame) {
     SV *eval_text = frame->blk_eval.cur_text;
-    EvalCollected *collected = get_or_attach_evalcollected(aTHX_ eval_text);
+    EvalCollected *collected = get_or_attach_evalcollected(aTHX_ eval_text, false); // overwrite not OK
 
     if (!collected->saved) {
         trace.add_eval_source(eval_text, collected->evalseq);
@@ -138,7 +138,7 @@ devel::statprofiler::collect_trace(pTHX_ TraceFileWriter &trace, int depth, bool
 }
 
 EvalCollected *
-devel::statprofiler::get_or_attach_evalcollected(pTHX_ SV *eval_text)
+devel::statprofiler::get_or_attach_evalcollected(pTHX_ SV *eval_text, bool overwrite_if_needed)
 {
     MAGIC *marker = SvMAGICAL(eval_text) ? mg_findext(eval_text, PERL_MAGIC_ext, &Devel_StatProfiler_eval_idx_vtbl) : NULL;
     EvalCollected *collected;
@@ -155,7 +155,7 @@ devel::statprofiler::get_or_attach_evalcollected(pTHX_ SV *eval_text)
 
         // this is going to break in case of recursive evals that are
         // eval()ing the same SV. I'm going to ignore the issue.
-        if (collected->evalseq != PL_evalseq) {
+        if (collected->evalseq != PL_evalseq && overwrite_if_needed) {
             collected->sub_gen = PL_breakable_sub_gen;
             collected->evalseq = PL_evalseq;
             collected->saved = false;
