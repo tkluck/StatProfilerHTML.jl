@@ -2,6 +2,12 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.40      2015-10-22 20:51:48 CEST
+
+    - Start splitting aggregator/aggregate classes
+    - Optionally, perform name remapping/eval uniquification
+      during the initial aggregation pass
+
 0.39      2015-10-18 18:51:00 CEST
 
     - Fix eval STRING source code collection for evals containing
