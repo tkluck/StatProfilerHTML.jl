@@ -4,6 +4,7 @@ use t::lib::Test ':spawn';
 use t::lib::Slowops;
 
 use Devel::StatProfiler::Aggregator;
+use Devel::StatProfiler::NameMap;
 use Time::HiRes qw(time);
 
 my ($profile_dir, $template);
@@ -38,15 +39,31 @@ my ($root, $tree) = get_process_tree(@files);
 
 is(scalar @files, 9);
 
+my $nm1 = Devel::StatProfiler::NameMap->new(
+    source  => Devel::StatProfiler::EvalSource->new(
+        root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+        shard           => 'shard1',
+        genealogy       => {},
+    ),
+);
+my $nm2 = Devel::StatProfiler::NameMap->new(
+    source  => Devel::StatProfiler::EvalSource->new(
+        root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
+        shard           => 'shard2',
+        genealogy       => {},
+    ),
+);
 my $a1s1 = Devel::StatProfiler::Aggregator->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
     parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
     shard           => 'shard1',
+    mapper          => $nm1,
 );
 my $a1s2 = Devel::StatProfiler::Aggregator->new(
     root_directory  => File::Spec::Functions::catdir($profile_dir, 'aggr1'),
     parts_directory => File::Spec::Functions::catdir($profile_dir, 'aggr1p'),
     shard           => 'shard2',
+    mapper          => $nm2,
 );
 
 my (%processed, @remaining);
@@ -69,7 +86,9 @@ my (%processed, @remaining);
     is($a1s2_can, 0, 'nothing to process until merge');
 }
 
+# fake a merge plus a followup run
 $a1s1->merge_metadata;
+$_->{source}{genealogy} = { %{$a1s1->{genealogy}} } for $nm1, $nm2;
 delete $_->{merged_metadata} for $a1s1, $a1s2;
 
 {

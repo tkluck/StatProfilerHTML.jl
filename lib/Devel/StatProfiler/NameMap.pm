@@ -54,6 +54,19 @@ sub update_genealogy {
     );
 }
 
+sub is_processed {
+    my ($self, $process_id, $process_ordinal) = @_;
+
+    return 1 if $process_id eq "00" x 24;
+
+    # TODO more incestuous relationships
+    my $genealogy = $self->{source}{genealogy};
+
+    return 1 if $genealogy &&
+        $genealogy->{$process_id} &&
+        $genealogy->{$process_id}{$process_ordinal};
+}
+
 sub can_map_eval { !!$_[0]->{source} }
 sub can_map_sub  { !!$_[0]->{rx} }
 sub can_map      { !!$_[0]->{rx} || !!$_[0]->{source} }

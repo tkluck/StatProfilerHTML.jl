@@ -265,26 +265,10 @@ sub _state {
 
 sub _is_processed {
     my ($self, $process_id, $process_ordinal) = @_;
+    my $eval_mapper = $self->{mapper} && $self->{mapper}->can_map_eval ? $self->{mapper} : undef;
 
-    return 1 if $process_id eq "00" x 24;
-
-    return 1 if $self->{genealogy} &&
-        $self->{genealogy}{$process_id} &&
-        $self->{genealogy}{$process_id}{$process_ordinal};
-
-    unless ($self->{merged_metadata}) {
-        my @shards = Devel::StatProfiler::Aggregate->shards($self->{root_dir});
-        $self->{merged_metadata} = Devel::StatProfiler::Aggregate->new(
-            root_directory  => $self->{root_dir},
-            shards          => \@shards,
-            serializer      => $self->{serializer},
-        );
-        $self->{merged_metadata}->_load_genealogy;
-    }
-
-    return $self->{merged_metadata}{genealogy} &&
-        $self->{merged_metadata}{genealogy}{$process_id} &&
-        $self->{merged_metadata}{genealogy}{$process_id}{$process_ordinal};
+    return 1 if !$eval_mapper;
+    return $eval_mapper->is_processed($process_id, $process_ordinal);
 }
 
 sub _merge_genealogy {
