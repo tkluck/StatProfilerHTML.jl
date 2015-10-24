@@ -964,7 +964,9 @@ sub output {
     my @files = sort { $b->{exclusive} <=> $a->{exclusive} }
                     values %$files;
 
-    $_->{file} //= 'xs:unknown' for @subs;
+    # Backwards compatibility for releases before 0.40
+    $_->{file_pretty} //= $_->{file} for @subs;
+    $_->{name_pretty} //= $_->{name} for @subs;
 
     my $date = POSIX::strftime('%c', localtime(time));
     my $at_inc = [map s{[/\\]$}{}r, @{$self->{metadata}->get_at_inc}];
