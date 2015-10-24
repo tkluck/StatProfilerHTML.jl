@@ -152,27 +152,6 @@ sub discard_expired_process_data {
 
     $aggregator->_load_all_metadata;
 
-    # Burn-in eval mapping, so we can discard eval map
-    for my $report_id ($self->all_reports) {
-        my $report_dir = File::Spec::Functions::catdir($self->{root_dir}, $report_id);
-        my $data_glob = File::Spec::Functions::catfile($report_dir, "report.*.$self->{shard}");
-
-        for my $data (bsd_glob $data_glob) {
-            my ($suffix) = $data =~ m/\breport\.(\d+)\.\Q$self->{shard}\E$/;
-            my $report = $self->_fresh_report(suffix => $suffix);
-
-            $report->load($data);
-
-            # TODO fix this incestuous relation
-            $report->{source} = $aggregator->{source};
-            $report->{sourcemap} = $aggregator->{sourcemap};
-            $report->{genealogy} = $aggregator->{genealogy};
-
-            $report->map_source;
-            $report->save_remapped($report_dir);
-        }
-    }
-
     my $last_sample = $aggregator->{last_sample};
     my $genealogy = $aggregator->{genealogy};
 

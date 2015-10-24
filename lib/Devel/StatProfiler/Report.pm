@@ -654,7 +654,6 @@ sub _save_data {
 
 sub save_part { $_[0]->_save($_[1], 1) }
 sub save_aggregate { $_[0]->_save($_[1], 0) }
-sub save_remapped { $_[0]->_save_data($_[1], 0) }
 
 sub load {
     my ($self, $report) = @_;
