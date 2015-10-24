@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.41      2015-10-24 11:59:13 CEST
+
+    - Don't load genealogy data over and over again during aggregation
+
 0.40      2015-10-22 20:51:48 CEST
 
     - Start splitting aggregator/aggregate classes
