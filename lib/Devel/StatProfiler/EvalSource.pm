@@ -235,7 +235,7 @@ sub _get_source_by_hash {
             substr($unpacked, 4)
         );
 
-        read_file($path, 'use_utf8');
+        -f $path ? read_file($path, 'use_utf8') : '';
     };
 }
 
