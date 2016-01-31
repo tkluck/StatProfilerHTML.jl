@@ -242,20 +242,9 @@ sub _get_source_by_hash {
 sub _get_hash_by_name {
     my ($self, $process_id, $name) = @_;
     my ($ordinal) = sort { $b <=> $a } keys %{$self->{all}{$process_id} || {}};
-    my @queue = [$process_id, $ordinal];
+    my ($p_id, $o) = ($process_id, $ordinal);
 
-    while (@queue) {
-        my ($p_id, $o) = @{pop @queue};
-
-        if ($self->{genealogy}{$p_id}) {
-            my ($ord) = keys %{$self->{genealogy}{$p_id}};
-
-            push @queue, $self->{genealogy}{$p_id}{$ord}
-                 if $self->{genealogy}{$p_id}{$ord} &&
-                    # the root process has parent ['0000...0000', 0]
-                    $self->{genealogy}{$p_id}{$ord}[1] != 0;
-        }
-
+    for (;;) {
         if (my $by_process = $self->{all}{$p_id}) {
             # sorting is there for "extra correctness"
             for my $ord (sort { $b <=> $a } grep $_ <= $o, keys %$by_process) {
@@ -273,6 +262,20 @@ sub _get_hash_by_name {
                     );
                 }
             }
+        }
+
+        if ($self->{genealogy}{$p_id}) {
+            my ($ord) = keys %{$self->{genealogy}{$p_id}};
+
+            if ($self->{genealogy}{$p_id}{$ord} &&
+                    # the root process has parent ['0000...0000', 0]
+                    $self->{genealogy}{$p_id}{$ord}[1] != 0) {
+                ($p_id, $o) = @{$self->{genealogy}{$p_id}{$ord}};
+            } else {
+                last;
+            }
+        } else {
+            last;
         }
     }
 
