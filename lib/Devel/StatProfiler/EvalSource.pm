@@ -265,6 +265,7 @@ sub _get_hash_by_name {
         }
 
         if ($self->{genealogy}{$p_id}) {
+            no warnings 'internal'; # we only need to get a random key
             my (undef, $parent) = each %{$self->{genealogy}{$p_id}};
 
             if ($parent &&
