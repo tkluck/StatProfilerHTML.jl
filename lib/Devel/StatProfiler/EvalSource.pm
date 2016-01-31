@@ -256,21 +256,21 @@ sub _get_hash_by_name {
                     $self->{genealogy}{$p_id}{$ord}[1] != 0;
         }
 
-        if ($self->{all}{$p_id}) {
-            for my $ord (reverse 1..$o) {
-                if (my $entry = $self->{all}{$p_id}{$ord}) {
-                    my $hash = $entry->{sparse}{$name};
-                    return $hash if $hash;
-                    if ($name =~ /^\(eval ([0-9]+)\)$/ &&
-                            $entry->{first} &&
-                            $1 >= $entry->{first} &&
-                            $1 < $entry->{first} + length($entry->{packed}) / 20) {
-                        return substr(
-                            $entry->{packed},
-                            ($1 - $entry->{first}) * 20,
-                            20,
-                        );
-                    }
+        if (my $by_process = $self->{all}{$p_id}) {
+            # sorting is there for "extra correctness"
+            for my $ord (sort { $b <=> $a } grep $_ <= $o, keys %$by_process) {
+                my $entry = $by_process->{$ord};
+                my $hash = $entry->{sparse}{$name};
+                return $hash if $hash;
+                if ($name =~ /^\(eval ([0-9]+)\)$/ &&
+                        $entry->{first} &&
+                        $1 >= $entry->{first} &&
+                        $1 < $entry->{first} + length($entry->{packed}) / 20) {
+                    return substr(
+                        $entry->{packed},
+                        ($1 - $entry->{first}) * 20,
+                        20,
+                    );
                 }
             }
         }
