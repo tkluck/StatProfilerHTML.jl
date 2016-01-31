@@ -265,12 +265,12 @@ sub _get_hash_by_name {
         }
 
         if ($self->{genealogy}{$p_id}) {
-            my ($ord) = keys %{$self->{genealogy}{$p_id}};
+            my (undef, $parent) = each %{$self->{genealogy}{$p_id}};
 
-            if ($self->{genealogy}{$p_id}{$ord} &&
+            if ($parent &&
                     # the root process has parent ['0000...0000', 0]
-                    $self->{genealogy}{$p_id}{$ord}[1] != 0) {
-                ($p_id, $o) = @{$self->{genealogy}{$p_id}{$ord}};
+                    $parent->[1] != 0) {
+                ($p_id, $o) = @$parent;
             } else {
                 last;
             }
