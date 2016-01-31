@@ -213,6 +213,7 @@ sub report_names {
 *_load_sourcemap = \&Devel::StatProfiler::Aggregator::_load_sourcemap;
 *_merge_genealogy = \&Devel::StatProfiler::Aggregator::_merge_genealogy;
 *_merge_last_sample = \&Devel::StatProfiler::Aggregator::_merge_last_sample;
+*_clone_genealogy = \&Devel::StatProfiler::Aggregator::_clone_genealogy;
 
 *global_metadata = \&Devel::StatProfiler::Aggregator::global_metadata;
 

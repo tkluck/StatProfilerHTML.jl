@@ -46,7 +46,6 @@ my %SPECIAL_SUBS = map { $_ => 1 } qw(
 
 sub new {
     my ($class, %opts) = @_;
-    my $genealogy = $opts{sources} ? {} : undef;
     my $mapper = $opts{mapper} && $opts{mapper}->can_map ? $opts{mapper} : undef;
     my $self = bless {
         aggregate     => {
@@ -58,7 +57,7 @@ sub new {
         $opts{sources} ? (
             source    => Devel::StatProfiler::EvalSource->new(
                 serializer     => $opts{serializer},
-                genealogy      => $genealogy,
+                genealogy      => {},
                 root_dir       => $opts{root_directory},
                 shard          => $opts{shard},
             ),
@@ -76,7 +75,7 @@ sub new {
             root_directory     => $opts{root_directory},
             shard              => $opts{shard},
         ),
-        genealogy     => $genealogy,
+        genealogy     => {},
         flamegraph    => $opts{flamegraph} || 0,
         slowops       => {map { $_ => 1 } @{$opts{slowops} || \@Devel::StatProfiler::Slowops::OPS}},
         tick          => 0,
@@ -228,6 +227,8 @@ sub add_trace_file {
         if $self->{genealogy};
     $eval_mapper->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
         if $eval_mapper;
+    $self->{source}->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
+        if $self->{source};
 
     $self->_check_consistency(
         $r->get_source_tick_duration,

@@ -30,7 +30,6 @@ my $MAIN_REPORT_ID = ['__main__'];
 
 sub new {
     my ($class, %opts) = @_;
-    my $genealogy = {};
     my $mapper = $opts{mapper} && $opts{mapper}->can_map ? $opts{mapper} : undef;
     my $self = bless {
         root_dir     => $opts{root_directory},
@@ -47,7 +46,7 @@ sub new {
             serializer     => $opts{serializer},
             root_directory => $opts{root_directory},
             shard          => $opts{shard},
-            genealogy      => $genealogy,
+            genealogy      => {},
         ),
         sourcemap    => Devel::StatProfiler::SourceMap->new(
             serializer     => $opts{serializer},
@@ -61,7 +60,7 @@ sub new {
         ),
         mapper       => $mapper,
         mixed_process=> $opts{mixed_process},
-        genealogy    => $genealogy,
+        genealogy    => {},
         last_sample  => {},
         parts        => [],
         fetchers     => $opts{fetchers},
@@ -120,6 +119,8 @@ sub process_trace_files {
         $self->{metadata}->add_entries($r->get_custom_metadata);
         $eval_mapper->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
             if $eval_mapper;
+        $self->{source}->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
+            if $self->{source};
 
         if (my $reader_state = delete $state->{reader_state}) {
             $r->set_reader_state($reader_state);
@@ -281,6 +282,20 @@ sub _merge_genealogy {
     }
 }
 
+sub _clone_genealogy {
+    my ($self) = @_;
+    my $genealogy = $self->{genealogy};
+    my $res = {};
+
+    for my $process_id (keys %$genealogy) {
+        my $item = $genealogy->{$process_id};
+
+        @{$res->{$process_id}}{keys %$item} = values %$item;
+    }
+
+    return $res;
+}
+
 sub _merge_last_sample {
     my ($self, $last_sample) = @_;
 
@@ -345,7 +360,7 @@ sub _load_source {
         serializer     => $self->{serializer},
         root_directory => $self->{root_dir},
         shard          => $self->{shard},
-        genealogy      => $self->{genealogy},
+        genealogy      => $self->_clone_genealogy,
     );
     my ($source_parts, $source_merged) = _all_data_files($self, $parts, 'source');
 
@@ -388,7 +403,7 @@ sub merge_metadata {
     $self->{sourcemap}->save_merged;
     write_data($self, state_dir($self), 'last_sample', $self->{last_sample});
     # genealogy needs to be saved last, because can_process_trace_files
-    # assumes that if there is the genalogy the rest has been saved
+    # assumes that if there is the genealogy the rest has been saved
     write_data($self, state_dir($self), 'genealogy', $self->{genealogy});
 
     for my $part (@{$self->{parts}}) {

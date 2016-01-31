@@ -58,13 +58,7 @@ sub is_processed {
     my ($self, $process_id, $process_ordinal) = @_;
 
     return 1 if $process_id eq "00" x 24;
-
-    # TODO more incestuous relationships
-    my $genealogy = $self->{source}{genealogy};
-
-    return 1 if $genealogy &&
-        $genealogy->{$process_id} &&
-        $genealogy->{$process_id}{$process_ordinal};
+    return $self->{source}->is_processed($process_id, $process_ordinal);
 }
 
 sub can_map_eval { !!$_[0]->{source} }

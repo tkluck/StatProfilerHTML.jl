@@ -306,4 +306,13 @@ sub delete_process {
     delete $self->{all}{$process_id};
 }
 
+sub is_processed {
+    my ($self, $process_id, $process_ordinal) = @_;
+    my $genealogy = $self->{genealogy};
+
+    return 1 if $genealogy &&
+        $genealogy->{$process_id} &&
+        $genealogy->{$process_id}{$process_ordinal};
+}
+
 1;
