@@ -251,8 +251,8 @@ sub _get_hash_by_name {
                 my $entry = $by_process->{$ord};
                 my $hash = $entry->{sparse}{$name};
                 return $hash if $hash;
-                if ($name =~ /^\(eval ([0-9]+)\)$/ &&
-                        $entry->{first} &&
+                if ($entry->{first} &&
+                        $name =~ /^\(eval ([0-9]+)\)$/ &&
                         $1 >= $entry->{first} &&
                         $1 < $entry->{first} + length($entry->{packed}) / 20) {
                     return substr(
