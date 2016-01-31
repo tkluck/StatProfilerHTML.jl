@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.44      2016-01-31 16:48:08 CET
+
+    - Optimize get_hash_by_name for the common case
+
 0.43      2015-11-04 21:40:31 CET
 
     - Do not die if there is no source code for an eval
