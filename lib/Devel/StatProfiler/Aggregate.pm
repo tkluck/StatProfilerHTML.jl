@@ -5,8 +5,6 @@ use strict;
 use warnings;
 
 use Devel::StatProfiler::Report;
-use Devel::StatProfiler::EvalSource;
-use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Metadata;
 use Devel::StatProfiler::Utils qw(
     check_serializer
