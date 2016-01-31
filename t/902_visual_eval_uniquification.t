@@ -90,9 +90,9 @@ Click the eval entry with more samples
 
 and the link points to the line with the sub C<foo> call
 
-=item The line with the sub C<foo> call has two callers
+=item The first line lists two callers for the eval
 
-=item Both callers are the lines in main where the code is C<eval()>d
+=item Both C<eval> callers are the lines in main where the code is C<eval()>d
 
 =item Sub C<foo> has four callers
 

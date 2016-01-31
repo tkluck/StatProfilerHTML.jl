@@ -1045,7 +1045,10 @@ sub output {
             for my $uq_name (keys %$subs_at_line) {
                 my $sub = $self->{aggregate}{subs}{$uq_name} //
                     die "Unable to find sub '$uq_name'";
-                next if $sub->{is_main} || $sub->{is_eval};
+                if ($sub->{is_main} || $sub->{is_eval}) {
+                    push @{$subs{1}}, $sub if $sub->{is_eval};
+                    next;
+                }
                 my $fq_name = $sub->{name};
                 my $name = $fq_name =~ s{.*::}{}r;
 
