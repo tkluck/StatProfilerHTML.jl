@@ -1242,8 +1242,10 @@ sub output {
         date                => $date,
         files               => \@files,
         subs                => \@subs,
-        clickable_flamegraph=> $flamegraphs->{clickable}->flamegraph_base,
-        zoomable_flamegraph => $flamegraphs->{zoomable}->flamegraph_base,
+        !$flamegraphs ? () : (
+            clickable_flamegraph=> $flamegraphs->{clickable}->flamegraph_base,
+            zoomable_flamegraph => $flamegraphs->{zoomable}->flamegraph_base,
+        ),
         sub_link            => $sub_link,
         sub_name            => $sub_name,
         file_name           => $file_name,
@@ -1261,7 +1263,7 @@ sub output {
         File::ShareDir::dist_file('Devel-StatProfiler', 'sorttable.js'),
         File::Spec::Functions::catfile($directory, 'sorttable.js'));
 
-    $self->complete_flamegraphs($flamegraphs);
+    $self->complete_flamegraphs($flamegraphs) if $flamegraphs;
 
     return \@diagnostics;
 }
