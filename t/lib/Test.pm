@@ -187,7 +187,7 @@ sub visual_test {
 
         1;
     } or do {
-        print "Open the report $report with a browser, press return when finished\n\n";
+        print "Open the report $report with a browser, press return when finished (or install Browser::Open)\n\n";
     };
 
     readline(STDIN);
