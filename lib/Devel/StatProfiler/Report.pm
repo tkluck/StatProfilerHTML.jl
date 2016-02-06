@@ -943,9 +943,10 @@ sub complete_flamegraphs {
     $state->{zoomable}->wait;
 
     if ($state->{compress}) {
-        $self->_compress_inplace($_)
-            for grep -f $_, @{$state->{clickable}->all_files},
-                            @{$state->{zoomable}->all_files};
+        for my $file (@{$state->{clickable}->all_files},
+                      @{$state->{zoomable}->all_files}) {
+            $self->_compress_inplace($file) if -f $file;
+        }
     }
 
     return $state;
