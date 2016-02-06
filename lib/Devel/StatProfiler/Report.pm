@@ -17,6 +17,7 @@ use Devel::StatProfiler::Utils qw(
     write_data_any
 );
 use Devel::StatProfiler::Slowops;
+use Devel::StatProfiler::FlameGraph;
 use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
@@ -884,68 +885,77 @@ sub _callees_by_file {
     return $callees;
 }
 
-sub render_flamegraphs {
+sub start_flamegraphs {
     my ($self, $attributes, $directory, $compress) = @_;
-    my $clickable_flames = "clickable_stacks_by_time.svg";
-    my $zoomable_flames = "zoomable_stacks_by_time.svg";
-
     my $flames = $self->{aggregate}{flames};
     my $calls_data = File::Spec::Functions::catfile($directory, 'all_stacks_by_time.calls');
-    my $clickable_svg = File::Spec::Functions::catfile($directory, $clickable_flames);
-    my $zoomable_svg = File::Spec::Functions::catfile($directory, $zoomable_flames);
     my $clickable_nameattr = File::Spec::Functions::catfile($directory, 'clickable_stacks.attrs');
     my $zoomable_nameattr = File::Spec::Functions::catfile($directory, 'zoomable_stacks.attrs');
 
-    open my $calls_fh, '>', $calls_data;
+    open my $calls_fh, '>', $calls_data or die "Unable to open '$calls_data': $!";
     for my $key (keys %$flames) {
         print $calls_fh $key, ' ', $flames->{$key}, "\n";
     }
-    close $calls_fh;
+    close $calls_fh or die "Unable to close '$calls_data': $!";
 
-    open my $cattrs_fh, '>', $clickable_nameattr;
-    for my $sub (keys %$attributes) {
-        my $attrs = $attributes->{$sub};
+    Devel::StatProfiler::FlameGraph->write_attributes(
+        $clickable_nameattr, $attributes,
+    );
+    Devel::StatProfiler::FlameGraph->write_attributes(
+        $zoomable_nameattr, $attributes, 'zoomable',
+    );
 
-        print $cattrs_fh join(
-            "\t",
-            $sub,
-            map("$_=$attrs->{$_}", keys %$attrs),
-        ), "\n";
-    }
-    close $cattrs_fh;
+    my $clickable = Devel::StatProfiler::FlameGraph->new(
+        directory   => $directory,
+        traces      => 'all_stacks_by_time.calls',
+        output      => 'clickable_stacks_by_time.svg',
+        attributes  => 'clickable_stacks.attrs',
+        args        => {
+            total   => $self->{aggregate}{total},
+            title   => "Flame Graph",
+        },
+    );
+    my $zoomable = Devel::StatProfiler::FlameGraph->new(
+        directory   => $directory,
+        traces      => 'all_stacks_by_time.calls',
+        output      => 'zoomable_stacks_by_time.svg',
+        attributes  => 'zoomable_stacks.attrs',
+        args        => {
+            total   => $self->{aggregate}{total},
+            title   => "Zoomable Flame Graph",
+        },
+    );
 
-    open my $zattrs_fh, '>', $zoomable_nameattr;
-    for my $sub (keys %$attributes) {
-        my $attrs = $attributes->{$sub};
-
-        print $zattrs_fh join(
-            "\t",
-            $sub,
-            map("$_=$attrs->{$_}", grep $_ ne 'href', keys %$attrs),
-        ), "\n";
-    }
-    close $zattrs_fh;
-
-    my $pwd = Cwd::cwd;
-    chdir $directory;
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=clickable_stacks.attrs --title=\"Flame Graph\" all_stacks_by_time.calls > $clickable_flames") == 0
-        or die "Generating $clickable_svg failed\n";
-    system("$self->{fg_cmd} --total=$self->{aggregate}{total} --nameattr=zoomable_stacks.attrs --title=\"Zoomable Flame Graph\" all_stacks_by_time.calls > $zoomable_flames") == 0
-        or die "Generating $zoomable_svg failed\n";
-    chdir $pwd;
-
-    if ($compress) {
-        $self->_compress_inplace($calls_data);
-        $self->_compress_inplace($clickable_nameattr);
-        $self->_compress_inplace($zoomable_nameattr);
-        $self->_compress_inplace($clickable_svg);
-        $self->_compress_inplace($zoomable_svg);
-    }
+    $clickable->start;
+    $zoomable->start;
 
     return {
-        clickable   => $clickable_flames,
-        zoomable    => $zoomable_flames,
+        clickable   => $clickable,
+        zoomable    => $zoomable,
+        compress    => $compress,
     };
+}
+
+sub complete_flamegraphs {
+    my ($self, $state) = @_;
+
+    $state->{clickable}->wait;
+    $state->{zoomable}->wait;
+
+    if ($state->{compress}) {
+        $self->_compress_inplace($_)
+            for grep -f $_, @{$state->{clickable}->all_files},
+                            @{$state->{zoomable}->all_files};
+    }
+
+    return $state;
+}
+
+sub render_flamegraphs {
+    my ($self, $attributes, $directory, $compress) = @_;
+    my $state = $self->start_flamegraphs($attributes, $directory, $compress);
+
+    return $self->complete_flamegraphs($state);
 }
 
 sub output {
@@ -1238,8 +1248,8 @@ sub output {
         date                => $date,
         files               => \@files,
         subs                => \@subs,
-        clickable_flamegraph=> $flamegraphs->{clickable},
-        zoomable_flamegraph => $flamegraphs->{zoomable},
+        clickable_flamegraph=> $flamegraphs->{clickable}->flamegraph_base,
+        zoomable_flamegraph => $flamegraphs->{zoomable}->flamegraph_base,
         sub_link            => $sub_link,
         sub_name            => $sub_name,
         file_name           => $file_name,
