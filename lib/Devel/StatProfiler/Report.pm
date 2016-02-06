@@ -951,13 +951,6 @@ sub complete_flamegraphs {
     return $state;
 }
 
-sub render_flamegraphs {
-    my ($self, $attributes, $directory, $compress) = @_;
-    my $state = $self->start_flamegraphs($attributes, $directory, $compress);
-
-    return $self->complete_flamegraphs($state);
-}
-
 sub output {
     my ($self, $directory, $compress, $fetchers) = @_;
     my @diagnostics;
@@ -1214,7 +1207,7 @@ sub output {
                 function    => $sub_name->($sub->{name}),
             };
         }
-        $flamegraphs = $self->render_flamegraphs(\%attributes, $directory, $compress);
+        $flamegraphs = $self->start_flamegraphs(\%attributes, $directory, $compress);
     }
 
     # format subs page
@@ -1266,6 +1259,8 @@ sub output {
     File::Copy::copy(
         File::ShareDir::dist_file('Devel-StatProfiler', 'sorttable.js'),
         File::Spec::Functions::catfile($directory, 'sorttable.js'));
+
+    $self->complete_flamegraphs($flamegraphs);
 
     return \@diagnostics;
 }

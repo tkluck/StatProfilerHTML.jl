@@ -5,7 +5,9 @@ use warnings;
 
 use File::ShareDir;
 use File::Spec::Functions;
+use IPC::Open3 ();
 use Cwd ();
+use Symbol ();
 
 my @BASE_CMD = (
     $^X,
@@ -40,6 +42,7 @@ sub new {
         output      => $opts{output},
         attributes  => $opts{attributes},
         args        => $opts{extra_args},
+        stderr      => undef,
     }, $class;
 
     return $self;
@@ -48,18 +51,29 @@ sub new {
 sub start {
     my ($self) = @_;
     my $cwd = Cwd::cwd;
-    my $args = join " ", map "--$_=$self->{args}{$_}", keys %{$self->{args}};
 
     chdir $self->{directory};
-    system("@BASE_CMD $args --nameattr=$self->{attributes} $self->{traces} > $self->{output}") == 0
-        or die "Generating ", $self->flamegraph, " failed\n";
+    (my $stdin, $self->{stderr}) = map Symbol::gensym, 1 .. 2;
+    open my $stdout, '>', $self->{output} or die "Error opening '", $self->flamegraph, "': $!";
+    local *FLAMES = $stdout;
+    $self->{pid} = IPC::Open3::open3(
+        $stdin, ">&FLAMES", $self->{stderr},
+        @BASE_CMD,
+        map("--$_=$self->{args}{$_}", keys %{$self->{args}}),
+        "--nameattr=$self->{attributes}",
+        $self->{traces},
+    );
     chdir $cwd;
 }
 
 sub wait {
     my ($self) = @_;
 
-    return;
+    if (waitpid($self->{pid}, 0) != $self->{pid}) {
+        die "Generating ", $self->flamegraph, " failed:\n", $self->_errors;
+    } elsif ($? != 0) {
+        die "Generating ", $self->flamegraph, " failed\n", $self->_errors;;
+    }
 }
 
 sub flamegraph {
@@ -81,6 +95,16 @@ sub all_files {
         map File::Spec::Functions::catfile($self->{directory}, $_),
             $self->{output}, $self->{traces}, $self->{attributes},
     ];
+}
+
+sub _errors {
+    my ($self) = @_;
+
+    return $self->{errors} //= do {
+        local $/;
+        $self->{stderr} ? readline $self->{stderr} :
+                          "Command was not run";
+    };
 }
 
 1;
