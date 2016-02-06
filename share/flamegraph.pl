@@ -559,9 +559,10 @@ foreach (sort @Data) {
 
 	# there may be an extra samples column for differentials:
 	my $samples2 = undef;
-	if ($stack =~ /^(.*)\s+?(\d+(?:\.\d*)?)$/) {
+	if ($stack =~ /(\s+?)(\d+(?:\.\d*)?)$/) {
 		$samples2 = $samples;
-		($stack, $samples) = $stack =~ (/^(.*)\s+?(\d+(?:\.\d*)?)$/);
+		$samples = $2;
+		$stack = substr $stack, 0, -(length($1) + length($2));
 	}
 	$delta = undef;
 	if (defined $samples2) {
