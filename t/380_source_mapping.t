@@ -90,6 +90,11 @@ my %full_map = (
     ]
 );
 
+for my $r ($r1, $r2, $r3, $r4, $r5) {
+    $_ = $r->{sourcemap}->_decode($_)
+        for values %{$r->{sourcemap}{map}};
+}
+
 eq_or_diff($r1->{sourcemap}{map}, \%full_map);
 eq_or_diff($r2->{sourcemap}{map}, \%eval_map);
 eq_or_diff($r3->{sourcemap}{map}, \%eval_map);

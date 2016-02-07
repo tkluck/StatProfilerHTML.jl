@@ -13,6 +13,25 @@ use Devel::StatProfiler::Utils qw(
 use File::Path;
 use File::Spec::Functions;
 
+my ($SEREAL_ENCODER, $SEREAL_DECODER);
+
+sub _check_serializer {
+    my ($serializer) = @_;
+
+    if ($serializer eq 'storable') {
+        require Storable;
+    } elsif ($serializer eq 'sereal') {
+        require Sereal;
+
+        $SEREAL_ENCODER = Sereal::Encoder->new({
+            dedupe_strings  => 1,
+        });
+        $SEREAL_DECODER = Sereal::Decoder->new;
+    } else {
+        die "Unsupported serializer format '$serializer'";
+    }
+}
+
 sub new {
     my ($class, %opts) = @_;
     my $self = bless {
@@ -27,6 +46,7 @@ sub new {
         serializer      => $opts{serializer} || 'storable',
     }, $class;
 
+    _check_serializer($self->{serializer});
     check_serializer($self->{serializer});
 
     return $self;
@@ -67,7 +87,7 @@ sub end_file_mapping {
     # add last line
     push @$current_mapping, [$physical_line + 1, undef, $physical_line + 1];
 
-    $self->{map}{$current_file} = $current_mapping;
+    $self->{map}{$current_file} = _encode($self, $current_mapping);
 }
 
 sub add_file_mapping {
@@ -137,10 +157,16 @@ sub _load_and_merge {
     my ($self, $file) = @_;
     my $data = read_data($self->{serializer}, $file);
 
+    # Backwards compatibility for releases before 0.47
+    for my $value (values %$data) {
+        # use aliasing to modify in-place
+        $value = _encode($self, $value) if ref $value;
+    }
+
     for my $key (keys %$data) {
         $self->{map}{$key} = $data->{$key};
 
-        for my $entry (@{$data->{$key}}) {
+        for my $entry (@{_decode($self, $data->{$key})}) {
             $self->{reverse_map}{$entry->[1]}{$key} = 1
                 if $entry->[1]; # skip sentinel entry for last line
         }
@@ -150,7 +176,7 @@ sub _load_and_merge {
 sub get_mapping {
     my ($self, $file) = @_;
 
-    return $self->{map}{$file};
+    return _decode($self, $self->{map}{$file});
 }
 
 sub get_reverse_mapping {
@@ -160,6 +186,30 @@ sub get_reverse_mapping {
 
     return unless $self->{reverse_map}{$file};
     return (keys %{$self->{reverse_map}{$file}})[0];
+}
+
+sub _encode {
+    my ($self, $rows) = @_;
+
+    if ($self->{serializer} eq 'storable') {
+        return Storable::nfreeze($rows);
+    } elsif ($self->{serializer} eq 'sereal') {
+        return $SEREAL_ENCODER->encode($rows);
+    } else {
+        die "Unsupported serializer format '$self->{serializer}'";
+    }
+}
+
+sub _decode {
+    my ($self, $blob) = @_;
+
+    if ($self->{serializer} eq 'storable') {
+        return Storable::thaw($blob);
+    } elsif ($self->{serializer} eq 'sereal') {
+        return $SEREAL_DECODER->decode($blob);
+    } else {
+        die "Unsupported serializer format '$self->{serializer}'";
+    }
 }
 
 1;
