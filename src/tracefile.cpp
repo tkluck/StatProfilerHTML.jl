@@ -714,7 +714,7 @@ SV *TraceFileReader::read_trace()
             int first_line = read_varint(in);
             HV *frame = newHV();
             SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
-            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
+            bool maybe_eval = map_evals && SvCUR(file) >= 8 && SvPVX(file)[0] == '(';
 
             if (sub_prefix_rx)
                 name = map_name(package, name);
@@ -763,7 +763,7 @@ SV *TraceFileReader::read_trace()
             int line = read_varint(in);
             HV *frame = newHV();
             SV *full_file = make_fullfile(aTHX_ genealogy_info, file);
-            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
+            bool maybe_eval = map_evals && SvCUR(file) >= 8 && SvPVX(file)[0] == '(';
 
             if (map_evals) {
                 eval_remap = eval_remap || maybe_eval;
@@ -793,7 +793,7 @@ SV *TraceFileReader::read_trace()
             SV *file = read_string(aTHX_ in);
             int line = read_varint(in);
             HV *frame = newHV();
-            bool maybe_eval = map_evals && SvCUR(file) > 8 && SvPVX(file)[0] == '(';
+            bool maybe_eval = map_evals && SvCUR(file) >= 8 && SvPVX(file)[0] == '(';
 
             if (map_evals) {
                 eval_remap = eval_remap || maybe_eval;
