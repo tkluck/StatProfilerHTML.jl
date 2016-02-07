@@ -720,7 +720,7 @@ SV *TraceFileReader::read_trace()
                 name = map_name(package, name);
             if (map_evals) {
                 eval_remap = eval_remap || maybe_eval;
-                try_eval_remap.push_back(maybe_eval ? file : NULL);
+                try_eval_remap.push_back(maybe_eval ? SvREFCNT_inc(file) : NULL);
             }
 
             hv_stores(frame, "fq_sub_name", make_fullname(aTHX_ package, name));
@@ -767,7 +767,7 @@ SV *TraceFileReader::read_trace()
 
             if (map_evals) {
                 eval_remap = eval_remap || maybe_eval;
-                try_eval_remap.push_back(maybe_eval ? file : NULL);
+                try_eval_remap.push_back(maybe_eval ? SvREFCNT_inc(file) : NULL);
             }
 
             hv_stores(frame, "file", full_file);
@@ -797,7 +797,7 @@ SV *TraceFileReader::read_trace()
 
             if (map_evals) {
                 eval_remap = eval_remap || maybe_eval;
-                try_eval_remap.push_back(maybe_eval ? file : NULL);
+                try_eval_remap.push_back(maybe_eval ? SvREFCNT_inc(file) : NULL);
             }
 
             hv_stores(frame, "file", SvREFCNT_inc(file));
@@ -826,6 +826,8 @@ SV *TraceFileReader::read_trace()
                     SV *frame = *av_fetch(frames, i, 0);
 
                     hv_stores((HV *) SvRV(frame), "file", make_fullfile(aTHX_ genealogy_info, mapped));
+                    try_eval_remap[i] = NULL;
+                    SvREFCNT_dec(file);
                 }
             }
             if (map_evals) {
