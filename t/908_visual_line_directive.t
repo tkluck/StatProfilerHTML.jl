@@ -59,7 +59,7 @@ my $r = Devel::StatProfiler::Report->new(
     sources    => 1,
 );
 $r->add_trace_file($profile_file);
-$r->_file('t/lib/Test/LineMap.pm'); # ensure we read the file
+$r->_file('t/lib/Test/LineMap.pm', 't/lib/Test/LineMap.pm'); # ensure we read the file
 
 $r->output($output_dir);
 
