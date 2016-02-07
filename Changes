@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.48      2016-02-07 19:25:14 CET
+
+    - Fix some subtle errors in eval mapping
+
 0.47      2016-02-07 14:34:42 CET
 
     - Depessimize pathological case of many source entries only
