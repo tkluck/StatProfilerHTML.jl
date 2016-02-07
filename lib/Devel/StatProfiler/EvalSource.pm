@@ -265,7 +265,10 @@ sub _get_hash_by_name {
         }
 
         if ($self->{genealogy}{$p_id}) {
-            no warnings 'internal'; # we only need to get a random key
+            # we only need to get a random value, but using just
+            # each() returns undef from time to time (when it reaches the
+            # end of the hash)
+            keys(%{$self->{genealogy}{$p_id}});
             my (undef, $parent) = each %{$self->{genealogy}{$p_id}};
 
             if ($parent &&
