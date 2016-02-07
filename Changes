@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.47      2016-02-07 14:34:42 CET
+
+    - Depessimize pathological case of many source entries only
+      differing for uninteresting details
+
 0.46      2016-02-06 19:16:38 CET
 
     - Optimized flamegraph generation
