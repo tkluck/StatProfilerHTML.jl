@@ -203,6 +203,7 @@ sub _encode {
 sub _decode {
     my ($self, $blob) = @_;
 
+    return undef unless defined $blob;
     if ($self->{serializer} eq 'storable') {
         return Storable::thaw($blob);
     } elsif ($self->{serializer} eq 'sereal') {
