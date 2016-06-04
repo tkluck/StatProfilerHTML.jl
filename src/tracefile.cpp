@@ -412,7 +412,7 @@ namespace {
             char *s = SvPVX(file);
 
             if (s[len - 1] == ')' && strncmp(s, "(eval ", 6) == 0) {
-                return newSVpvf("qeval:%s/%"SVf, genealogy.id, file);
+                return newSVpvf("qeval:%s/%" SVf, genealogy.id, file);
             }
         }
 
