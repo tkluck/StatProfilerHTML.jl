@@ -662,6 +662,66 @@ SV *TraceFileReader::maybe_map_eval(SV *file) {
     return file;
 }
 
+// works around the source code explosion caused by Sub::Quote, and
+// possibly other modules
+static void normalize_references(pTHX_ SV *source) {
+    char *ptr = SvPVX(source);
+
+    for (char *curr = strstr(ptr + 1, "(0x"); curr; curr = strstr(curr + 1, "(0x")) {
+        // look back for CODE, SCALAR, ARRAY, ...
+        const char *check_for;
+        int check_len;
+        switch (curr[-1]) {
+        case 'B': // GLOB
+            check_for = "GLOB";
+            check_len = 4;
+            break;
+        case 'E': // CODE
+            check_for = "CODE";
+            check_len = 4;
+            break;
+        case 'F': // REF
+            check_for = "REF";
+            check_len = 3;
+            break;
+        case 'H': // HASH
+            check_for = "HASH";
+            check_len = 4;
+            break;
+        case 'O': // IO
+            check_for = "IO";
+            check_len = 2;
+            break;
+        case 'R': // SCALAR
+            check_for = "SCALAR";
+            check_len = 6;
+            break;
+        case 'Y': // ARRAY
+            check_for = "ARRAY";
+            check_len = 5;
+            break;
+        default:
+            continue;
+        }
+        if (strncmp(curr - check_len, check_for, check_len) != 0)
+            continue;
+
+        // scan forward for hex digits terminated by a )
+        char *end = curr + 3, c;
+        while ((c = *end)) {
+            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
+                break;
+            ++end;
+        }
+        if (*end != ')')
+            continue;
+
+        for (char *i = curr + 3; i < end; ++i)
+            *i = 'f';
+        curr = end;
+    }
+}
+
 SV *TraceFileReader::read_trace()
 {
     HV *sample = NULL;
@@ -783,6 +843,7 @@ SV *TraceFileReader::read_trace()
             char file[28]; // 20 for 64-bit int, 7 for (eval ), 1 for null
             int file_size;
 
+            normalize_references(aTHX_ text);
             file_size = sprintf(file, "(eval %lu)", eval_seq);
             hv_store(source_code, file, file_size, SvREFCNT_inc(text), 0);
             break;

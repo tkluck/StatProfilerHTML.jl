@@ -23,11 +23,11 @@ sub bar {
 
 {
     no warnings 'redefine';
-    eval <<'EOT' or die;
+    eval <<'EOT' or die; # the one explicity mentioned below
 sub foo {
     usleep(50000);
 }
-
+# CODE(0x1234567890abcdef)
 foo();
 EOT
 
@@ -35,12 +35,12 @@ EOT
 sub foo {
     usleep(50000);
 }
-
+# CODE(0xfedcba9876543210)
 foo();
 EOT
 
     eval <<'EOT' or die;
-usleep(55000);
+usleep(55000); # REF(0x18aa6d0)
 EOT
 }
 
@@ -76,7 +76,7 @@ my $a2 = $r2->{aggregate};
 
     my $f1e1 = $f1->{_e($process_id, $first_eval_n + 1)};
     my $f1e2 = $f1->{_e($process_id, $first_eval_n + 2)};
-    my $f2e1 = $f2->{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8'};
+    my $f2e1 = $f2->{'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4'};
 
     is($f1e1->{name}, _e($process_id, $first_eval_n + 1));
     is($f1e2->{name}, _e($process_id, $first_eval_n + 2));
@@ -97,7 +97,7 @@ my $a2 = $r2->{aggregate};
 
     my $s1e1foo = $s1->{_e($process_id, $first_eval_n + 1) . ':main::foo:2'};
     my $s1e2foo = $s1->{_e($process_id, $first_eval_n + 2) . ':main::foo:2'};
-    my $s2e1foo = $s2->{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2'};
+    my $s2e1foo = $s2->{'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:main::foo:2'};
 
     is($s2e1foo->{exclusive}, $s1e1foo->{exclusive} + $s1e2foo->{exclusive});
     is($s2e1foo->{inclusive}, $s1e1foo->{inclusive} + $s1e2foo->{inclusive});
@@ -105,10 +105,10 @@ my $a2 = $r2->{aggregate};
     {
         my $s1cs1 = $s1e1foo->{call_sites}{_e($process_id, $first_eval_n + 1) . ':5'};
         my $s1cs2 = $s1e2foo->{call_sites}{_e($process_id, $first_eval_n + 2) . ':5'};
-        my $s2cs = $s2e1foo->{call_sites}{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:5'};
+        my $s2cs = $s2e1foo->{call_sites}{'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:5'};
 
-        is($s2cs->{caller}, 'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:eval');
-        is($s2cs->{file}, 'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8');
+        is($s2cs->{caller}, 'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:eval');
+        is($s2cs->{file}, 'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4');
         is($s2cs->{inclusive}, $s1cs1->{inclusive} + $s1cs2->{inclusive});
         is($s2cs->{exclusive}, $s1cs1->{exclusive} + $s1cs2->{exclusive});
    }
@@ -128,7 +128,7 @@ my $a2 = $r2->{aggregate};
 
     my $s1e1foo = $s1->{_e($process_id, $first_eval_n + 1) . ':eval'};
     my $s1e2foo = $s1->{_e($process_id, $first_eval_n + 2) . ':eval'};
-    my $s2e1foo = $s2->{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:eval'};
+    my $s2e1foo = $s2->{'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:eval'};
 
     is($s2e1foo->{exclusive}, $s1e1foo->{exclusive} + $s1e2foo->{exclusive});
     is($s2e1foo->{inclusive}, $s1e1foo->{inclusive} + $s1e2foo->{inclusive});
@@ -143,9 +143,9 @@ my $a2 = $r2->{aggregate};
     {
         my $s1c1 = $s1e1foo->{callees}{5}{_e($process_id, $first_eval_n + 1) . ':main::foo:2'};
         my $s1c2 = $s1e2foo->{callees}{5}{_e($process_id, $first_eval_n + 2) . ':main::foo:2'};
-        my $s2c = $s2e1foo->{callees}{5}{'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2'};
+        my $s2c = $s2e1foo->{callees}{5}{'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:main::foo:2'};
 
-        is($s2c->{callee}, 'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8:main::foo:2');
+        is($s2c->{callee}, 'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4:main::foo:2');
         is($s2c->{inclusive}, $s1c1->{inclusive} + $s1c2->{inclusive});
     }
 }
@@ -154,7 +154,7 @@ my $a2 = $r2->{aggregate};
 
 {
     my ($merged, @src) = map __FILE__ . ":main;$_:eval;$_:main::foo:2;(unknown):Time::HiRes::usleep",
-        'eval:61da06e799e66a5e0a0240bf058e28bd8c8322c8',
+        'eval:a2dab4a2c2b28c7a5e41eb03c43b1338a7f31bc4',
         _e($process_id, $first_eval_n + 1), _e($process_id, $first_eval_n + 2);
 
     my $f1 = $a1->{flames};
