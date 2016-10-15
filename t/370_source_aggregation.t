@@ -64,13 +64,16 @@ my $rs1 = $r1->{source};
 my $rs2 = $r2->{source};
 my $rs3 = $r3->{source};
 
-my ($first_eval_name) = keys %{$rs1->{all}{$parent_id}{1}{sparse}};
+my ($first_eval_name) = sort keys %{$rs1->{all}{$parent_id}{1}{sparse}};
 my ($first_eval_n) = $first_eval_name =~ /^\(eval (\d+)\)$/ or
     die "Unparsable '$first_eval_name'";
+my $has_test2 = Test::Builder->VERSION >= '1.302015';
+
+$first_eval_n += $has_test2;
 
 my @hashes = map unpack("H*", $_), keys %{$rs1->{hashed}};
 
-is(scalar @hashes, 6);
+is(scalar @hashes, 6 + $has_test2);
 
 numify($_) for $rs1, $rs2, $rs3;
 

@@ -56,7 +56,7 @@ my @strange = grep !/^\(eval \d+\)$/, keys %$source;
 ok(!@strange, "found unusual file names for eval");
 diag("Strange eval source '$_'") for @strange;
 
-$count{$_}++ for values %$source;
+$count{$_}++ for grep !/\btest2_set_is_end\b/, values %$source;
 
 is_deeply(\%count, {
     'Time::HiRes::sleep(0.000002); sub {}' => 4,
