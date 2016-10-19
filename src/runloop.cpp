@@ -1078,9 +1078,6 @@ cleanup_runloop(pTHX_ void *ptr)
 {
     dMY_CXT;
 
-    if (MY_CXT.trace)
-        MY_CXT.trace->close(TraceFileWriter::write_end_tag);
-
     // declared static and destroyed during global destruction
 #ifdef PERL_IMPLICIT_CONTEXT
     MY_CXT.~Cxt();
