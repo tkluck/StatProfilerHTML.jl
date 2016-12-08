@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw(Module::Build::WithXSpp);
 
-use Getopt::Long;
+use Getopt::Long qw( :config pass_through );
 use Config;
 
 # yes, doing this in a module is ugly; OTOH it's a private module
