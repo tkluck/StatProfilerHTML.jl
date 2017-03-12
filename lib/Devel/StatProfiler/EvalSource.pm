@@ -3,6 +3,7 @@ package Devel::StatProfiler::EvalSource;
 use strict;
 use warnings;
 
+use Devel::StatProfiler::EvalSourceStorage;
 use Devel::StatProfiler::Utils qw(
     check_serializer
     read_data
@@ -25,7 +26,15 @@ sub new {
         root_dir        => $opts{root_directory},
         shard           => $opts{shard},
         genealogy       => $opts{genealogy},
+        storage         => undef,
     }, $class;
+
+    if ($self->{root_dir}) {
+        my $storage_base = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
+        $self->{storage} = Devel::StatProfiler::EvalSourceStorage->new(
+            base_dir    => $storage_base,
+        ),
+    }
 
     check_serializer($self->{serializer});
 
@@ -104,28 +113,19 @@ sub _pack_data {
 
 sub _save {
     my ($self, $state_dir, $is_part) = @_;
-    my $source_dir = File::Spec::Functions::catdir($self->{root_dir}, '__source__');
 
     $state_dir //= state_dir($self);
-    File::Path::mkpath([$state_dir, $source_dir]);
-
     $self->_pack_data;
 
-    # $self->{seen_in_process} can be reconstructed fomr $self->{all}
+    # $self->{seen_in_process} can be reconstructed from $self->{all}
     write_data_any($is_part, $self, $state_dir, 'source', $self->{all})
         if %{$self->{all}};
 
+    my $storage = $self->{storage};
     for my $hash (keys %{$self->{hashed}}) {
         my $unpacked = unpack "H*", $hash;
-        my $source_subdir = File::Spec::Functions::catdir(
-            $source_dir,
-            substr($unpacked, 0, 2),
-            substr($unpacked, 2, 2),
-        );
 
-        File::Path::mkpath([$source_subdir]);
-        write_file($source_subdir, substr($unpacked, 4), 'use_utf8', $self->{hashed}{$hash})
-            unless -e File::Spec::Functions::catfile($source_subdir, substr($unpacked, 4));
+        $storage->add_source_string($unpacked, $self->{hashed}{$hash});
     }
 }
 
@@ -225,18 +225,8 @@ sub load_and_merge {
 sub _get_source_by_hash {
     my ($self, $hash) = @_;
 
-    return $self->{hashed}{$hash} // do {
-        my $unpacked = unpack "H*", $hash;
-        my $path = File::Spec::Functions::catfile(
-            $self->{root_dir},
-            '__source__',
-            substr($unpacked, 0, 2),
-            substr($unpacked, 2, 2),
-            substr($unpacked, 4)
-        );
-
-        -f $path ? read_file($path, 'use_utf8') : '';
-    };
+    return $self->{hashed}{$hash} //
+        $self->{storage}->get_source_by_hash(unpack "H*", $hash);
 }
 
 sub _get_hash_by_name {
