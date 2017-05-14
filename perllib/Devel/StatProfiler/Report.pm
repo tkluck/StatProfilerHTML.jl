@@ -16,7 +16,6 @@ use Devel::StatProfiler::Utils qw(
     utf8_sha1_hex
     write_data_any
 );
-use Devel::StatProfiler::Slowops;
 use Devel::StatProfiler::FlameGraph;
 use File::ShareDir;
 use File::Basename ();
@@ -78,7 +77,6 @@ sub new {
         ),
         genealogy     => {},
         flamegraph    => $opts{flamegraph} || 0,
-        slowops       => {map { $_ => 1 } @{$opts{slowops} || \@Devel::StatProfiler::Slowops::OPS}},
         tick          => 0,
         stack_depth   => 0,
         perl_version  => undef,
@@ -219,7 +217,6 @@ sub add_trace_file {
     my ($self, $file) = @_;
     my $r = ref $file ? $file : Devel::StatProfiler::Reader->new($file, $self->{mapper});
     my $flames = $self->{flamegraph} ? $self->{aggregate}{flames} : undef;
-    my $slowops = $self->{slowops};
     my $eval_mapper = $self->{mapper} && $self->{mapper}->can_map_eval ? $self->{mapper} : undef;
 
     my ($process_id, $process_ordinal, $parent_id, $parent_ordinal) =
@@ -246,18 +243,6 @@ sub add_trace_file {
         $self->{aggregate}{total} += $weight;
 
         my $frames = $trace->frames;
-
-        # TODO move it to Reader.pm?
-        if ($slowops->{my $op_name = $trace->op_name}) {
-            unshift @$frames, bless {
-                "package"  => "CORE",
-                sub_name   => $op_name,
-                fq_sub_name=> "CORE::$op_name",
-                file       => $frames->[0]->file,
-                line       => -2,
-                first_line => -2,
-            }, 'Devel::StatProfiler::StackFrame';
-        }
 
         my ($next_sub, @for_flamegraph, %tracked_sub, %tracked_cs, %tracked_callee);
         for my $i (0 .. $#$frames) {

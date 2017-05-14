@@ -4,8 +4,6 @@ package Devel::StatProfiler::Reader;
 use strict;
 use warnings;
 
-require Devel::StatProfiler; # load XS but don't start profiling
-
 sub get_reader_state {
     my ($self) = @_;
 
