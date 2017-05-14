@@ -26,16 +26,9 @@ my $report = Devel::StatProfiler::Report->new(
 die "Missing input files (via ARGV or 'statprof.out.*' or 'statprof.out'\n"
     if not @files;
 
-for my $f (@files) {
-    my $r;
-    if($f eq '-') {# reading stackframes from STDIN
-        $r = Devel::StatProfiler::Reader::Text->new(\*STDIN);
-    } else {
-        $r = Devel::StatProfiler::Reader->new($f);
-    }
-    $report->add_trace_file($r);
-    $report->map_source($r->get_genealogy_info->[0]);
-}
+my $r = Devel::StatProfiler::Reader::Text->new(\*ARGV);
+$report->add_trace_file($r);
+$report->map_source($r->get_genealogy_info->[0]);
 
 my $diagnostics = $report->output($outdir);
 
