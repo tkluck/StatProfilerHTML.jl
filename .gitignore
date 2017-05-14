@@ -17,3 +17,6 @@
 .*.sw*
 tprof.out
 statprof.out.*
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
