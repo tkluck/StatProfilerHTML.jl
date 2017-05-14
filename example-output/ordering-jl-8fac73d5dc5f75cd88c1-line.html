@@ -1,0 +1,875 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/src/julia/usr/bin/../share/julia/base/./ordering.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:47:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># This file is a part of Julia. License is MIT: http://julialang.org/license
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">module Order
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## notions of element ordering ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">export # not exported by Base
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Ordering, Forward, Reverse, Lexicographic,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    By, Lt, Perm,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ReverseOrdering, ForwardOrdering, LexicographicOrdering,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    DirectOrdering,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lt, ord, ordtype
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">abstract Ordering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-16"></a>16</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable ForwardOrdering &lt;: Ordering end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable ReverseOrdering{Fwd&lt;:Ordering} &lt;: Ordering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    fwd::Fwd
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ReverseOrdering(rev::ReverseOrdering) = rev.fwd
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ReverseOrdering{Fwd}(fwd::Fwd) = ReverseOrdering{Fwd}(fwd)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">typealias DirectOrdering Union{ForwardOrdering,ReverseOrdering{ForwardOrdering}}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const Forward = ForwardOrdering()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const Reverse = ReverseOrdering(Forward)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable LexicographicOrdering &lt;: Ordering end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const Lexicographic = LexicographicOrdering()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable By{T} &lt;: Ordering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    by::T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable Lt{T} &lt;: Ordering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lt::T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable Perm{O&lt;:Ordering,V&lt;:AbstractVector} &lt;: Ordering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    order::O
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    data::V
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt(o::ForwardOrdering,       a, b) = isless(a,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt(o::ReverseOrdering,       a, b) = lt(o.fwd,b,a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt(o::By,                    a, b) = isless(o.by(a),o.by(b))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt(o::Lt,                    a, b) = o.lt(a,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt(o::LexicographicOrdering, a, b) = lexcmp(a,b) &lt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function lt(p::Perm, a::Integer, b::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-52"></a>52</td>
+          <td>190 (3.94%)</td>
+          <td>190 (3.94%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52"></a>
+              190 (3.94%) samples spent in lt<br />
+              1 (0.53%) (ex.),
+              1 (0.53%) (incl.)
+              when called from
+              selectpivot!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-249">line 249</a><br />
+              2 (1.05%) (ex.),
+              2 (1.05%) (incl.)
+              when called from
+              selectpivot!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-252">line 252</a><br />
+              15 (7.89%) (ex.),
+              15 (7.89%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-223">line 223</a><br />
+              51 (26.84%) (ex.),
+              51 (26.84%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-280">line 280</a><br />
+              121 (63.68%) (ex.),
+              121 (63.68%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-279">line 279</a><br />
+            </div>
+            <span class="code">    da = p.data[a]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-53"></a>53</td>
+          <td>181 (3.75%)</td>
+          <td>181 (3.75%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-53"></a>
+              181 (3.75%) samples spent in lt<br />
+              8 (4.42%) (ex.),
+              8 (4.42%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-223">line 223</a><br />
+              21 (11.60%) (ex.),
+              21 (11.60%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-279">line 279</a><br />
+              152 (83.98%) (ex.),
+              152 (83.98%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-280">line 280</a><br />
+            </div>
+            <span class="code">    db = p.data[b]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-54"></a>54</td>
+          <td>973 (20.16%)</td>
+          <td>3087 (63.95%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54"></a>
+              3086 (63.93%) samples spent in lt<br />
+              0 (ex.),
+              5 (0.16%) (incl.)
+              when called from
+              selectpivot!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-249">line 249</a><br />
+              4 (0.41%) (ex.),
+              6 (0.19%) (incl.)
+              when called from
+              selectpivot!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-252">line 252</a><br />
+              4 (0.41%) (ex.),
+              7 (0.23%) (incl.)
+              when called from
+              selectpivot!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-253">line 253</a><br />
+              89 (9.16%) (ex.),
+              314 (10.17%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-223">line 223</a><br />
+              438 (45.06%) (ex.),
+              1372 (44.46%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-280">line 280</a><br />
+              437 (44.96%) (ex.),
+              1382 (44.78%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-279">line 279</a><br />
+            </div>
+            <div class="callees">
+              2114 (68.48%)
+              samples spent calling
+              <a href="comp-jl-e7e79896f0d7dfc73428-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-comp-jl-grlex-164">grlex</a><br />
+            </div>
+            <span class="code">    lt(p.order, da, db) | (!lt(p.order, db, da) &amp; (a &lt; b))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function lt(p::Perm{LexicographicOrdering}, a::Integer, b::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    c = lexcmp(p.data[a], p.data[b])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    c != 0 ? c &lt; 0 : a &lt; b
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ordtype(o::ReverseOrdering, vs::AbstractArray) = ordtype(o.fwd, vs)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ordtype(o::Perm,            vs::AbstractArray) = ordtype(o.order, o.data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># TODO: here, we really want the return type of o.by, without calling it
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ordtype(o::By,              vs::AbstractArray) = try typeof(o.by(vs[1])) catch; Any end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ordtype(o::Ordering,        vs::AbstractArray) = eltype(vs)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-ord-67"></a>
+              1 (0.02%) samples spent in ord<br />
+              1 (100.00%) (ex.),
+              1 (100.00%) (incl.)
+              when called from
+              #sortperm#11
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-456">line 456</a><br />
+            </div>
+            <span class="code">function ord(lt, by, rev::Bool, order::Ordering=Forward)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-68"></a>68</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    o = (lt===isless) &amp; (by===identity) ? order  :
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        (lt===isless) &amp; (by!==identity) ? By(by) :
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        (lt!==isless) &amp; (by===identity) ? Lt(lt) :
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                          Lt((x,y)-&gt;lt(by(x),by(y)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-72"></a>72</td>
+          <td>1 (0.02%)</td>
+          <td>1 (0.02%)</td>
+          <td>
+            <span class="code">    rev ? ReverseOrdering(o) : o
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lordering-jl-8fac73d5dc5f75cd88c1-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

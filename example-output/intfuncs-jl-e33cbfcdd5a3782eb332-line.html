@@ -1,0 +1,4225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/src/julia/usr/bin/../share/julia/base/./intfuncs.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:47:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># This file is a part of Julia. License is MIT: http://julialang.org/license
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## number-theoretic functions ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function gcd{T&lt;:Integer}(a::T, b::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while b != 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t = b
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        b = rem(a, b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    checked_abs(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># binary GCD (aka Stein&#39;s) algorithm
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># about 1.7x (2.1x) faster for random Int64s (Int128s)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-16"></a>16</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function gcd{T&lt;:Union{Int64,UInt64,Int128,UInt128}}(a::T, b::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a == 0 &amp;&amp; return abs(b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    b == 0 &amp;&amp; return abs(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    za = trailing_zeros(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    zb = trailing_zeros(b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k = min(za, zb)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    u = unsigned(abs(a &gt;&gt; za))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    v = unsigned(abs(b &gt;&gt; zb))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while u != v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if u &gt; v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            u, v = v, u
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        v -= u
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        v &gt;&gt;= trailing_zeros(v)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r = u &lt;&lt; k
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # T(r) would throw InexactError; we want OverflowError instead
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r &gt; typemax(T) &amp;&amp; throw(OverflowError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r % T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># explicit a==0 test is to handle case of lcm(0,0) correctly
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lcm{T&lt;:Integer}(a::T, b::T) = a == 0 ? a : checked_abs(a * div(b, gcd(b,a)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">gcd(a::Integer) = a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lcm(a::Integer) = a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">gcd(a::Integer, b::Integer) = gcd(promote(a,b)...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lcm(a::Integer, b::Integer) = lcm(promote(a,b)...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">gcd(a::Integer, b::Integer...) = gcd(a, gcd(b...))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lcm(a::Integer, b::Integer...) = lcm(a, lcm(b...))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">gcd{T&lt;:Integer}(abc::AbstractArray{T}) = reduce(gcd,abc)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lcm{T&lt;:Integer}(abc::AbstractArray{T}) = reduce(lcm,abc)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># return (gcd(a,b),x,y) such that ax+by == gcd(a,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-52"></a>52</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    gcdx(x,y)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-53"></a>53</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-54"></a>54</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Computes the greatest common (positive) divisor of `x` and `y` and their Bézout
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">coefficients, i.e. the integer coefficients `u` and `v` that satisfy
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">``ux+vy = d = gcd(x,y)``. ``gcdx(x,y)`` returns ``(d,u,v)``.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">```jldoctest
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">julia&gt; gcdx(12, 42)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(6,-3,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">```
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">```jldoctest
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">julia&gt; gcdx(240, 46)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(2,-9,47)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">```
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-68"></a>68</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">!!! note
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Bézout coefficients are *not* uniquely defined. `gcdx` returns the minimal
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Bézout coefficients that are computed by the extended Euclidean algorithm.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (Ref: D. Knuth, TAoCP, 2/e, p. 325, Algorithm X.)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-72"></a>72</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    For signed integers, these coefficients `u` and `v` are minimal in
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    the sense that ``|u| &lt; |y/d|`` and ``|v| &lt; |x/d|``. Furthermore,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    the signs of `u` and `v` are chosen so that `d` is positive.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    For unsigned integers, the coefficients `u` and `v` might be near
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-76"></a>76</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    their `typemax`, and the identity then holds only via the unsigned
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-77"></a>77</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    integers&#39; modulo arithmetic.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-78"></a>78</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-79"></a>79</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function gcdx{T&lt;:Integer}(a::T, b::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-80"></a>80</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # a0, b0 = a, b
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-81"></a>81</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s0, s1 = one(T), zero(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-82"></a>82</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t0, t1 = s1, s0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-83"></a>83</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # The loop invariant is: s0*a0 + t0*b0 == a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-84"></a>84</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while b != 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-85"></a>85</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        q = div(a, b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-86"></a>86</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a, b = b, rem(a, b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-87"></a>87</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        s0, s1 = s1, s0 - q*s1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-88"></a>88</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t0, t1 = t1, t0 - q*t1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-89"></a>89</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-90"></a>90</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a &lt; 0 ? (-a, -s0, -t0) : (a, s0, t0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-91"></a>91</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-92"></a>92</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">gcdx(a::Integer, b::Integer) = gcdx(promote(a,b)...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-93"></a>93</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-94"></a>94</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># multiplicative inverse of n mod m, error if none
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-95"></a>95</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function invmod{T&lt;:Integer}(n::T, m::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-96"></a>96</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    g, x, y = gcdx(n, m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-97"></a>97</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (g != 1 || m == 0) &amp;&amp; throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-98"></a>98</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Note that m might be negative here.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-99"></a>99</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # For unsigned T, x might be close to typemax; add m to force a wrap-around.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-100"></a>100</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r = mod(x + m, m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-101"></a>101</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # The postcondition is: mod(r * n, m) == mod(T(1), m) &amp;&amp; div(r, m) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-102"></a>102</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-103"></a>103</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-104"></a>104</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">invmod(n::Integer, m::Integer) = invmod(promote(n,m)...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-105"></a>105</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-106"></a>106</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># ^ for any x supporting *
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-107"></a>107</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">to_power_type(x::Number) = oftype(x*x, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-108"></a>108</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">to_power_type(x) = x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-109"></a>109</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-intfuncs-jl-power_by_squaring-109"></a>
+              4794 (99.32%) samples spent in power_by_squaring<br />
+              2 (100.00%) (ex.),
+              4794 (100.00%) (incl.)
+              when called from
+              ^
+              <a href="intfuncs-jl-e33cbfcdd5a3782eb332-line.html#Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-144">line 144</a><br />
+            </div>
+            <span class="code">function power_by_squaring(x_, p::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-110"></a>110</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x = to_power_type(x_)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-111"></a>111</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if p == 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-112"></a>112</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return copy(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-113"></a>113</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif p == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-114"></a>114</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return one(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-115"></a>115</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif p == 2
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-116"></a>116</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return x*x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-117"></a>117</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif p &lt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-118"></a>118</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-119"></a>119</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-120"></a>120</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t = trailing_zeros(p) + 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-121"></a>121</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p &gt;&gt;= t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-122"></a>122</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while (t -= 1) &gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-123"></a>123</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x *= x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-124"></a>124</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-125"></a>125</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    y = x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-126"></a>126</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while p &gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-127"></a>127</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t = trailing_zeros(p) + 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-128"></a>128</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        p &gt;&gt;= t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-129"></a>129</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while (t -= 1) &gt;= 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-130"></a>130</td>
+          <td></td>
+          <td>295 (6.11%)</td>
+          <td>
+            <div class="callees">
+              295 (100.00%)
+              samples spent calling
+              <a href="calg-jl-ab0c07905d81cd2eb7dc-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-calg-jl-128">*</a><br />
+            </div>
+            <span class="code">            x *= x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-131"></a>131</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-132"></a>132</td>
+          <td>2 (0.04%)</td>
+          <td>4499 (93.20%)</td>
+          <td>
+            <div class="callees">
+              1 (0.02%)
+              samples spent calling
+              <a href="poly-jl-85f503a54a90790bdda3-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-poly-jl-getindex-220">getindex</a><br />
+              4496 (99.93%)
+              samples spent calling
+              <a href="calg-jl-ab0c07905d81cd2eb7dc-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-calg-jl-128">*</a><br />
+            </div>
+            <span class="code">        y *= x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-133"></a>133</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-134"></a>134</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return y
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-135"></a>135</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-136"></a>136</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">power_by_squaring(x::Bool, p::Unsigned) = ((p==0) | x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-137"></a>137</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function power_by_squaring(x::Bool, p::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-138"></a>138</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p &lt; 0 &amp;&amp; throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-139"></a>139</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return (p==0) | x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-140"></a>140</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-141"></a>141</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-142"></a>142</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">^{T&lt;:Integer}(x::T, p::T) = power_by_squaring(x,p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-143"></a>143</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-intfuncs-jl-143"></a>
+              4794 (99.32%) samples spent in ^<br />
+              0 (ex.),
+              4794 (100.00%) (incl.)
+              when called from
+              macro expansion;
+              <a href="profile-jl-09745d080c1bd31bdd81-line.html#Lprofile-jl-09745d080c1bd31bdd81-line.html-16">line 16</a><br />
+            </div>
+            <span class="code">^(x::Number, p::Integer)  = power_by_squaring(x,p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-144"></a>144</td>
+          <td></td>
+          <td>4794 (99.32%)</td>
+          <td>
+            <div class="callees">
+              4794 (100.00%)
+              samples spent calling
+              <a href="intfuncs-jl-e33cbfcdd5a3782eb332-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-intfuncs-jl-power_by_squaring-109">power_by_squaring</a><br />
+            </div>
+            <span class="code">^(x, p::Integer)          = power_by_squaring(x,p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-145"></a>145</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-146"></a>146</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># b^p mod m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-147"></a>147</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function powermod{T&lt;:Integer}(x::Integer, p::Integer, m::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-148"></a>148</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p &lt; 0 &amp;&amp; return powermod(invmod(x, m), -p, m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-149"></a>149</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p == 0 &amp;&amp; return mod(one(m),m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-150"></a>150</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (m == 1 || m == -1) &amp;&amp; return zero(m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-151"></a>151</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    b = oftype(m,mod(x,m))  # this also checks for divide by zero
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-152"></a>152</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-153"></a>153</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t = prevpow2(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-154"></a>154</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    local r::T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-155"></a>155</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    r = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-156"></a>156</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-157"></a>157</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if p &gt;= t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-158"></a>158</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            r = mod(widemul(r,b),m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-159"></a>159</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            p -= t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-160"></a>160</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-161"></a>161</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t &gt;&gt;&gt;= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-162"></a>162</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t &lt;= 0 &amp;&amp; break
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-163"></a>163</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        r = mod(widemul(r,r),m)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-164"></a>164</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-165"></a>165</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return r
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-166"></a>166</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-167"></a>167</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-168"></a>168</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># optimization: promote the modulus m to BigInt only once (cf. widemul in generic powermod above)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-169"></a>169</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">powermod(x::Integer, p::Integer, m::Union{Int128,UInt128}) = oftype(m, powermod(x, p, big(m)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-170"></a>170</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-171"></a>171</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># smallest power of 2 &gt;= x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-172"></a>172</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nextpow2(x::Unsigned) = one(x)&lt;&lt;((sizeof(x)&lt;&lt;3)-leading_zeros(x-one(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-173"></a>173</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nextpow2(x::Integer) = reinterpret(typeof(x),x &lt; 0 ? -nextpow2(unsigned(-x)) : nextpow2(unsigned(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-174"></a>174</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-175"></a>175</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">prevpow2(x::Unsigned) = one(x) &lt;&lt; unsigned((sizeof(x)&lt;&lt;3)-leading_zeros(x)-1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-176"></a>176</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">prevpow2(x::Integer) = reinterpret(typeof(x),x &lt; 0 ? -prevpow2(unsigned(-x)) : prevpow2(unsigned(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-177"></a>177</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-178"></a>178</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ispow2(x::Integer) = x &gt; 0 &amp;&amp; count_ones(x) == 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-179"></a>179</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-180"></a>180</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># smallest a^n &gt;= x, with integer n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-181"></a>181</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function nextpow(a::Real, x::Real)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-182"></a>182</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (a &lt;= 1 || x &lt;= 0) &amp;&amp; throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-183"></a>183</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x &lt;= 1 &amp;&amp; return one(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-184"></a>184</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = ceil(Integer,log(a, x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-185"></a>185</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = a^(n-1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-186"></a>186</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # guard against roundoff error, e.g., with a=5 and x=125
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-187"></a>187</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p &gt;= x ? p : a^n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-188"></a>188</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-189"></a>189</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># largest a^n &lt;= x, with integer n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-190"></a>190</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function prevpow(a::Real, x::Real)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-191"></a>191</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (a &lt;= 1 || x &lt; 1) &amp;&amp; throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-192"></a>192</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = floor(Integer,log(a, x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-193"></a>193</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = a^(n+1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-194"></a>194</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p &lt;= x ? p : a^n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-195"></a>195</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-196"></a>196</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-197"></a>197</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># decimal digits in an unsigned integer
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-198"></a>198</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const powers_of_ten = [
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-199"></a>199</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    0x0000000000000001, 0x000000000000000a, 0x0000000000000064, 0x00000000000003e8,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-200"></a>200</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    0x0000000000002710, 0x00000000000186a0, 0x00000000000f4240, 0x0000000000989680,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-201"></a>201</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    0x0000000005f5e100, 0x000000003b9aca00, 0x00000002540be400, 0x000000174876e800,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-202"></a>202</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    0x000000e8d4a51000, 0x000009184e72a000, 0x00005af3107a4000, 0x00038d7ea4c68000,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-203"></a>203</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    0x002386f26fc10000, 0x016345785d8a0000, 0x0de0b6b3a7640000, 0x8ac7230489e80000,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-204"></a>204</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-205"></a>205</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function ndigits0z(x::Union{UInt8,UInt16,UInt32,UInt64})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-206"></a>206</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lz = (sizeof(x)&lt;&lt;3)-leading_zeros(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-207"></a>207</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nd = (1233*lz)&gt;&gt;12+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-208"></a>208</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nd -= x &lt; powers_of_ten[nd]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-209"></a>209</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-210"></a>210</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function ndigits0z(x::UInt128)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-211"></a>211</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-212"></a>212</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while x &gt; 0x8ac7230489e80000
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-213"></a>213</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x = div(x,0x8ac7230489e80000)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-214"></a>214</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n += 19
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-215"></a>215</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-216"></a>216</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return n + ndigits0z(UInt64(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-217"></a>217</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-218"></a>218</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits0z(x::Integer) = ndigits0z(unsigned(abs(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-219"></a>219</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-220"></a>220</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const ndigits_max_mul = Core.sizeof(Int) == 4 ? 69000000 : 290000000000000000
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-221"></a>221</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-222"></a>222</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function ndigits0znb(n::Signed, b::Int)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-223"></a>223</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    d = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-224"></a>224</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while n != 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-225"></a>225</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = cld(n,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-226"></a>226</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        d += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-227"></a>227</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-228"></a>228</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return d
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-229"></a>229</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-230"></a>230</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-231"></a>231</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function ndigits0z(n::Unsigned, b::Int)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-232"></a>232</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    d = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-233"></a>233</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if b &lt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-234"></a>234</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        d = ndigits0znb(signed(n), b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-235"></a>235</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-236"></a>236</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        b == 2  &amp;&amp; return (sizeof(n)&lt;&lt;3-leading_zeros(n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-237"></a>237</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        b == 8  &amp;&amp; return div((sizeof(n)&lt;&lt;3)-leading_zeros(n)+2,3)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-238"></a>238</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        b == 16 &amp;&amp; return (sizeof(n)&lt;&lt;1)-(leading_zeros(n)&gt;&gt;2)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-239"></a>239</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        b == 10 &amp;&amp; return ndigits0z(n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-240"></a>240</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while ndigits_max_mul &lt; n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-241"></a>241</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            n = div(n,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-242"></a>242</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            d += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-243"></a>243</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-244"></a>244</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        m = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-245"></a>245</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while m &lt;= n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-246"></a>246</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            m *= b
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-247"></a>247</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            d += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-248"></a>248</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-249"></a>249</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-250"></a>250</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return d
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-251"></a>251</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-252"></a>252</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits0z(x::Integer, b::Integer) = ndigits0z(unsigned(abs(x)),Int(b))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-253"></a>253</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-254"></a>254</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigitsnb(x::Integer, b::Integer) = x==0 ? 1 : ndigits0znb(x, b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-255"></a>255</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-256"></a>256</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits(x::Unsigned, b::Integer) = x==0 ? 1 : ndigits0z(x,Int(b))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-257"></a>257</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits(x::Unsigned)             = x==0 ? 1 : ndigits0z(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-258"></a>258</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-259"></a>259</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits(x::Integer, b::Integer) = b &gt;= 0 ? ndigits(unsigned(abs(x)),Int(b)) : ndigitsnb(x, b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-260"></a>260</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">ndigits(x::Integer) = ndigits(unsigned(abs(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-261"></a>261</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-262"></a>262</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## integer to string functions ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-263"></a>263</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-264"></a>264</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">string(x::Union{Int8,Int16,Int32,Int64,Int128}) = dec(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-265"></a>265</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-266"></a>266</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function bin(x::Unsigned, pad::Int, neg::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-267"></a>267</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = neg + max(pad,sizeof(x)&lt;&lt;3-leading_zeros(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-268"></a>268</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Array{UInt8}(i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-269"></a>269</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while i &gt; neg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-270"></a>270</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = &#39;0&#39;+(x&amp;0x1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-271"></a>271</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x &gt;&gt;= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-272"></a>272</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-273"></a>273</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-274"></a>274</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if neg; a[1]=&#39;-&#39;; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-275"></a>275</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    String(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-276"></a>276</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-277"></a>277</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-278"></a>278</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function oct(x::Unsigned, pad::Int, neg::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-279"></a>279</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = neg + max(pad,div((sizeof(x)&lt;&lt;3)-leading_zeros(x)+2,3))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-280"></a>280</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Array{UInt8}(i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-281"></a>281</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while i &gt; neg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-282"></a>282</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = &#39;0&#39;+(x&amp;0x7)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-283"></a>283</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x &gt;&gt;= 3
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-284"></a>284</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-285"></a>285</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-286"></a>286</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if neg; a[1]=&#39;-&#39;; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-287"></a>287</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    String(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-288"></a>288</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-289"></a>289</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-290"></a>290</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function dec(x::Unsigned, pad::Int, neg::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-291"></a>291</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = neg + max(pad,ndigits0z(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-292"></a>292</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Array{UInt8}(i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-293"></a>293</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while i &gt; neg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-294"></a>294</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = &#39;0&#39;+rem(x,10)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-295"></a>295</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x = oftype(x,div(x,10))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-296"></a>296</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-297"></a>297</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-298"></a>298</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if neg; a[1]=&#39;-&#39;; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-299"></a>299</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    String(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-300"></a>300</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-301"></a>301</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-302"></a>302</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function hex(x::Unsigned, pad::Int, neg::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-303"></a>303</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = neg + max(pad,(sizeof(x)&lt;&lt;1)-(leading_zeros(x)&gt;&gt;2))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-304"></a>304</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Array{UInt8}(i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-305"></a>305</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while i &gt; neg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-306"></a>306</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        d = x &amp; 0xf
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-307"></a>307</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = &#39;0&#39;+d+39*(d&gt;9)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-308"></a>308</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x &gt;&gt;= 4
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-309"></a>309</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-310"></a>310</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-311"></a>311</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if neg; a[1]=&#39;-&#39;; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-312"></a>312</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    String(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-313"></a>313</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-314"></a>314</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-315"></a>315</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">num2hex(n::Integer) = hex(n, sizeof(n)*2)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-316"></a>316</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-317"></a>317</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const base36digits = [&#39;0&#39;:&#39;9&#39;;&#39;a&#39;:&#39;z&#39;]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-318"></a>318</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const base62digits = [&#39;0&#39;:&#39;9&#39;;&#39;A&#39;:&#39;Z&#39;;&#39;a&#39;:&#39;z&#39;]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-319"></a>319</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-320"></a>320</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function base(b::Int, x::Unsigned, pad::Int, neg::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-321"></a>321</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    2 &lt;= b &lt;= 62 || throw(ArgumentError(&quot;base must be 2 ≤ base ≤ 62, got $b&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-322"></a>322</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    digits = b &lt;= 36 ? base36digits : base62digits
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-323"></a>323</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = neg + max(pad,ndigits0z(x,b))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-324"></a>324</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Array{UInt8}(i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-325"></a>325</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while i &gt; neg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-326"></a>326</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = digits[1+rem(x,b)]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-327"></a>327</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x = div(x,b)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-328"></a>328</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-329"></a>329</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-330"></a>330</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if neg; a[1]=&#39;-&#39;; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-331"></a>331</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    String(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-332"></a>332</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-333"></a>333</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">base(b::Integer, n::Integer, pad::Integer=1) = base(Int(b), unsigned(abs(n)), pad, n&lt;0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-334"></a>334</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-335"></a>335</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">for sym in (:bin, :oct, :dec, :hex)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-336"></a>336</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @eval begin
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-337"></a>337</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Unsigned, p::Int) = ($sym)(x,p,false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-338"></a>338</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Unsigned)         = ($sym)(x,1,false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-339"></a>339</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Char, p::Int)     = ($sym)(unsigned(x),p,false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-340"></a>340</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Char)             = ($sym)(unsigned(x),1,false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-341"></a>341</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Integer, p::Int)  = ($sym)(unsigned(abs(x)),p,x&lt;0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-342"></a>342</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ($sym)(x::Integer)          = ($sym)(unsigned(abs(x)),1,x&lt;0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-343"></a>343</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-344"></a>344</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-345"></a>345</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-346"></a>346</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">bits(x::Union{Bool,Int8,UInt8})           = bin(reinterpret(UInt8,x),8)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-347"></a>347</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">bits(x::Union{Int16,UInt16,Float16})      = bin(reinterpret(UInt16,x),16)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-348"></a>348</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">bits(x::Union{Char,Int32,UInt32,Float32}) = bin(reinterpret(UInt32,x),32)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-349"></a>349</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">bits(x::Union{Int64,UInt64,Float64})      = bin(reinterpret(UInt64,x),64)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-350"></a>350</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">bits(x::Union{Int128,UInt128})            = bin(reinterpret(UInt128,x),128)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-351"></a>351</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-352"></a>352</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">digits{T&lt;:Integer}(n::Integer, base::T=10, pad::Integer=1) = digits(T, n, base, pad)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-353"></a>353</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-354"></a>354</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function digits{T&lt;:Integer}(::Type{T}, n::Integer, base::Integer=10, pad::Integer=1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-355"></a>355</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    2 &lt;= base || throw(ArgumentError(&quot;base must be ≥ 2, got $base&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-356"></a>356</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    digits!(zeros(T, max(pad, ndigits0z(n,base))), n, base)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-357"></a>357</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-358"></a>358</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-359"></a>359</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function digits!{T&lt;:Integer}(a::AbstractArray{T,1}, n::Integer, base::Integer=10)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-360"></a>360</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    2 &lt;= base || throw(ArgumentError(&quot;base must be ≥ 2, got $base&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-361"></a>361</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    base - 1 &lt;= typemax(T) || throw(ArgumentError(&quot;type $T too small for base $base&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-362"></a>362</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in eachindex(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-363"></a>363</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        a[i] = rem(n, base)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-364"></a>364</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = div(n, base)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-365"></a>365</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-366"></a>366</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-367"></a>367</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-368"></a>368</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-369"></a>369</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isqrt(x::Integer) = oftype(x, trunc(sqrt(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-370"></a>370</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-371"></a>371</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function isqrt(x::Union{Int64,UInt64,Int128,UInt128})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-372"></a>372</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x==0 &amp;&amp; return x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-373"></a>373</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s = oftype(x, trunc(sqrt(x)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-374"></a>374</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # fix with a Newton iteration, since conversion to float discards
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-375"></a>375</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # too many bits.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-376"></a>376</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s = (s + div(x,s)) &gt;&gt; 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-377"></a>377</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s*s &gt; x ? s-1 : s
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-378"></a>378</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-379"></a>379</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-380"></a>380</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function factorial(n::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-381"></a>381</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n &lt; 0 &amp;&amp; throw(DomainError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-382"></a>382</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    local f::typeof(n*n), i::typeof(n*n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-383"></a>383</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    f = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-384"></a>384</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i = 2:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-385"></a>385</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        f *= i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-386"></a>386</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-387"></a>387</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return f
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-388"></a>388</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-389"></a>389</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-390"></a>390</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function binomial{T&lt;:Integer}(n::T, k::T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-391"></a>391</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k &lt; 0 &amp;&amp; return zero(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-392"></a>392</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sgn = one(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-393"></a>393</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if n &lt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-394"></a>394</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = -n + k -1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-395"></a>395</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if isodd(k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-396"></a>396</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            sgn = -sgn
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-397"></a>397</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-398"></a>398</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-399"></a>399</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k &gt; n &amp;&amp; return zero(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-400"></a>400</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    (k == 0 || k == n) &amp;&amp; return sgn
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-401"></a>401</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k == 1 &amp;&amp; return sgn*n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-402"></a>402</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if k &gt; (n&gt;&gt;1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-403"></a>403</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        k = (n - k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-404"></a>404</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-405"></a>405</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x::T = nn = n - k + 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-406"></a>406</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nn += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-407"></a>407</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    rr = 2
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-408"></a>408</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while rr &lt;= k
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-409"></a>409</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        xt = div(widemul(x, nn), rr)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-410"></a>410</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x = xt
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-411"></a>411</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        x == xt || throw(OverflowError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-412"></a>412</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        rr += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-413"></a>413</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        nn += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-414"></a>414</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-415"></a>415</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    convert(T, copysign(x, sgn))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-416"></a>416</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

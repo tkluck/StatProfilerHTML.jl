@@ -1,0 +1,6554 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/src/julia/usr/bin/../share/julia/base/./sort.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:47:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># This file is a part of Julia. License is MIT: http://julialang.org/license
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">module Sort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">using Base: Order, copymutable, linearindices, linearindexing, viewindexing, LinearFast, _length
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">import
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Base.sort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Base.sort!,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Base.issorted,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Base.sortperm
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">export # also exported by Base
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # order-only:
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    issorted,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-16"></a>16</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    select,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    select!,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    searchsorted,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    searchsortedfirst,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    searchsortedlast,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # order &amp; algorithm:
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    selectperm,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    selectperm!,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sortperm,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sortperm!,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sortrows,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sortcols,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # algorithms:
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    InsertionSort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    QuickSort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MergeSort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    PartialQuickSort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">export # not exported by Base
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Algorithm,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    DEFAULT_UNSTABLE,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    DEFAULT_STABLE,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SMALL_ALGORITHM,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SMALL_THRESHOLD
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## functions requiring only ordering ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-issorted-46"></a>
+              1 (0.02%) samples spent in issorted<br />
+              0 (ex.),
+              1 (100.00%) (incl.)
+              when called from
+              #issorted
+              <a href="nothing-0feca720e2c29dafb2c9-line.html#Lnothing-0feca720e2c29dafb2c9-line.html-0">line 0</a><br />
+            </div>
+            <span class="code">function issorted(itr, order::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    state = start(itr)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    done(itr,state) &amp;&amp; return true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    prev, state = next(itr, state)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while !done(itr, state)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        this, state = next(itr, state)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-52"></a>52</td>
+          <td></td>
+          <td>1 (0.02%)</td>
+          <td>
+            <div class="callees">
+              1 (100.00%)
+              samples spent calling
+              <a href="comp-jl-e7e79896f0d7dfc73428-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-comp-jl-grlex-164">grlex</a><br />
+            </div>
+            <span class="code">        lt(order, this, prev) &amp;&amp; return false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-53"></a>53</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        prev = this
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-54"></a>54</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">issorted(itr;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lt=isless, by=identity, rev::Bool=false, order::Ordering=Forward) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    issorted(itr, ord(lt,by,rev,order))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function select!(v::AbstractVector, k::Union{Int,OrdinalRange}, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    inds = indices(v, 1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(v, first(inds), last(inds), PartialQuickSort(k), o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    v[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">select!(v::AbstractVector, k::Union{Int,OrdinalRange};
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lt=isless, by=identity, rev::Bool=false, order::Ordering=Forward) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-68"></a>68</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    select!(v, k, ord(lt,by,rev,order))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">select(v::AbstractVector, k::Union{Int,OrdinalRange}; kws...) = select!(copymutable(v), k; kws...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-72"></a>72</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># reference on sorted binary search:
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#   http://www.tbray.org/ongoing/When/200x/2003/03/22/Binary
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-76"></a>76</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># index of the first value of vector a that is greater than or equal to x;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-77"></a>77</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># returns length(v)+1 if x is greater than all values in v.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-78"></a>78</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedfirst(v::AbstractVector, x, lo::Int, hi::Int, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-79"></a>79</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lo = lo-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-80"></a>80</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    hi = hi+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-81"></a>81</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt; hi-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-82"></a>82</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        m = (lo+hi)&gt;&gt;&gt;1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-83"></a>83</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if lt(o, v[m], x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-84"></a>84</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lo = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-85"></a>85</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-86"></a>86</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            hi = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-87"></a>87</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-88"></a>88</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-89"></a>89</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-90"></a>90</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-91"></a>91</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-92"></a>92</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># index of the last value of vector a that is less than or equal to x;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-93"></a>93</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># returns 0 if x is less than all values of v.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-94"></a>94</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedlast(v::AbstractVector, x, lo::Int, hi::Int, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-95"></a>95</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lo = lo-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-96"></a>96</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    hi = hi+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-97"></a>97</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt; hi-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-98"></a>98</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        m = (lo+hi)&gt;&gt;&gt;1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-99"></a>99</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if lt(o, x, v[m])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-100"></a>100</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            hi = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-101"></a>101</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-102"></a>102</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lo = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-103"></a>103</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-104"></a>104</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-105"></a>105</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return lo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-106"></a>106</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-107"></a>107</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-108"></a>108</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># returns the range of indices of v equal to x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-109"></a>109</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># if v does not contain x, returns a 0-length range
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-110"></a>110</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># indicating the insertion point of x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-111"></a>111</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsorted(v::AbstractVector, x, ilo::Int, ihi::Int, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-112"></a>112</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lo = ilo-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-113"></a>113</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    hi = ihi+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-114"></a>114</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt; hi-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-115"></a>115</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        m = (lo+hi)&gt;&gt;&gt;1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-116"></a>116</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if lt(o, v[m], x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-117"></a>117</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lo = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-118"></a>118</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        elseif lt(o, x, v[m])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-119"></a>119</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            hi = m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-120"></a>120</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-121"></a>121</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            a = searchsortedfirst(v, x, max(lo,ilo), m, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-122"></a>122</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            b = searchsortedlast(v, x, m, min(hi,ihi), o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-123"></a>123</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            return a : b
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-124"></a>124</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-125"></a>125</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-126"></a>126</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return (lo + 1) : (hi - 1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-127"></a>127</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-128"></a>128</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-129"></a>129</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedlast{T&lt;:Real}(a::Range{T}, x::Real, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-130"></a>130</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-131"></a>131</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, x, first(a)) ? 0 : length(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-132"></a>132</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-133"></a>133</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = round(Integer, clamp((x - first(a)) / step(a) + 1, 1, length(a)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-134"></a>134</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, x, a[n]) ? n - 1 : n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-135"></a>135</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-136"></a>136</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-137"></a>137</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-138"></a>138</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedfirst{T&lt;:Real}(a::Range{T}, x::Real, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-139"></a>139</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-140"></a>140</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, first(a), x) ? length(a) + 1 : 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-141"></a>141</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-142"></a>142</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = round(Integer, clamp((x - first(a)) / step(a) + 1, 1, length(a)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-143"></a>143</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, a[n] ,x) ? n + 1 : n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-144"></a>144</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-145"></a>145</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-146"></a>146</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-147"></a>147</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedlast{T&lt;:Integer}(a::Range{T}, x::Real, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-148"></a>148</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-149"></a>149</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, x, first(a)) ? 0 : length(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-150"></a>150</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-151"></a>151</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        clamp( fld(floor(Integer, x) - first(a), step(a)) + 1, 0, length(a))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-152"></a>152</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-153"></a>153</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-154"></a>154</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-155"></a>155</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedfirst{T&lt;:Integer}(a::Range{T}, x::Real, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-156"></a>156</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-157"></a>157</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, first(a), x) ? length(a)+1 : 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-158"></a>158</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-159"></a>159</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        clamp(-fld(floor(Integer, -x) + first(a), step(a)) + 1, 1, length(a) + 1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-160"></a>160</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-161"></a>161</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-162"></a>162</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-163"></a>163</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedfirst{T&lt;:Integer}(a::Range{T}, x::Unsigned, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-164"></a>164</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-165"></a>165</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, first(a), x) ? length(a) + 1 : 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-166"></a>166</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-167"></a>167</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        clamp(-fld(first(a) - signed(x), step(a)) + 1, 1, length(a) + 1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-168"></a>168</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-169"></a>169</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-170"></a>170</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-171"></a>171</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function searchsortedlast{T&lt;:Integer}(a::Range{T}, x::Unsigned, o::DirectOrdering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-172"></a>172</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if step(a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-173"></a>173</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lt(o, x, first(a)) ? 0 : length(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-174"></a>174</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-175"></a>175</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        clamp( fld(signed(x) - first(a), step(a)) + 1, 0, length(a))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-176"></a>176</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-177"></a>177</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-178"></a>178</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-179"></a>179</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">searchsorted{T&lt;:Real}(a::Range{T}, x::Real, o::DirectOrdering) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-180"></a>180</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    searchsortedfirst(a, x, o) : searchsortedlast(a, x, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-181"></a>181</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-182"></a>182</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">for s in [:searchsortedfirst, :searchsortedlast, :searchsorted]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-183"></a>183</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @eval begin
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-184"></a>184</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        $s(v::AbstractVector, x, o::Ordering) = (inds = indices(v, 1); $s(v,x,first(inds),last(inds),o))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-185"></a>185</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        $s(v::AbstractVector, x;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-186"></a>186</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">           lt=isless, by=identity, rev::Bool=false, order::Ordering=Forward) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-187"></a>187</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            $s(v,x,ord(lt,by,rev,order))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-188"></a>188</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        $s(v::AbstractVector, x) = $s(v, x, Forward)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-189"></a>189</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-190"></a>190</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-191"></a>191</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-192"></a>192</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## sorting algorithms ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-193"></a>193</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-194"></a>194</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">abstract Algorithm
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-195"></a>195</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-196"></a>196</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable InsertionSortAlg &lt;: Algorithm end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-197"></a>197</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable QuickSortAlg     &lt;: Algorithm end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-198"></a>198</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable MergeSortAlg     &lt;: Algorithm end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-199"></a>199</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-200"></a>200</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable PartialQuickSort{T &lt;: Union{Int,OrdinalRange}} &lt;: Algorithm
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-201"></a>201</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k::T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-202"></a>202</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-203"></a>203</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-204"></a>204</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.first(a::PartialQuickSort{Int}) = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-205"></a>205</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.last(a::PartialQuickSort{Int}) = a.k
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-206"></a>206</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.first(a::PartialQuickSort) = first(a.k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-207"></a>207</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.last(a::PartialQuickSort) = last(a.k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-208"></a>208</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-209"></a>209</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const InsertionSort = InsertionSortAlg()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-210"></a>210</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const QuickSort     = QuickSortAlg()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-211"></a>211</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const MergeSort     = MergeSortAlg()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-212"></a>212</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-213"></a>213</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const DEFAULT_UNSTABLE = QuickSort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-214"></a>214</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const DEFAULT_STABLE   = MergeSort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-215"></a>215</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const SMALL_ALGORITHM  = InsertionSort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-216"></a>216</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const SMALL_THRESHOLD  = 20
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-217"></a>217</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-218"></a>218</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-218"></a>
+              423 (8.76%) samples spent in sort!<br />
+              1 (1.16%) (ex.),
+              1 (0.24%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-300">line 300</a><br />
+              85 (98.84%) (ex.),
+              422 (99.76%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-294">line 294</a><br />
+            </div>
+            <span class="code">function sort!(v::AbstractVector, lo::Int, hi::Int, ::InsertionSortAlg, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-219"></a>219</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds for i = lo+1:hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-220"></a>220</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j = i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-221"></a>221</td>
+          <td>3 (0.06%)</td>
+          <td>3 (0.06%)</td>
+          <td>
+            <span class="code">        x = v[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-222"></a>222</td>
+          <td>14 (0.29%)</td>
+          <td>14 (0.29%)</td>
+          <td>
+            <span class="code">        while j &gt; lo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-223"></a>223</td>
+          <td>24 (0.50%)</td>
+          <td>361 (7.48%)</td>
+          <td>
+            <div class="callees">
+              314 (86.98%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+              15 (4.16%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52">lt</a><br />
+              8 (2.22%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-53">lt</a><br />
+            </div>
+            <span class="code">            if lt(o, x, v[j-1])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-224"></a>224</td>
+          <td>21 (0.44%)</td>
+          <td>21 (0.44%)</td>
+          <td>
+            <span class="code">                v[j] = v[j-1]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-225"></a>225</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                j -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-226"></a>226</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                continue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-227"></a>227</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-228"></a>228</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            break
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-229"></a>229</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-230"></a>230</td>
+          <td>18 (0.37%)</td>
+          <td>18 (0.37%)</td>
+          <td>
+            <span class="code">        v[j] = x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-231"></a>231</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-232"></a>232</td>
+          <td>4 (0.08%)</td>
+          <td>4 (0.08%)</td>
+          <td>
+            <span class="code">    return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-233"></a>233</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-234"></a>234</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-235"></a>235</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># selectpivot!
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-236"></a>236</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-237"></a>237</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Given 3 locations in an array (lo, mi, and hi), sort v[lo], v[mi], v[hi]) and
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-238"></a>238</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># choose the middle value as a pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-239"></a>239</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-240"></a>240</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Upon return, the pivot is in v[lo], and v[hi] is guaranteed to be
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-241"></a>241</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># greater than the pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-242"></a>242</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-243"></a>243</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">@inline function selectpivot!(v::AbstractVector, lo::Int, hi::Int, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-244"></a>244</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds begin
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-245"></a>245</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        mi = (lo+hi)&gt;&gt;&gt;1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-246"></a>246</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-247"></a>247</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # sort the values in v[lo], v[mi], v[hi]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-248"></a>248</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-249"></a>249</td>
+          <td></td>
+          <td>6 (0.12%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-249"></a>
+              6 (0.12%) samples spent in selectpivot!<br />
+              0 (ex.),
+              6 (100.00%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-274">line 274</a><br />
+            </div>
+            <div class="callees">
+              5 (83.33%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+              1 (16.67%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52">lt</a><br />
+            </div>
+            <span class="code">        if lt(o, v[mi], v[lo])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-250"></a>250</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v[mi], v[lo] = v[lo], v[mi]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-251"></a>251</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-252"></a>252</td>
+          <td>3 (0.06%)</td>
+          <td>11 (0.23%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-252"></a>
+              11 (0.23%) samples spent in selectpivot!<br />
+              3 (100.00%) (ex.),
+              11 (100.00%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-274">line 274</a><br />
+            </div>
+            <div class="callees">
+              2 (18.18%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52">lt</a><br />
+              6 (54.55%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+            </div>
+            <span class="code">        if lt(o, v[hi], v[mi])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-253"></a>253</td>
+          <td>2 (0.04%)</td>
+          <td>9 (0.19%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-253"></a>
+              9 (0.19%) samples spent in selectpivot!<br />
+              2 (100.00%) (ex.),
+              9 (100.00%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-274">line 274</a><br />
+            </div>
+            <div class="callees">
+              7 (77.78%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+            </div>
+            <span class="code">            if lt(o, v[hi], v[lo])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-254"></a>254</td>
+          <td>2 (0.04%)</td>
+          <td>2 (0.04%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-254"></a>
+              2 (0.04%) samples spent in selectpivot!<br />
+              2 (100.00%) (ex.),
+              2 (100.00%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-274">line 274</a><br />
+            </div>
+            <span class="code">                v[lo], v[mi], v[hi] = v[hi], v[lo], v[mi]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-255"></a>255</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-256"></a>256</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                v[hi], v[mi] = v[mi], v[hi]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-257"></a>257</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-258"></a>258</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-259"></a>259</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-260"></a>260</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # move v[mi] to v[lo] and use it as the pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-261"></a>261</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        v[lo], v[mi] = v[mi], v[lo]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-262"></a>262</td>
+          <td>7 (0.15%)</td>
+          <td>7 (0.15%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-262"></a>
+              1 (0.02%) samples spent in selectpivot!<br />
+              1 (100.00%) (ex.),
+              1 (100.00%) (incl.)
+              when called from
+              partition!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-274">line 274</a><br />
+            </div>
+            <span class="code">        pivot = v[lo]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-263"></a>263</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-264"></a>264</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-265"></a>265</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # return the pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-266"></a>266</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-267"></a>267</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-268"></a>268</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-269"></a>269</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># partition!
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-270"></a>270</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-271"></a>271</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># select a pivot, and partition v according to the pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-272"></a>272</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-273"></a>273</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-partition-273"></a>
+              3395 (70.33%) samples spent in partition!<br />
+              267 (100.00%) (ex.),
+              3395 (100.00%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-295">line 295</a><br />
+            </div>
+            <span class="code">function partition!(v::AbstractVector, lo::Int, hi::Int, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-274"></a>274</td>
+          <td></td>
+          <td>29 (0.60%)</td>
+          <td>
+            <div class="callees">
+              6 (20.69%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-249">selectpivot!</a><br />
+              2 (6.90%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-254">selectpivot!</a><br />
+              9 (31.03%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-253">selectpivot!</a><br />
+              11 (37.93%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-252">selectpivot!</a><br />
+              1 (3.45%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-selectpivot-262">selectpivot!</a><br />
+            </div>
+            <span class="code">    pivot = selectpivot!(v, lo, hi, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-275"></a>275</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # pivot == v[lo], v[hi] &gt; pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-276"></a>276</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i, j = lo, hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-277"></a>277</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-278"></a>278</td>
+          <td>5 (0.10%)</td>
+          <td>5 (0.10%)</td>
+          <td>
+            <span class="code">        i += 1; j -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-279"></a>279</td>
+          <td>130 (2.69%)</td>
+          <td>1654 (34.27%)</td>
+          <td>
+            <div class="callees">
+              21 (1.27%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-53">lt</a><br />
+              121 (7.32%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52">lt</a><br />
+              1382 (83.56%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+            </div>
+            <span class="code">        while lt(o, v[i], pivot); i += 1; end;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-280"></a>280</td>
+          <td>86 (1.78%)</td>
+          <td>1661 (34.41%)</td>
+          <td>
+            <div class="callees">
+              1372 (82.60%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-54">lt</a><br />
+              152 (9.15%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-53">lt</a><br />
+              51 (3.07%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-lt-52">lt</a><br />
+            </div>
+            <span class="code">        while lt(o, pivot, v[j]); j -= 1; end;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-281"></a>281</td>
+          <td>5 (0.10%)</td>
+          <td>5 (0.10%)</td>
+          <td>
+            <span class="code">        i &gt;= j &amp;&amp; break
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-282"></a>282</td>
+          <td>31 (0.64%)</td>
+          <td>31 (0.64%)</td>
+          <td>
+            <span class="code">        v[i], v[j] = v[j], v[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-283"></a>283</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-284"></a>284</td>
+          <td>3 (0.06%)</td>
+          <td>3 (0.06%)</td>
+          <td>
+            <span class="code">    v[j], v[lo] = pivot, v[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-285"></a>285</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-286"></a>286</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # v[j] == pivot
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-287"></a>287</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # v[k] &gt;= pivot for k &gt; j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-288"></a>288</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # v[i] &lt;= pivot for i &lt; j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-289"></a>289</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-290"></a>290</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-291"></a>291</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-292"></a>292</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-292"></a>
+              3869 (80.15%) samples spent in sort!<br />
+              11 (42.31%) (ex.),
+              2902 (75.01%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-300">line 300</a><br />
+              12 (46.15%) (ex.),
+              3055 (78.96%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-303">line 303</a><br />
+              3 (11.54%) (ex.),
+              3869 (100.00%) (incl.)
+              when called from
+              sort!
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-406">line 406</a><br />
+            </div>
+            <span class="code">function sort!(v::AbstractVector, lo::Int, hi::Int, a::QuickSortAlg, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-293"></a>293</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt; hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-294"></a>294</td>
+          <td>5 (0.10%)</td>
+          <td>432 (8.95%)</td>
+          <td>
+            <div class="callees">
+              4 (0.93%)
+              samples spent calling
+              <a href="comp-jl-e7e79896f0d7dfc73428-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-comp-jl-grlex-164">grlex</a><br />
+              422 (97.69%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-218">sort!</a><br />
+              1 (0.23%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-sort-218">sort!</a><br />
+            </div>
+            <span class="code">        hi-lo &lt;= SMALL_THRESHOLD &amp;&amp; return sort!(v, lo, hi, SMALL_ALGORITHM, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-295"></a>295</td>
+          <td>17 (0.35%)</td>
+          <td>3432 (71.10%)</td>
+          <td>
+            <div class="callees">
+              20 (0.58%)
+              samples spent calling
+              <a href="comp-jl-e7e79896f0d7dfc73428-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-comp-jl-grlex-164">grlex</a><br />
+              3395 (98.92%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-partition-273">partition!</a><br />
+            </div>
+            <span class="code">        j = partition!(v, lo, hi, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-296"></a>296</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if j-lo &lt; hi-j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-297"></a>297</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            # recurse on the smaller chunk
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-298"></a>298</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            # this is necessary to preserve O(log(n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-299"></a>299</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            # stack space in the worst case (rather than O(n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-300"></a>300</td>
+          <td>1 (0.02%)</td>
+          <td>6614 (137.02%)</td>
+          <td>
+            <div class="callees">
+              1 (0.02%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-218">sort!</a><br />
+              2903 (43.89%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-292">sort!</a><br />
+            </div>
+            <span class="code">            lo &lt; (j-1) &amp;&amp; sort!(v, lo, j-1, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-301"></a>301</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lo = j+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-302"></a>302</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-303"></a>303</td>
+          <td>1 (0.02%)</td>
+          <td>6740 (139.63%)</td>
+          <td>
+            <div class="callees">
+              3055 (45.33%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-292">sort!</a><br />
+            </div>
+            <span class="code">            j+1 &lt; hi &amp;&amp; sort!(v, j+1, hi, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-304"></a>304</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            hi = j-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-305"></a>305</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-306"></a>306</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-307"></a>307</td>
+          <td>1 (0.02%)</td>
+          <td>1 (0.02%)</td>
+          <td>
+            <span class="code">    return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-308"></a>308</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-309"></a>309</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-310"></a>310</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sort!(v::AbstractVector, lo::Int, hi::Int, a::MergeSortAlg, o::Ordering, t=similar(v,0))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-311"></a>311</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds if lo &lt; hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-312"></a>312</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        hi-lo &lt;= SMALL_THRESHOLD &amp;&amp; return sort!(v, lo, hi, SMALL_ALGORITHM, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-313"></a>313</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-314"></a>314</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        m = (lo+hi)&gt;&gt;&gt;1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-315"></a>315</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        isempty(t) &amp;&amp; resize!(t, m-lo+1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-316"></a>316</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-317"></a>317</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sort!(v, lo,  m,  a, o, t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-318"></a>318</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sort!(v, m+1, hi, a, o, t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-319"></a>319</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-320"></a>320</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i, j = 1, lo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-321"></a>321</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while j &lt;= m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-322"></a>322</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            t[i] = v[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-323"></a>323</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-324"></a>324</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            j += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-325"></a>325</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-326"></a>326</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-327"></a>327</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i, k = 1, lo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-328"></a>328</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while k &lt; j &lt;= hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-329"></a>329</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if lt(o, v[j], t[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-330"></a>330</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                v[k] = v[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-331"></a>331</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                j += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-332"></a>332</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-333"></a>333</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                v[k] = t[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-334"></a>334</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-335"></a>335</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-336"></a>336</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            k += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-337"></a>337</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-338"></a>338</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while k &lt; j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-339"></a>339</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v[k] = t[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-340"></a>340</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            k += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-341"></a>341</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-342"></a>342</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-343"></a>343</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-344"></a>344</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-345"></a>345</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-346"></a>346</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-347"></a>347</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-348"></a>348</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## TODO: When PartialQuickSort is parameterized by an Int, this version of sort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-349"></a>349</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">##       has one less comparison per loop than the version below, but enabling
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-350"></a>350</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">##       it causes return type inference to fail for sort/sort! (#12833)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-351"></a>351</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-352"></a>352</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># function sort!(v::AbstractVector, lo::Int, hi::Int, a::PartialQuickSort{Int},
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-353"></a>353</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#                o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-354"></a>354</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#     @inbounds while lo &lt; hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-355"></a>355</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         hi-lo &lt;= SMALL_THRESHOLD &amp;&amp; return sort!(v, lo, hi, SMALL_ALGORITHM, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-356"></a>356</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         j = partition!(v, lo, hi, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-357"></a>357</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         if j &gt;= a.k
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-358"></a>358</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             # we don&#39;t need to sort anything bigger than j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-359"></a>359</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             hi = j-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-360"></a>360</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         elseif j-lo &lt; hi-j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-361"></a>361</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             # recurse on the smaller chunk
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-362"></a>362</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             # this is necessary to preserve O(log(n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-363"></a>363</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             # stack space in the worst case (rather than O(n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-364"></a>364</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             lo &lt; (j-1) &amp;&amp; sort!(v, lo, j-1, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-365"></a>365</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             lo = j+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-366"></a>366</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-367"></a>367</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             (j+1) &lt; hi &amp;&amp; sort!(v, j+1, hi, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-368"></a>368</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#             hi = j-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-369"></a>369</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#         end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-370"></a>370</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#     end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-371"></a>371</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#     return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-372"></a>372</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-373"></a>373</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-374"></a>374</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-375"></a>375</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sort!(v::AbstractVector, lo::Int, hi::Int, a::PartialQuickSort,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-376"></a>376</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-377"></a>377</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt; hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-378"></a>378</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        hi-lo &lt;= SMALL_THRESHOLD &amp;&amp; return sort!(v, lo, hi, SMALL_ALGORITHM, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-379"></a>379</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j = partition!(v, lo, hi, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-380"></a>380</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-381"></a>381</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if j &lt;= first(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-382"></a>382</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lo = j+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-383"></a>383</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        elseif j &gt;= last(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-384"></a>384</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            hi = j-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-385"></a>385</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-386"></a>386</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if j-lo &lt; hi-j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-387"></a>387</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                lo &lt; (j-1) &amp;&amp; sort!(v, lo, j-1, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-388"></a>388</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                lo = j+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-389"></a>389</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-390"></a>390</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                hi &gt; (j+1) &amp;&amp; sort!(v, j+1, hi, a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-391"></a>391</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                hi = j-1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-392"></a>392</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-393"></a>393</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-394"></a>394</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-395"></a>395</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-396"></a>396</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-397"></a>397</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-398"></a>398</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-399"></a>399</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## generic sorting methods ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-400"></a>400</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-401"></a>401</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">defalg(v::AbstractArray) = DEFAULT_STABLE
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-402"></a>402</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">defalg{T&lt;:Number}(v::AbstractArray{T}) = DEFAULT_UNSTABLE
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-403"></a>403</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-404"></a>404</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-404"></a>
+              3869 (80.15%) samples spent in sort!<br />
+              0 (ex.),
+              3869 (100.00%) (incl.)
+              when called from
+              #sortperm#11
+              <a href="sort-jl-f12752f26483db5810d9-line.html#Lsort-jl-f12752f26483db5810d9-line.html-456">line 456</a><br />
+            </div>
+            <span class="code">function sort!(v::AbstractVector, alg::Algorithm, order::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-405"></a>405</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    inds = indices(v,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-406"></a>406</td>
+          <td></td>
+          <td>3869 (80.15%)</td>
+          <td>
+            <div class="callees">
+              3869 (100.00%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-292">sort!</a><br />
+            </div>
+            <span class="code">    sort!(v,first(inds),last(inds),alg,order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-407"></a>407</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-408"></a>408</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-409"></a>409</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sort!(v::AbstractVector;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-410"></a>410</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               alg::Algorithm=defalg(v),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-411"></a>411</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               lt=isless,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-412"></a>412</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               by=identity,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-413"></a>413</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               rev::Bool=false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-414"></a>414</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">               order::Ordering=Forward)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-415"></a>415</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(v, alg, ord(lt,by,rev,order))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-416"></a>416</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-417"></a>417</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-418"></a>418</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">sort(v::AbstractVector; kws...) = sort!(copymutable(v); kws...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-419"></a>419</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-420"></a>420</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-421"></a>421</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## selectperm: the permutation to sort the first k elements of an array ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-422"></a>422</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-423"></a>423</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">selectperm(v::AbstractVector, k::Union{Integer,OrdinalRange}; kwargs...) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-424"></a>424</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    selectperm!(similar(Vector{eltype(k)}, indices(v,1)), v, k; kwargs..., initialized=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-425"></a>425</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-426"></a>426</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function selectperm!{I&lt;:Integer}(ix::AbstractVector{I}, v::AbstractVector,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-427"></a>427</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 k::Union{Int, OrdinalRange};
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-428"></a>428</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 lt::Function=isless,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-429"></a>429</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 by::Function=identity,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-430"></a>430</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 rev::Bool=false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-431"></a>431</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 order::Ordering=Forward,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-432"></a>432</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                                 initialized::Bool=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-433"></a>433</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if !initialized
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-434"></a>434</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        @inbounds for i = indices(ix,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-435"></a>435</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            ix[i] = i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-436"></a>436</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-437"></a>437</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-438"></a>438</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-439"></a>439</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # do partial quicksort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-440"></a>440</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(ix, PartialQuickSort(k), Perm(ord(lt, by, rev, order), v))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-441"></a>441</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return ix[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-442"></a>442</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-443"></a>443</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-444"></a>444</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## sortperm: the permutation to sort an array ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-445"></a>445</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-446"></a>446</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sortperm(v::AbstractVector;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-447"></a>447</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                  alg::Algorithm=DEFAULT_UNSTABLE,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-448"></a>448</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                  lt=isless,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-449"></a>449</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                  by=identity,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-450"></a>450</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                  rev::Bool=false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-451"></a>451</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sortperm-11-451"></a>
+              3882 (80.42%) samples spent in #sortperm#11<br />
+              12 (100.00%) (ex.),
+              3882 (100.00%) (incl.)
+              when called from
+              #sortperm
+              <a href="nothing-0feca720e2c29dafb2c9-line.html#Lnothing-0feca720e2c29dafb2c9-line.html-0">line 0</a><br />
+            </div>
+            <span class="code">                  order::Ordering=Forward)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-452"></a>452</td>
+          <td>7 (0.15%)</td>
+          <td>7 (0.15%)</td>
+          <td>
+            <span class="code">    p = similar(Vector{Int}, indices(v, 1))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-453"></a>453</td>
+          <td>3 (0.06%)</td>
+          <td>3 (0.06%)</td>
+          <td>
+            <span class="code">    for (i,ind) in zip(eachindex(p), indices(v, 1))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-454"></a>454</td>
+          <td>2 (0.04%)</td>
+          <td>2 (0.04%)</td>
+          <td>
+            <span class="code">        p[i] = ind
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-455"></a>455</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-456"></a>456</td>
+          <td></td>
+          <td>3870 (80.17%)</td>
+          <td>
+            <div class="callees">
+              3869 (99.97%)
+              samples spent calling
+              <a href="sort-jl-f12752f26483db5810d9-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-sort-jl-sort-404">sort!</a><br />
+              1 (0.03%)
+              samples spent calling
+              <a href="ordering-jl-8fac73d5dc5f75cd88c1-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-ordering-jl-ord-67">ord</a><br />
+            </div>
+            <span class="code">    sort!(p, alg, Perm(ord(lt,by,rev,order),v))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-457"></a>457</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-458"></a>458</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-459"></a>459</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sortperm!{I&lt;:Integer}(x::AbstractVector{I}, v::AbstractVector;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-460"></a>460</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               alg::Algorithm=DEFAULT_UNSTABLE,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-461"></a>461</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               lt=isless,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-462"></a>462</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               by=identity,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-463"></a>463</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               rev::Bool=false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-464"></a>464</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               order::Ordering=Forward,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-465"></a>465</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                               initialized::Bool=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-466"></a>466</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if indices(x,1) != indices(v,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-467"></a>467</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        throw(ArgumentError(&quot;index vector must have the same indices as the source vector, $(indices(x,1)) != $(indices(v,1))&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-468"></a>468</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-469"></a>469</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if !initialized
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-470"></a>470</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        @inbounds for i = indices(v,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-471"></a>471</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            x[i] = i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-472"></a>472</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-473"></a>473</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-474"></a>474</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(x, alg, Perm(ord(lt,by,rev,order),v))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-475"></a>475</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-476"></a>476</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-477"></a>477</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## sorting multi-dimensional arrays ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-478"></a>478</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-479"></a>479</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sort(A::AbstractArray, dim::Integer;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-480"></a>480</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              alg::Algorithm=DEFAULT_UNSTABLE,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-481"></a>481</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              lt=isless,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-482"></a>482</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              by=identity,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-483"></a>483</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              rev::Bool=false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-484"></a>484</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              order::Ordering=Forward,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-485"></a>485</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              initialized::Bool=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-486"></a>486</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    order = ord(lt,by,rev,order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-487"></a>487</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = length(indices(A, dim))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-488"></a>488</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if dim != 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-489"></a>489</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        pdims = (dim, setdiff(1:ndims(A), dim)...)  # put the selected dimension first
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-490"></a>490</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Ap = permutedims(A, pdims)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-491"></a>491</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Av = vec(Ap)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-492"></a>492</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sort_chunks!(Av, n, alg, order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-493"></a>493</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ipermutedims(Ap, pdims)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-494"></a>494</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-495"></a>495</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Av = A[:]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-496"></a>496</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sort_chunks!(Av, n, alg, order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-497"></a>497</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        reshape(Av, indices(A))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-498"></a>498</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-499"></a>499</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-500"></a>500</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-501"></a>501</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">@noinline function sort_chunks!(Av, n, alg, order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-502"></a>502</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    inds = linearindices(Av)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-503"></a>503</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for s = first(inds):n:last(inds)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-504"></a>504</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sort!(Av, s, s+n-1, alg, order)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-505"></a>505</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-506"></a>506</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Av
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-507"></a>507</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-508"></a>508</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-509"></a>509</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sortrows(A::AbstractMatrix; kws...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-510"></a>510</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    inds = indices(A,1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-511"></a>511</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    T = slicetypeof(A, inds, :)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-512"></a>512</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    rows = similar(Vector{T}, indices(A, 1))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-513"></a>513</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in inds
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-514"></a>514</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        rows[i] = view(A, i, :)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-515"></a>515</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-516"></a>516</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = sortperm(rows; kws..., order=Lexicographic)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-517"></a>517</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    A[p,:]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-518"></a>518</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-519"></a>519</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-520"></a>520</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sortcols(A::AbstractMatrix; kws...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-521"></a>521</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    inds = indices(A,2)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-522"></a>522</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    T = slicetypeof(A, :, inds)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-523"></a>523</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    cols = similar(Vector{T}, indices(A, 2))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-524"></a>524</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in inds
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-525"></a>525</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        cols[i] = view(A, :, i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-526"></a>526</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-527"></a>527</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = sortperm(cols; kws..., order=Lexicographic)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-528"></a>528</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    A[:,p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-529"></a>529</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-530"></a>530</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-531"></a>531</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function slicetypeof{T,N}(A::AbstractArray{T,N}, i1, i2)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-532"></a>532</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    I = (slice_dummy(i1),slice_dummy(i2))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-533"></a>533</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    fast = isa(linearindexing(viewindexing(I), linearindexing(A)), LinearFast)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-534"></a>534</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SubArray{T,1,typeof(A),typeof(I),fast}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-535"></a>535</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-536"></a>536</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">slice_dummy(::Colon) = Colon()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-537"></a>537</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">slice_dummy{T}(::AbstractUnitRange{T}) = one(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-538"></a>538</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-539"></a>539</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## fast clever sorting for floats ##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-540"></a>540</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-541"></a>541</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">module Float
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-542"></a>542</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">using ..Sort
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-543"></a>543</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">using ...Order
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-544"></a>544</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-545"></a>545</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">import Core.Intrinsics: unbox, slt_int
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-546"></a>546</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">import ..Sort: sort!
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-547"></a>547</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">import ...Order: lt, DirectOrdering
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-548"></a>548</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-549"></a>549</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">typealias Floats Union{Float32,Float64}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-550"></a>550</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-551"></a>551</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable Left &lt;: Ordering end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-552"></a>552</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">immutable Right &lt;: Ordering end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-553"></a>553</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-554"></a>554</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">left(::DirectOrdering) = Left()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-555"></a>555</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">right(::DirectOrdering) = Right()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-556"></a>556</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-557"></a>557</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">left(o::Perm) = Perm(left(o.order), o.data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-558"></a>558</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">right(o::Perm) = Perm(right(o.order), o.data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-559"></a>559</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-560"></a>560</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt{T&lt;:Floats}(::Left, x::T, y::T) = slt_int(unbox(T,y),unbox(T,x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-561"></a>561</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">lt{T&lt;:Floats}(::Right, x::T, y::T) = slt_int(unbox(T,x),unbox(T,y))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-562"></a>562</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-563"></a>563</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isnan(o::DirectOrdering, x::Floats) = (x!=x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-564"></a>564</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isnan(o::Perm, i::Int) = isnan(o.order,o.data[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-565"></a>565</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-566"></a>566</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function nans2left!(v::AbstractVector, o::Ordering, lo::Int=first(indices(v,1)), hi::Int=last(indices(v,1)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-567"></a>567</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = lo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-568"></a>568</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while i &lt;= hi &amp;&amp; isnan(o,v[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-569"></a>569</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-570"></a>570</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-571"></a>571</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    j = i + 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-572"></a>572</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while j &lt;= hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-573"></a>573</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if isnan(o,v[j])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-574"></a>574</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v[i], v[j] = v[j], v[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-575"></a>575</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-576"></a>576</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-577"></a>577</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-578"></a>578</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-579"></a>579</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return i, hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-580"></a>580</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-581"></a>581</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function nans2right!(v::AbstractVector, o::Ordering, lo::Int=first(indices(v,1)), hi::Int=last(indices(v,1)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-582"></a>582</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = hi
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-583"></a>583</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt;= i &amp;&amp; isnan(o,v[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-584"></a>584</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-585"></a>585</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-586"></a>586</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    j = i - 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-587"></a>587</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while lo &lt;= j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-588"></a>588</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if isnan(o,v[j])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-589"></a>589</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v[i], v[j] = v[j], v[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-590"></a>590</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-591"></a>591</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-592"></a>592</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-593"></a>593</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-594"></a>594</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return lo, i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-595"></a>595</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-596"></a>596</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-597"></a>597</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nans2end!(v::AbstractVector, o::ForwardOrdering) = nans2right!(v,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-598"></a>598</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nans2end!(v::AbstractVector, o::ReverseOrdering) = nans2left!(v,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-599"></a>599</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nans2end!{O&lt;:ForwardOrdering}(v::AbstractVector{Int}, o::Perm{O}) = nans2right!(v,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-600"></a>600</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nans2end!{O&lt;:ReverseOrdering}(v::AbstractVector{Int}, o::Perm{O}) = nans2left!(v,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-601"></a>601</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-602"></a>602</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">issignleft(o::ForwardOrdering, x::Floats) = lt(o, x, zero(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-603"></a>603</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">issignleft(o::ReverseOrdering, x::Floats) = lt(o, x, -zero(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-604"></a>604</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">issignleft(o::Perm, i::Int) = issignleft(o.order, o.data[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-605"></a>605</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-606"></a>606</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function fpsort!(v::AbstractVector, a::Algorithm, o::Ordering)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-607"></a>607</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i, j = lo, hi = nans2end!(v,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-608"></a>608</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @inbounds while true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-609"></a>609</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while i &lt;= j &amp;&amp;  issignleft(o,v[i]); i += 1; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-610"></a>610</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while i &lt;= j &amp;&amp; !issignleft(o,v[j]); j -= 1; end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-611"></a>611</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i &lt;= j || break
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-612"></a>612</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        v[i], v[j] = v[j], v[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-613"></a>613</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i += 1; j -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-614"></a>614</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-615"></a>615</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(v, lo, j,  a, left(o))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-616"></a>616</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(v, i,  hi, a, right(o))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-617"></a>617</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-618"></a>618</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-619"></a>619</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-620"></a>620</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-621"></a>621</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">fpsort!(v::AbstractVector, a::Sort.PartialQuickSort, o::Ordering) =
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-622"></a>622</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sort!(v, first(indices(v,1)), last(indices(v,1)), a, o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-623"></a>623</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-624"></a>624</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">sort!{T&lt;:Floats}(v::AbstractVector{T}, a::Algorithm, o::DirectOrdering) = fpsort!(v,a,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-625"></a>625</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">sort!{O&lt;:DirectOrdering,T&lt;:Floats}(v::Vector{Int}, a::Algorithm, o::Perm{O,Vector{T}}) = fpsort!(v,a,o)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-626"></a>626</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-627"></a>627</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end # module Sort.Float
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-628"></a>628</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lsort-jl-f12752f26483db5810d9-line.html-629"></a>629</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end # module Sort
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

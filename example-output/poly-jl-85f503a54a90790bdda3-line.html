@@ -1,0 +1,3956 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/.julia/v0.5/MultivariatePolynomials/src/poly.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:47:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">export Term, Polynomial, MatPolynomial, SOSDecomposition, TermType, getmat, monomials, removemonomials
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">abstract TermType{C, T} &lt;: PolyType{C}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">eltype{C, T}(::Type{TermType{C, T}}) = T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">eltype{C, T}(p::TermType{C, T}) = T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">zero{C, T}(t::TermType{C, T}) = Polynomial(T[], MonomialVector{C}(vars(t), Vector{Vector{Int}}()))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#zero{T&lt;:TermType}(::Type{T}) = Polynomial(eltype(T)[], MonomialVector{iscomm(T)}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">one{C, T}(t::TermType{C, T}) = Polynomial([one(T)], MonomialVector{C}(vars(t), [zeros(Int, length(vars(t)))]))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#one{T&lt;:TermType}(::Type{T}) = Polynomial([one(eltype(T))], MonomialVector{iscomm(T)}(PolyVar[], [Int[]]))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">abstract TermContainer{C, T} &lt;: TermType{C, T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">eltype{C, T}(::Type{TermContainer{C, T}}) = T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">zero{C, T}(::Type{TermContainer{C, T}}) = zero(Polynomial{C, T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">one{C, T}(::Type{TermContainer{C, T}}) = one(Polynomial{C, T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-16"></a>16</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type Term{C, T} &lt;: TermContainer{C, T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    α::T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x::Monomial{C}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.hash(t::Term, u::UInt) = t.α == 1 ? hash(t.x, u) : hash(t.x, hash(t.α, u))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">iscomm{C, T}(::Type{Term{C, T}}) = C
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Term(t::Term) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Term{C}}){C}(x::Monomial{C}) = Term{C, Int}(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Term{C}}){C}(x::PolyVar{C}) = Term{C}(Monomial{C}(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Term{C}(x::Monomial{C}) = Term{C}(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Term{C}(x::PolyVar{C}) = Term{C}(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{TermContainer{C}}){C}(x::PolyVar{C}) = Term(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{TermContainer{C}}){C}(x::Monomial{C}) = Term(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{TermContainer{C}}){C}(t::TermContainer{C}) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">TermContainer(x::PolyVar) = Term(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">TermContainer(x::Monomial) = Term(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">TermContainer(t::TermContainer) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Term{C}}){C, T}(α::T) = Term{C, T}(α, Monomial{C}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Term{C, T}}, t::Term{C, T}) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Term{C, T}}, t::Term{C}) = Term{C, T}(T(t.α), t.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Term{C, T}}, x::Monomial{C}) = Term{C, T}(one(T), x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Term{C, T}}, x::PolyVar{C}) = Term{C, T}(Monomial{C}(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Term{C, T}}, α) = Term{C}(T(α))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{TermContainer{C, T}}, x::Union{Monomial{C},PolyVar{C}}) = Term{C, T}(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{TermContainer{C, T}}, α::T) = Term{C, T}(α, Monomial{C}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, S, T}(::Type{TermContainer{C, T}}, α::S) = TermContainer{C, T}(T(α))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{TermContainer{C}}){C, T}(α::T) = TermContainer{C, T}(α)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{TermContainer{C, T}}, t::Term{C}) = Term{C, T}(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">zero{C, T}(t::Term{C, T}) = Term{C, T}(zero(T), t.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">zero{C, T}(::Type{Term{C, T}}) = Term{C, T}(zero(T), Monomial{C}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">one{C, T}(t::Term{C, T}) = Term{C, T}(one(T), Monomial{C}(t.x.vars, zeros(Int, length(t.x.vars))))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-52"></a>52</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">one{C, T}(::Type{Term{C, T}}) = Term{C, T}(one(T), Monomial{C}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-53"></a>53</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-54"></a>54</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert(::Type{Any}, t::Term) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.copy{T&lt;:Term}(t::T) = T(copy(t.α), copy(t.x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">vars(t::Term) = vars(t.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nvars(t::Term) = nvars(t.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">eltype{C, T}(::Type{Term{C, T}}) = T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">length(::Term) = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isempty(::Term) = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">start(::Term) = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">done(::Term, state) = state
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">next(t::Term, state) = (t, true)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">getindex(t::Term, I::Int) = t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-68"></a>68</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Invariant:
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># a and x might be empty: meaning it is the zero polynomial
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># a does not contain any zeros
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># x is increasing in the monomial order (i.e. grlex)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-72"></a>72</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type Polynomial{C, T} &lt;: TermContainer{C, T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a::Vector{T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x::MonomialVector{C}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-76"></a>76</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    function Polynomial(a::Vector{T}, x::MonomialVector{C})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-77"></a>77</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if length(a) != length(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-78"></a>78</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            throw(ArgumentError(&quot;There should be as many coefficient than monomials&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-79"></a>79</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-80"></a>80</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        zeroidx = Int[]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-81"></a>81</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for (i,α) in enumerate(a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-82"></a>82</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if iszero(α)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-83"></a>83</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                push!(zeroidx, i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-84"></a>84</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-85"></a>85</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-86"></a>86</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if !isempty(zeroidx)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-87"></a>87</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            isnz = ones(Bool, length(a))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-88"></a>88</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            isnz[zeroidx] = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-89"></a>89</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            nzidx = find(isnz)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-90"></a>90</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            a = a[nzidx]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-91"></a>91</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            x = x[nzidx]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-92"></a>92</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-93"></a>93</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        new(a, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-94"></a>94</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-95"></a>95</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-96"></a>96</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">iscomm{C, T}(::Type{Polynomial{C, T}}) = C
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-97"></a>97</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-98"></a>98</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Base.hash(p::Polynomial, u::UInt)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-99"></a>99</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if length(p.a) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-100"></a>100</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        hash(0, u)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-101"></a>101</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif length(p.a) == 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-102"></a>102</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        hash(Term(p.a[1], Monomial(p.x[1])))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-103"></a>103</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-104"></a>104</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        hash(p.a, hash(p.x, hash(u)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-105"></a>105</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-106"></a>106</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-107"></a>107</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-108"></a>108</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.copy{C, T}(p::Polynomial{C, T}) = Polynomial{C, T}(copy(p.a), copy(p.x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-109"></a>109</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">zero{C, T}(::Type{Polynomial{C, T}}) = Polynomial(T[], MonomialVector{C}())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-110"></a>110</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">one{C, T}(::Type{Polynomial{C, T}}) = Polynomial([one(T)], MonomialVector{C}(PolyVar{C}[], [Int[]]))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-111"></a>111</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-112"></a>112</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Polynomial{C, T}}){C, T}(a::Vector, x::MonomialVector) = Polynomial{C, T}(Vector{T}(a), x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-113"></a>113</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-114"></a>114</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{Polynomial{C, T}}){C, T}(a::Vector, x::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-115"></a>115</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if length(a) != length(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-116"></a>116</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        throw(ArgumentError(&quot;There should be as many coefficient than monomials&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-117"></a>117</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-118"></a>118</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    σ, X = sortmonovec(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-119"></a>119</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Polynomial{C, T}(a[σ], X)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-120"></a>120</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-121"></a>121</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Polynomial{C}}){C, T}(a::Vector{T}, x) = Polynomial{C, T}(a, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-122"></a>122</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-123"></a>123</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{C}(af::Union{Function, Vector}, x::MonomialVector{C}) = Polynomial{C}(af, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-124"></a>124</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{T&lt;:VectorOfPolyType{false}}(af::Union{Function, Vector}, x::Vector{T}) = Polynomial{false}(af, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-125"></a>125</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{T&lt;:VectorOfPolyType{true}}(af::Union{Function, Vector}, x::Vector{T}) = Polynomial{true}(af, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-126"></a>126</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-127"></a>127</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Polynomial{C}}){C}(α) = Polynomial(Term{C}(α))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-128"></a>128</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{C}(x::PolyType{C}) = Polynomial{C}(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-129"></a>129</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial(p::Polynomial) = p
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-130"></a>130</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{C, T}(t::Term{C, T}) = Polynomial{C, T}([t.α], [t.x])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-131"></a>131</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Polynomial{C, T}}, x) = Polynomial(Term{C, T}(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-132"></a>132</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Polynomial{C, T}}, t::Term{C}) = Polynomial{C, T}([T(t.α)], [t.x])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-133"></a>133</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{Polynomial{C, T}}, p::Polynomial{C, T}) = p
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-134"></a>134</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, S, T}(::Type{Polynomial{C, T}}, p::Polynomial{C, S}) = Polynomial{C}(Vector{T}(p.a), p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-135"></a>135</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-136"></a>136</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C, T}(::Type{TermContainer{C, T}}, p::Polynomial{C}) = Polynomial{C, T}(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-137"></a>137</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-138"></a>138</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{Polynomial{C, T}}){C, T}(f::Function, x::MonomialVector{C})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-139"></a>139</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = T[f(i) for i in 1:length(x)]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-140"></a>140</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Polynomial{C, T}(a, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-141"></a>141</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-142"></a>142</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{Polynomial{C, T}}){C, T}(f::Function, x::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-143"></a>143</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    σ, X = sortmonovec(PolyVar{C}, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-144"></a>144</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = T[f(i) for i in σ]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-145"></a>145</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Polynomial{C, T}(a, X)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-146"></a>146</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-147"></a>147</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{Polynomial{C}}){C}(f::Function, x) = Polynomial{C, Base.promote_op(f, Int)}(f, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-148"></a>148</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-149"></a>149</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># FIXME why did I need it ?
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-150"></a>150</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert(::Type{Any}, p::Polynomial) = p
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-151"></a>151</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-152"></a>152</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Base.convert{C}(::Type{PolyType{C}}, p::TermContainer{C}) = p
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-153"></a>153</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Base.convert{S}(::Type{S}, p::TermContainer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-154"></a>154</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s = zero(S)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-155"></a>155</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for t in p
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-156"></a>156</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if sum(abs.(t.x.z)) &gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-157"></a>157</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            # The polynomial is not constant
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-158"></a>158</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            throw(InexactError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-159"></a>159</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-160"></a>160</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        s += S(t.α)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-161"></a>161</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-162"></a>162</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    s
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-163"></a>163</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-164"></a>164</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-165"></a>165</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">vars(p::Polynomial) = vars(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-166"></a>166</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">nvars(p::Polynomial) = nvars(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-167"></a>167</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-168"></a>168</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">length(p::Polynomial) = length(p.a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-169"></a>169</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isempty(p::Polynomial) = isempty(p.a)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-170"></a>170</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">start(::Polynomial) = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-171"></a>171</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">done(p::Polynomial, state) = length(p) &lt; state
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-172"></a>172</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">next(p::Polynomial, state) = (p[state], state+1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-173"></a>173</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-174"></a>174</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">extdeg(p::Polynomial) = extdeg(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-175"></a>175</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">mindeg(p::Polynomial) = mindeg(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-176"></a>176</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">maxdeg(p::Polynomial) = maxdeg(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-177"></a>177</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-178"></a>178</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">monomials(p::Polynomial) = p.x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-179"></a>179</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-180"></a>180</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function removemonomials(p::Polynomial, x::MonomialVector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-181"></a>181</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # use the fact that monomials are sorted to do this O(n) instead of O(n^2)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-182"></a>182</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    j = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-183"></a>183</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    I = Int[]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-184"></a>184</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for (i,t) in enumerate(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-185"></a>185</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while j &lt;= length(x) &amp;&amp; x[j] &gt; t.x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-186"></a>186</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            j += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-187"></a>187</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-188"></a>188</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if j &gt; length(x) || x[j] != t.x
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-189"></a>189</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            push!(I, i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-190"></a>190</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-191"></a>191</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-192"></a>192</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Polynomial(p.a[I], p.x[I])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-193"></a>193</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-194"></a>194</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">removemonomials(p::Polynomial, x::Vector) = removemonomials(p, MonomialVector(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-195"></a>195</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-196"></a>196</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-poly-jl-removedups-196"></a>
+              4027 (83.43%) samples spent in removedups<br />
+              66 (100.00%) (ex.),
+              4027 (100.00%) (incl.)
+              when called from
+              vecpolynomialclean
+              <a href="poly-jl-85f503a54a90790bdda3-line.html#Lpoly-jl-85f503a54a90790bdda3-line.html-216">line 216</a><br />
+            </div>
+            <span class="code">function removedups{T}(adup::Vector{T}, Zdup::Vector{Vector{Int}})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-197"></a>197</td>
+          <td></td>
+          <td>3882 (80.42%)</td>
+          <td>
+            <div class="callees">
+              3882 (100.00%)
+              samples spent calling
+              <a href="nothing-0feca720e2c29dafb2c9-line.html#Snothing-sortperm">#sortperm</a><br />
+            </div>
+            <span class="code">    σ = sortperm(Zdup, rev=true, lt=grlex)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-198"></a>198</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Z = Vector{Vector{Int}}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-199"></a>199</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a = Vector{T}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-200"></a>200</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    i = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-201"></a>201</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    j = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-202"></a>202</td>
+          <td>1 (0.02%)</td>
+          <td>1 (0.02%)</td>
+          <td>
+            <span class="code">    while j &lt;= length(adup)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-203"></a>203</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        k = σ[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-204"></a>204</td>
+          <td>25 (0.52%)</td>
+          <td>103 (2.13%)</td>
+          <td>
+            <div class="callees">
+              78 (75.73%)
+              samples spent calling
+              <a href="operators-jl-596ef47ffea81dbe855e-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-operators-jl-57">!=</a><br />
+            </div>
+            <span class="code">        if j == 1 || Zdup[k] != Zdup[σ[j-1]]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-205"></a>205</td>
+          <td></td>
+          <td>1 (0.02%)</td>
+          <td>
+            <div class="callees">
+              1 (100.00%)
+              samples spent calling
+              <a href="array-jl-d367b17cda162b7538ab-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-array-jl-push-480">push!</a><br />
+            </div>
+            <span class="code">            push!(Z, Zdup[k])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-206"></a>206</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            push!(a, adup[k])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-207"></a>207</td>
+          <td>3 (0.06%)</td>
+          <td>3 (0.06%)</td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-208"></a>208</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-209"></a>209</td>
+          <td>37 (0.77%)</td>
+          <td>37 (0.77%)</td>
+          <td>
+            <span class="code">            a[i] += adup[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-210"></a>210</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-211"></a>211</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-212"></a>212</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-213"></a>213</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    a, Z
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-214"></a>214</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-215"></a>215</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-poly-jl-vecpolynomialclean-215"></a>
+              4028 (83.45%) samples spent in vecpolynomialclean<br />
+              0 (ex.),
+              4028 (100.00%) (incl.)
+              when called from
+              *
+              <a href="calg-jl-ab0c07905d81cd2eb7dc-line.html#Lcalg-jl-ab0c07905d81cd2eb7dc-line.html-159">line 159</a><br />
+            </div>
+            <span class="code">function vecpolynomialclean{C, T}(vars::Vector{PolyVar{C}}, adup::Vector{T}, Zdup::Vector{Vector{Int}})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-216"></a>216</td>
+          <td></td>
+          <td>4027 (83.43%)</td>
+          <td>
+            <div class="callees">
+              4027 (100.00%)
+              samples spent calling
+              <a href="poly-jl-85f503a54a90790bdda3-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-poly-jl-removedups-196">removedups</a><br />
+            </div>
+            <span class="code">    a, Z = removedups(adup, Zdup)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-217"></a>217</td>
+          <td></td>
+          <td>1 (0.02%)</td>
+          <td>
+            <div class="callees">
+              1 (100.00%)
+              samples spent calling
+              <a href="mono-jl-cd68131c2c9ec5569b93-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-mono-jl-Type-130">Type</a><br />
+            </div>
+            <span class="code">    Polynomial{C, T}(a, MonomialVector{C}(vars, Z))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-218"></a>218</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-219"></a>219</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-220"></a>220</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-poly-jl-getindex-220"></a>
+              151 (3.13%) samples spent in getindex<br />
+              1 (1.39%) (ex.),
+              1 (0.66%) (incl.)
+              when called from
+              *
+              <a href="calg-jl-ab0c07905d81cd2eb7dc-line.html#Lcalg-jl-ab0c07905d81cd2eb7dc-line.html-145">line 145</a><br />
+              1 (1.39%) (ex.),
+              1 (0.66%) (incl.)
+              when called from
+              power_by_squaring
+              <a href="intfuncs-jl-e33cbfcdd5a3782eb332-line.html#Lintfuncs-jl-e33cbfcdd5a3782eb332-line.html-132">line 132</a><br />
+              70 (97.22%) (ex.),
+              149 (98.68%) (incl.)
+              when called from
+              *
+              <a href="calg-jl-ab0c07905d81cd2eb7dc-line.html#Lcalg-jl-ab0c07905d81cd2eb7dc-line.html-146">line 146</a><br />
+            </div>
+            <span class="code">eltype{C, T}(::Type{Polynomial{C, T}}) = T
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-221"></a>221</td>
+          <td>60 (1.24%)</td>
+          <td>139 (2.88%)</td>
+          <td>
+            <div class="callees">
+              79 (56.83%)
+              samples spent calling
+              <a href="mono-jl-cd68131c2c9ec5569b93-line.html#S-home-tkluck-julia-v0-5-MultivariatePolynomials-src-mono-jl-getindex-182">getindex</a><br />
+            </div>
+            <span class="code">getindex(p::Polynomial, I::Int) = Term(p.a[I[1]], p.x[I[1]])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-222"></a>222</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-223"></a>223</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type MatPolynomial{C, T} &lt;: TermType{C, T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-224"></a>224</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Q::Vector{T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-225"></a>225</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    x::MonomialVector{C}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-226"></a>226</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-227"></a>227</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-228"></a>228</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># i &lt; j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-229"></a>229</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function trimap(i, j, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-230"></a>230</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    div(n*(n+1), 2) - div((n-i+1)*(n-i+2), 2) + j-i+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-231"></a>231</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-232"></a>232</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-233"></a>233</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function getindex(p::MatPolynomial, I::NTuple{2,Int})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-234"></a>234</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = length(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-235"></a>235</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p.Q[trimap(minimum(I), maximum(I), n)]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-236"></a>236</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-237"></a>237</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># MatPolynomial is not a subtype of AbstractArray so I need to define this too
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-238"></a>238</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">getindex(p::MatPolynomial, i, j) = getindex(p, (i, j))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-239"></a>239</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-240"></a>240</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function getmat{C, T}(p::MatPolynomial{C, T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-241"></a>241</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = length(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-242"></a>242</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    A = Matrix{T}(n, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-243"></a>243</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in 1:n, j in i:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-244"></a>244</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        A[j,i] = A[i,j] = p.Q[trimap(i,j,n)]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-245"></a>245</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-246"></a>246</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    A
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-247"></a>247</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-248"></a>248</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-249"></a>249</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function trimat{T}(::Type{T}, f, n, σ)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-250"></a>250</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Q = Vector{T}(trimap(n, n, n))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-251"></a>251</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in 1:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-252"></a>252</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for j in i:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-253"></a>253</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            Q[trimap(i, j, n)] = f(σ[i], σ[j])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-254"></a>254</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-255"></a>255</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-256"></a>256</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Q
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-257"></a>257</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-258"></a>258</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{MatPolynomial{C, T}}){C, T}(f::Function, x::MonomialVector{C}, σ=1:length(x))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-259"></a>259</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MatPolynomial{C, T}(trimat(T, f, length(x), σ), x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-260"></a>260</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-261"></a>261</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{MatPolynomial{C, T}}){C, T}(f::Function, x::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-262"></a>262</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    σ, X = sortmonovec(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-263"></a>263</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MatPolynomial{C, T}(f, X, σ)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-264"></a>264</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-265"></a>265</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(::Type{MatPolynomial{C}}){C}(f::Function, x) = MatPolynomial{C, Base.promote_op(f, Int, Int)}(f, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-266"></a>266</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">MatPolynomial{T&lt;:VectorOfPolyType{false}}(f::Function, x::Vector{T}) = MatPolynomial{false}(f, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-267"></a>267</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">MatPolynomial{T&lt;:VectorOfPolyType{true}}(f::Function, x::Vector{T}) = MatPolynomial{true}(f, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-268"></a>268</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">MatPolynomial{C}(f::Function, x::MonomialVector{C}) = MatPolynomial{C}(f, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-269"></a>269</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-270"></a>270</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function MatPolynomial{C, T}(Q::Matrix{T}, x::MonomialVector{C})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-271"></a>271</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MatPolynomial{C, T}((i,j) -&gt; Q[i, j], x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-272"></a>272</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-273"></a>273</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function matpolyperm{C, T}(Q::Matrix{T}, x::MonomialVector{C}, σ)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-274"></a>274</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MatPolynomial{C, T}((i,j) -&gt; Q[σ[i], σ[j]], x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-275"></a>275</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-276"></a>276</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function MatPolynomial{T}(Q::Matrix{T}, x::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-277"></a>277</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    σ, X = sortmonovec(x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-278"></a>278</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    matpolyperm(Q, X, σ)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-279"></a>279</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-280"></a>280</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-281"></a>281</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Base.convert{C, T}(::Type{Polynomial{C, T}}, p::MatPolynomial{C, T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-282"></a>282</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if isempty(p.Q)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-283"></a>283</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        zero(Polynomial{C, T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-284"></a>284</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-285"></a>285</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = length(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-286"></a>286</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        U = typeof(2*p.Q[1] + p.Q[1])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-287"></a>287</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if C
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-288"></a>288</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            N = trimap(n, n, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-289"></a>289</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            Z = Vector{Vector{Int}}(N)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-290"></a>290</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            a = Vector{U}(N)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-291"></a>291</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            for i in 1:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-292"></a>292</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                for j in i:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-293"></a>293</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    k = trimap(i, j, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-294"></a>294</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    Z[k] = p.x.Z[i] + p.x.Z[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-295"></a>295</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    if i == j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-296"></a>296</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        a[k] = p.Q[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-297"></a>297</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-298"></a>298</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        a[k] = 2*p.Q[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-299"></a>299</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-300"></a>300</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-301"></a>301</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-302"></a>302</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v = p.x.vars
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-303"></a>303</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-304"></a>304</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            N = n^2
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-305"></a>305</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            x = Vector{Monomial}(N)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-306"></a>306</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            a = Vector{U}(N)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-307"></a>307</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            offset = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-308"></a>308</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            for i in 1:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-309"></a>309</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # for j in 1:n wouldn&#39;t be cache friendly for p.Q
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-310"></a>310</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                for j in i:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-311"></a>311</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    k = trimap(i, j, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-312"></a>312</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    q = p.Q[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-313"></a>313</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    x[offset+k] = p.x[i] * p.x[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-314"></a>314</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    a[offset+k] = q
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-315"></a>315</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    if i != j
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-316"></a>316</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        offset += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-317"></a>317</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        x[offset+k] = p.x[j] * p.x[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-318"></a>318</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        a[offset+k] = q
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-319"></a>319</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-320"></a>320</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-321"></a>321</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-322"></a>322</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            σ, X = sortmonovec(PolyVar{false}, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-323"></a>323</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            a = a[σ]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-324"></a>324</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            v = X.vars
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-325"></a>325</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            Z = X.Z
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-326"></a>326</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-327"></a>327</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        vecpolynomialclean(v, a, Z)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-328"></a>328</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-329"></a>329</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-330"></a>330</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Polynomial{C, T}(p::MatPolynomial{C, T}) = convert(Polynomial{C, T}, p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-331"></a>331</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">TermContainer(p::MatPolynomial) = Polynomial(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-332"></a>332</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-333"></a>333</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type SOSDecomposition{C, T} &lt;: TermType{C, T}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-334"></a>334</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ps::Vector{Polynomial{C, T}}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-335"></a>335</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    function SOSDecomposition(ps::Vector{Polynomial{C, T}})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-336"></a>336</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        new(ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-337"></a>337</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-338"></a>338</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-339"></a>339</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{SOSDecomposition{C, T}}){C, T}(ps::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-340"></a>340</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SOSDecomposition(Vector{Polynomial{C, T}}(ps))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-341"></a>341</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-342"></a>342</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function (::Type{SOSDecomposition{C}}){C}(ps::Vector)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-343"></a>343</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    T = reduce(promote_type, Int, map(eltype, ps))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-344"></a>344</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SOSDecomposition{C, T}(ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-345"></a>345</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-346"></a>346</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">SOSDecomposition{T&lt;:VectorOfPolyType{false}}(ps::Vector{T}) = SOSDecomposition{false}(ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-347"></a>347</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">SOSDecomposition{T&lt;:VectorOfPolyType{true}}(ps::Vector{T}) = SOSDecomposition{true}(ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-348"></a>348</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-349"></a>349</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Base.convert{C, T}(::Type{MatPolynomial{C, T}}, p::SOSDecomposition)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-350"></a>350</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    X = mergemonovec(map(p -&gt; p.x, p))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-351"></a>351</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    m = length(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-352"></a>352</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = length(X)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-353"></a>353</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Q = zeros(T, m, n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-354"></a>354</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i in 1:m
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-355"></a>355</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        q = p[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-356"></a>356</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        k = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-357"></a>357</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for j in 1:n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-358"></a>358</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if k &lt;= length(q) &amp;&amp; X[j] == q.x[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-359"></a>359</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                Q[i, j] = q.a[k]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-360"></a>360</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                k += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-361"></a>361</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-362"></a>362</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-363"></a>363</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-364"></a>364</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    MatPolynomial(Q&#39; * Q, X)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-365"></a>365</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-366"></a>366</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">MatPolynomial{C, T}(p::SOSDecomposition{C, T}) = MatPolynomial{C, T}(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-367"></a>367</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-368"></a>368</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Base.convert{C, T}(::Type{SOSDecomposition{C, T}}, p::MatPolynomial)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-369"></a>369</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = length(p.x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-370"></a>370</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # TODO LDL^T factorization for SDP is missing in Julia
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-371"></a>371</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # it would be nice to have though
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-372"></a>372</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    A = getmat(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-373"></a>373</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Q = chol(A)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-374"></a>374</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    m = size(Q, 1)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-375"></a>375</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ps = [Polynomial{C, T}(Q[i,:], p.x) for i in 1:m]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-376"></a>376</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    SOSDecomposition(ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-377"></a>377</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-378"></a>378</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Without LDL^T, we need to do float(T)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-379"></a>379</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">SOSDecomposition{C, T}(p::MatPolynomial{C, T}) = SOSDecomposition{C, float(T)}(p)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-380"></a>380</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-381"></a>381</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">length(p::SOSDecomposition) = length(p.ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-382"></a>382</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isempty(p::SOSDecomposition) = isempty(p.ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-383"></a>383</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">start(p::SOSDecomposition) = start(p.ps)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-384"></a>384</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">done(p::SOSDecomposition, state) = done(p.ps, state)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-385"></a>385</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">next(p::SOSDecomposition, state) = next(p.ps, state)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lpoly-jl-85f503a54a90790bdda3-line.html-386"></a>386</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">getindex(p::SOSDecomposition, i::Int) = p.ps[i]
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
