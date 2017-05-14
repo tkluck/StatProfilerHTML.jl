@@ -231,12 +231,14 @@ sub add_trace_file {
     $self->{source}->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
         if $self->{source};
 
-    $self->_check_consistency(
-        $r->get_source_tick_duration,
-        $r->get_source_perl_version,
-        $process_id,
-        $file,
-    );
+    unless(ref $r eq 'Devel::StatProfiler::Reader::Text') {
+        $self->_check_consistency(
+            $r->get_source_tick_duration,
+            $r->get_source_perl_version,
+            $process_id,
+            $file,
+        );
+    }
 
     while (my $trace = $r->read_trace) {
         my $weight = $trace->weight;
