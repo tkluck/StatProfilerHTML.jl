@@ -1,0 +1,6143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/src/julia/usr/bin/../share/julia/base/./profile.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:17:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># This file is a part of Julia. License is MIT: http://julialang.org/license
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">module Profile
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">import Base.StackTraces: lookup, UNKNOWN, show_spec_linfo
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">export @profile
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">macro profile(ex)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    quote
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        try
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            status = start_timer()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if status &lt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                error(error_codes[status])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-16"></a>16</td>
+          <td></td>
+          <td>70 (100.00%)</td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-profile-jl-macro-expansion-16"></a>
+              70 (100.00%) samples spent in macro expansion;<br />
+              0 (ex.),
+              70 (100.00%) (incl.)
+              when called from
+              anonymous
+              <a href="nothing-0feca720e2c29dafb2c9-line.html#Lnothing-0feca720e2c29dafb2c9-line.html--1">line -1</a><br />
+            </div>
+            <div class="callees">
+              70 (100.00%)
+              samples spent calling
+              <a href="nothing-0feca720e2c29dafb2c9-line.html#Snothing-myfunc-1">myfunc</a><br />
+            </div>
+            <span class="code">            $(esc(ex))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        finally
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            stop_timer()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">####
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">#### User-level functions
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">####
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    init(; n::Integer, delay::Float64)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Configure the `delay` between backtraces (measured in seconds), and the number `n` of
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">instruction pointers that may be stored. Each instruction pointer corresponds to a single
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">line of code; backtraces generally consist of a long list of instruction pointers. Default
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">settings can be obtained by calling this function with no arguments, and each can be set
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">independently using keywords or in the order `(n, delay)`.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function init(; n::Union{Void,Integer} = nothing, delay::Union{Void,Float64} = nothing)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n_cur = ccall(:jl_profile_maxlen_data, Csize_t, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    delay_cur = ccall(:jl_profile_delay_nsec, UInt64, ())/10^9
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if n === nothing &amp;&amp; delay === nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return Int(n_cur), delay_cur
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nnew = (n === nothing) ? n_cur : n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    delaynew = (delay === nothing) ? delay_cur : delay
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    init(nnew, delaynew)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function init(n::Integer, delay::Float64)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    status = ccall(:jl_profile_init, Cint, (Csize_t, UInt64), n, round(UInt64,10^9*delay))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if status == -1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        error(&quot;could not allocate space for &quot;, n, &quot; instruction pointers&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-52"></a>52</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-53"></a>53</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-54"></a>54</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># init with default values
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Use a max size of 1M profile samples, and fire timer every 1ms
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">if is_windows()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    __init__() = init(1_000_000, 0.01)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    __init__() = init(1_000_000, 0.001)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    clear()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Clear any existing backtraces from the internal buffer.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">clear() = ccall(:jl_profile_clear_data, Void, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-68"></a>68</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    print([io::IO = STDOUT,] [data::Vector]; format = :tree, C = false, combine = true, maxdepth = typemax(Int), sortedby = :filefuncline)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-72"></a>72</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Prints profiling results to `io` (by default, `STDOUT`). If you do not
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">supply a `data` vector, the internal buffer of accumulated backtraces
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">will be used. `format` can be `:tree` or `:flat`. If `C==true`,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">backtraces from C and Fortran code are shown. `combine==true` merges
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-76"></a>76</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">instruction pointers that correspond to the same line of
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-77"></a>77</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">code. `maxdepth` can be used to limit the depth of printing in `:tree`
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-78"></a>78</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">format, while `sortedby` can be used to control the order in `:flat`
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-79"></a>79</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">format (`:filefuncline` sorts by the source line, whereas `:count`
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-80"></a>80</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">sorts in order of number of collected samples).
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-81"></a>81</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-82"></a>82</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function print{T&lt;:Unsigned}(io::IO, data::Vector{T} = fetch(), lidict::Dict = getdict(data);
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-83"></a>83</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        format = :tree,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-84"></a>84</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        C = false,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-85"></a>85</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        combine = true,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-86"></a>86</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        maxdepth::Int = typemax(Int),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-87"></a>87</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        sortedby::Symbol = :filefuncline)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-88"></a>88</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    cols = Base.displaysize(io)[2]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-89"></a>89</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if format == :tree
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-90"></a>90</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        tree(io, data, lidict, C, combine, cols, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-91"></a>91</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif format == :flat
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-92"></a>92</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        flat(io, data, lidict, C, combine, cols, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-93"></a>93</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-94"></a>94</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        throw(ArgumentError(&quot;output format $(repr(format)) not recognized&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-95"></a>95</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-96"></a>96</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-97"></a>97</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-98"></a>98</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-99"></a>99</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    print([io::IO = STDOUT,] data::Vector, lidict::Dict; kwargs)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-100"></a>100</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-101"></a>101</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Prints profiling results to `io`. This variant is used to examine results exported by a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-102"></a>102</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">previous call to [`retrieve`](:func:`retrieve`). Supply the vector `data` of backtraces and
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-103"></a>103</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">a dictionary `lidict` of line information.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-104"></a>104</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-105"></a>105</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">See `Profile.print([io], data)` for an explanation of the valid keyword arguments.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-106"></a>106</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-107"></a>107</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">print{T&lt;:Unsigned}(data::Vector{T} = fetch(), lidict::Dict = getdict(data); kwargs...) = print(STDOUT, data, lidict; kwargs...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-108"></a>108</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-109"></a>109</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-110"></a>110</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    retrieve() -&gt; data, lidict
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-111"></a>111</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-112"></a>112</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;Exports&quot; profiling results in a portable format, returning the set of all backtraces
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-113"></a>113</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">(`data`) and a dictionary that maps the (session-specific) instruction pointers in `data` to
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-114"></a>114</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">`LineInfo` values that store the file name, function name, and line number. This function
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-115"></a>115</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">allows you to save profiling results for future analysis.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-116"></a>116</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-117"></a>117</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function retrieve()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-118"></a>118</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    data = fetch()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-119"></a>119</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    copy(data), getdict(data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-120"></a>120</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-121"></a>121</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-122"></a>122</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function getdict(data::Vector{UInt})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-123"></a>123</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    uip = unique(data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-124"></a>124</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Dict{UInt, Vector{StackFrame}}(ip=&gt;lookup(ip) for ip in uip)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-125"></a>125</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-126"></a>126</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-127"></a>127</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-128"></a>128</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    flatten(btdata, lidict) -&gt; (newdata, newdict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-129"></a>129</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-130"></a>130</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Produces &quot;flattened&quot; backtrace data. Individual instruction pointers
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-131"></a>131</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">sometimes correspond to a multi-frame backtrace due to inlining; in
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-132"></a>132</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">such cases, this function inserts fake instruction pointers for the
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-133"></a>133</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">inlined calls, and returns a dictionary that is a 1-to-1 mapping
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-134"></a>134</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">between instruction pointers and a single StackFrame.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-135"></a>135</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-136"></a>136</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function flatten(data::Vector{UInt}, lidict::Dict{UInt,Vector{StackFrame}})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-137"></a>137</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Makes fake instruction pointers, counting down from typemax(UInt)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-138"></a>138</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newip = typemax(UInt)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-139"></a>139</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    taken = Set(keys(lidict))  # make sure we don&#39;t pick one that&#39;s already used
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-140"></a>140</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newdict = Dict{UInt,StackFrame}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-141"></a>141</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newmap  = Dict{UInt,Vector{UInt}}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-142"></a>142</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for (ip, trace) in lidict
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-143"></a>143</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if length(trace) == 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-144"></a>144</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            newdict[ip] = trace[1]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-145"></a>145</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-146"></a>146</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            newm = UInt[]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-147"></a>147</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            for sf in trace
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-148"></a>148</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                while newip ∈ taken &amp;&amp; newip &gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-149"></a>149</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    newip -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-150"></a>150</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-151"></a>151</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                newip == 0 &amp;&amp; error(&quot;all possible instruction pointers used&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-152"></a>152</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                push!(newm, newip)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-153"></a>153</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                newdict[newip] = sf
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-154"></a>154</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                newip -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-155"></a>155</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-156"></a>156</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            newmap[ip] = newm
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-157"></a>157</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-158"></a>158</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-159"></a>159</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newdata = UInt[]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-160"></a>160</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for ip in data
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-161"></a>161</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if haskey(newmap, ip)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-162"></a>162</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            append!(newdata, newmap[ip])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-163"></a>163</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-164"></a>164</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            push!(newdata, ip)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-165"></a>165</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-166"></a>166</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-167"></a>167</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newdata, newdict
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-168"></a>168</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-169"></a>169</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-170"></a>170</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-171"></a>171</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    callers(funcname, [data, lidict], [filename=&lt;filename&gt;], [linerange=&lt;start:stop&gt;]) -&gt; Vector{Tuple{count, lineinfo}}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-172"></a>172</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-173"></a>173</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Given a previous profiling run, determine who called a particular function. Supplying the
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-174"></a>174</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">filename (and optionally, range of line numbers over which the function is defined) allows
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-175"></a>175</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">you to disambiguate an overloaded method. The returned value is a vector containing a count
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-176"></a>176</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">of the number of calls and line information about the caller. One can optionally supply
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-177"></a>177</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">backtrace `data` obtained from [`retrieve`](:func:`retrieve`); otherwise, the current internal
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-178"></a>178</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">profile buffer is used.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-179"></a>179</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-180"></a>180</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function callers end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-181"></a>181</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-182"></a>182</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function callers(funcname::String, bt::Vector{UInt}, lidict; filename = nothing, linerange = nothing)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-183"></a>183</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if filename === nothing &amp;&amp; linerange === nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-184"></a>184</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return callersf(li -&gt; li.func == funcname, bt, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-185"></a>185</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-186"></a>186</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    filename === nothing &amp;&amp; throw(ArgumentError(&quot;if supplying linerange, you must also supply the filename&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-187"></a>187</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if linerange === nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-188"></a>188</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return callersf(li -&gt; li.func == funcname &amp;&amp; li.file == filename, bt, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-189"></a>189</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-190"></a>190</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return callersf(li -&gt; li.func == funcname &amp;&amp; li.file == filename &amp;&amp; in(li.line, linerange), bt, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-191"></a>191</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-192"></a>192</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-193"></a>193</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-194"></a>194</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">callers(funcname::String; kwargs...) = callers(funcname, retrieve()...; kwargs...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-195"></a>195</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">callers(func::Function, bt::Vector{UInt}, lidict; kwargs...) = callers(string(func), bt, lidict; kwargs...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-196"></a>196</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">callers(func::Function; kwargs...) = callers(string(func), retrieve()...; kwargs...)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-197"></a>197</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-198"></a>198</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-199"></a>199</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## For --track-allocation
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-200"></a>200</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">##
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-201"></a>201</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Reset the malloc log. Used to avoid counting memory allocated during
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-202"></a>202</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># compilation.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-203"></a>203</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-204"></a>204</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-205"></a>205</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    clear_malloc_data()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-206"></a>206</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-207"></a>207</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Clears any stored memory allocation data when running julia with `--track-allocation`.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-208"></a>208</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Execute the command(s) you want to test (to force JIT-compilation), then call
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-209"></a>209</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">[`clear_malloc_data`](:func:`clear_malloc_data`). Then execute your command(s) again, quit
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-210"></a>210</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Julia, and examine the resulting `*.mem` files.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-211"></a>211</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-212"></a>212</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">clear_malloc_data() = ccall(:jl_clear_malloc_data, Void, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-213"></a>213</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-214"></a>214</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># C wrappers
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-215"></a>215</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">start_timer() = ccall(:jl_profile_start_timer, Cint, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-216"></a>216</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-217"></a>217</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">stop_timer() = ccall(:jl_profile_stop_timer, Void, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-218"></a>218</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-219"></a>219</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">is_running() = ccall(:jl_profile_is_running, Cint, ())!=0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-220"></a>220</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-221"></a>221</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">get_data_pointer() = convert(Ptr{UInt}, ccall(:jl_profile_get_data, Ptr{UInt8}, ()))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-222"></a>222</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-223"></a>223</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">len_data() = convert(Int, ccall(:jl_profile_len_data, Csize_t, ()))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-224"></a>224</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-225"></a>225</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">maxlen_data() = convert(Int, ccall(:jl_profile_maxlen_data, Csize_t, ()))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-226"></a>226</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-227"></a>227</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">error_codes = Dict(
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-228"></a>228</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    -1=&gt;&quot;cannot specify signal action for profiling&quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-229"></a>229</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    -2=&gt;&quot;cannot create the timer for profiling&quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-230"></a>230</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    -3=&gt;&quot;cannot start the timer for profiling&quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-231"></a>231</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    -4=&gt;&quot;cannot unblock SIGUSR1&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-232"></a>232</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-233"></a>233</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-234"></a>234</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-235"></a>235</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    fetch() -&gt; data
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-236"></a>236</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-237"></a>237</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Returns a reference to the internal buffer of backtraces. Note that subsequent operations,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-238"></a>238</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">like [`clear`](:func:`clear`), can affect `data` unless you first make a copy. Note that the
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-239"></a>239</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">values in `data` have meaning only on this machine in the current session, because it
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-240"></a>240</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">depends on the exact memory addresses used in JIT-compiling. This function is primarily for
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-241"></a>241</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">internal use; [`retrieve`](:func:`retrieve`) may be a better choice for most users.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-242"></a>242</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-243"></a>243</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function fetch()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-244"></a>244</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    len = len_data()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-245"></a>245</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    maxlen = maxlen_data()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-246"></a>246</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if (len == maxlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-247"></a>247</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        warn(&quot;The profile data buffer is full; profiling probably terminated\nbefore your program finished. To profile for longer runs, call Profile.init\nwith a larger buffer and/or larger delay.&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-248"></a>248</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-249"></a>249</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    unsafe_wrap(Array, get_data_pointer(), (len,))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-250"></a>250</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-251"></a>251</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-252"></a>252</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-253"></a>253</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Number of backtrace &quot;steps&quot; that are triggered by taking the backtrace, e.g., inside profile_bt
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-254"></a>254</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># TODO: may be platform-specific?
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-255"></a>255</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">const btskip = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-256"></a>256</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-257"></a>257</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## Print as a flat list
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-258"></a>258</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Counts the number of times each line appears, at any nesting level
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-259"></a>259</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function count_flat{T&lt;:Unsigned}(data::Vector{T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-260"></a>260</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    linecount = Dict{T,Int}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-261"></a>261</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    toskip = btskip
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-262"></a>262</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for ip in data
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-263"></a>263</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if toskip &gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-264"></a>264</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            toskip -= 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-265"></a>265</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            continue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-266"></a>266</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-267"></a>267</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if ip == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-268"></a>268</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            toskip = btskip
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-269"></a>269</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            continue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-270"></a>270</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-271"></a>271</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        linecount[ip] = get(linecount, ip, 0)+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-272"></a>272</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-273"></a>273</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    iplist = Array{T}(0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-274"></a>274</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = Array{Int}(0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-275"></a>275</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for (k,v) in linecount
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-276"></a>276</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        push!(iplist, k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-277"></a>277</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        push!(n, v)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-278"></a>278</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-279"></a>279</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return iplist, n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-280"></a>280</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-281"></a>281</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-282"></a>282</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function parse_flat(iplist, n, lidict, C::Bool)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-283"></a>283</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Convert instruction pointers to names &amp; line numbers
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-284"></a>284</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lilist = [lidict[ip] for ip in iplist]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-285"></a>285</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Keep only the interpretable ones
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-286"></a>286</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # The ones with no line number might appear multiple times in a single
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-287"></a>287</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # backtrace, giving the wrong impression about the total number of backtraces.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-288"></a>288</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Delete them too.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-289"></a>289</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    keep = !Bool[x == UNKNOWN || x.line == 0 || (x.from_c &amp;&amp; !C) for x in lilist]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-290"></a>290</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = n[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-291"></a>291</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lilist = lilist[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-292"></a>292</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lilist, n
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-293"></a>293</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-294"></a>294</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-295"></a>295</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function flat{T&lt;:Unsigned}(io::IO, data::Vector{T}, lidict::Dict{T,StackFrame}, C::Bool, combine::Bool, cols::Integer, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-296"></a>296</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if !C
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-297"></a>297</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        data = purgeC(data, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-298"></a>298</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-299"></a>299</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    iplist, n = count_flat(data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-300"></a>300</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if isempty(n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-301"></a>301</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        warning_empty()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-302"></a>302</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-303"></a>303</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-304"></a>304</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lilist, n = parse_flat(iplist, n, lidict, C)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-305"></a>305</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    print_flat(io, lilist, n, combine, cols, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-306"></a>306</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-307"></a>307</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-308"></a>308</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function flat{T&lt;:Unsigned}(io::IO, data::Vector{T}, lidict::Dict{T,Vector{StackFrame}}, C::Bool, combine::Bool, cols::Integer, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-309"></a>309</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newdata, newdict = flatten(data, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-310"></a>310</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    flat(io, newdata, newdict, C, combine, cols, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-311"></a>311</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-312"></a>312</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-313"></a>313</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function print_flat(io::IO, lilist::Vector{StackFrame}, n::Vector{Int}, combine::Bool, cols::Integer, sortedby)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-314"></a>314</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = liperm(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-315"></a>315</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lilist = lilist[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-316"></a>316</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    n = n[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-317"></a>317</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if combine
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-318"></a>318</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        j = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-319"></a>319</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for i = 2:length(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-320"></a>320</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if lilist[i] == lilist[j]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-321"></a>321</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                n[j] += n[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-322"></a>322</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                n[i] = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-323"></a>323</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-324"></a>324</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                j = i
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-325"></a>325</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-326"></a>326</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-327"></a>327</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        keep = n .&gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-328"></a>328</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = n[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-329"></a>329</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lilist = lilist[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-330"></a>330</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-331"></a>331</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if sortedby == :count
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-332"></a>332</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        p = sortperm(n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-333"></a>333</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = n[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-334"></a>334</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lilist = lilist[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-335"></a>335</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-336"></a>336</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    wcounts = max(6, ndigits(maximum(n)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-337"></a>337</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    maxline = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-338"></a>338</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    maxfile = 6
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-339"></a>339</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    maxfunc = 10
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-340"></a>340</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for li in lilist
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-341"></a>341</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        maxline = max(maxline, li.line)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-342"></a>342</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        maxfile = max(maxfile, length(string(li.file)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-343"></a>343</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        maxfunc = max(maxfunc, length(string(li.func)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-344"></a>344</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-345"></a>345</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    wline = max(5, ndigits(maxline))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-346"></a>346</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ntext = cols - wcounts - wline - 3
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-347"></a>347</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    maxfunc += 25
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-348"></a>348</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if maxfile + maxfunc &lt;= ntext
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-349"></a>349</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        wfile = maxfile
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-350"></a>350</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        wfunc = maxfunc
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-351"></a>351</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-352"></a>352</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        wfile = floor(Integer,2*ntext/5)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-353"></a>353</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        wfunc = floor(Integer,3*ntext/5)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-354"></a>354</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-355"></a>355</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    println(io, lpad(&quot;Count&quot;, wcounts, &quot; &quot;), &quot; &quot;, rpad(&quot;File&quot;, wfile, &quot; &quot;), &quot; &quot;, lpad(&quot;Line&quot;, wline, &quot; &quot;), &quot; &quot;, rpad(&quot;Function&quot;, wfunc, &quot; &quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-356"></a>356</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i = 1:length(n)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-357"></a>357</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        li = lilist[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-358"></a>358</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Base.print(io, lpad(string(n[i]), wcounts, &quot; &quot;), &quot; &quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-359"></a>359</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Base.print(io, rpad(rtruncto(string(li.file), wfile), wfile, &quot; &quot;), &quot; &quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-360"></a>360</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Base.print(io, lpad(string(li.line), wline, &quot; &quot;), &quot; &quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-361"></a>361</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        fname = string(li.func)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-362"></a>362</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if !li.from_c &amp;&amp; !isnull(li.linfo)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-363"></a>363</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            fname = sprint(show_spec_linfo, li)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-364"></a>364</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-365"></a>365</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        Base.print(io, rpad(ltruncto(fname, wfunc), wfunc, &quot; &quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-366"></a>366</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        println(io)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-367"></a>367</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-368"></a>368</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-369"></a>369</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-370"></a>370</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## A tree representation
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-371"></a>371</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Identify and counts repetitions of all unique backtraces
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-372"></a>372</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function tree_aggregate{T&lt;:Unsigned}(data::Vector{T})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-373"></a>373</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    iz = find(data .== 0)  # find the breaks between backtraces
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-374"></a>374</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    treecount = Dict{Vector{T},Int}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-375"></a>375</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    istart = 1+btskip
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-376"></a>376</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for iend in iz
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-377"></a>377</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        tmp = data[iend-1:-1:istart]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-378"></a>378</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        treecount[tmp] = get(treecount, tmp, 0)+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-379"></a>379</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        istart = iend+1+btskip
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-380"></a>380</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-381"></a>381</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    bt = Array{Vector{T}}(0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-382"></a>382</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    counts = Array{Int}(0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-383"></a>383</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for (k,v) in treecount
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-384"></a>384</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if !isempty(k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-385"></a>385</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            push!(bt, k)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-386"></a>386</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            push!(counts, v)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-387"></a>387</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-388"></a>388</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-389"></a>389</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    bt, counts
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-390"></a>390</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-391"></a>391</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-392"></a>392</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">tree_format_linewidth(x::StackFrame) = ndigits(x.line)+6
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-393"></a>393</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-394"></a>394</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function tree_format(lilist::Vector{StackFrame}, counts::Vector{Int}, level::Int, cols::Integer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-395"></a>395</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nindent = min(cols&gt;&gt;1, level)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-396"></a>396</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ndigcounts = ndigits(maximum(counts))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-397"></a>397</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ndigline = maximum([tree_format_linewidth(x) for x in lilist])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-398"></a>398</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ntext = cols-nindent-ndigcounts-ndigline-5
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-399"></a>399</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    widthfile = floor(Integer,0.4ntext)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-400"></a>400</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    widthfunc = floor(Integer,0.6ntext)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-401"></a>401</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    strs = Array{String}(length(lilist))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-402"></a>402</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    showextra = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-403"></a>403</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if level &gt; nindent
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-404"></a>404</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        nextra = level-nindent
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-405"></a>405</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        nindent -= ndigits(nextra)+2
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-406"></a>406</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        showextra = true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-407"></a>407</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-408"></a>408</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i = 1:length(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-409"></a>409</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        li = lilist[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-410"></a>410</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if li != UNKNOWN
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-411"></a>411</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            base = &quot; &quot;^nindent
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-412"></a>412</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if showextra
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-413"></a>413</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                base = string(base, &quot;+&quot;, nextra, &quot; &quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-414"></a>414</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-415"></a>415</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if li.line == li.pointer
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-416"></a>416</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                strs[i] = string(base,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-417"></a>417</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                          rpad(string(counts[i]), ndigcounts, &quot; &quot;),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-418"></a>418</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                          &quot; &quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-419"></a>419</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                          &quot;unknown function (pointer: 0x&quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-420"></a>420</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                          hex(li.pointer,2*sizeof(Ptr{Void})),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-421"></a>421</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                          &quot;)&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-422"></a>422</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-423"></a>423</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                fname = string(li.func)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-424"></a>424</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                if !li.from_c &amp;&amp; !isnull(li.linfo)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-425"></a>425</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    fname = sprint(show_spec_linfo, li)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-426"></a>426</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-427"></a>427</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                strs[i] = string(base,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-428"></a>428</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              rpad(string(counts[i]), ndigcounts, &quot; &quot;),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-429"></a>429</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              &quot; &quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-430"></a>430</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              rtruncto(string(li.file), widthfile),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-431"></a>431</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              &quot;:&quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-432"></a>432</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              li.line == -1 ? &quot;?&quot; : string(li.line),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-433"></a>433</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              &quot;; &quot;,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-434"></a>434</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                              ltruncto(fname, widthfunc))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-435"></a>435</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-436"></a>436</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-437"></a>437</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            strs[i] = &quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-438"></a>438</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-439"></a>439</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-440"></a>440</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    strs
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-441"></a>441</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-442"></a>442</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-443"></a>443</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Print a &quot;branch&quot; starting at a particular level. This gets called recursively.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-444"></a>444</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function tree{T&lt;:Unsigned}(io::IO, bt::Vector{Vector{T}}, counts::Vector{Int}, lidict::Dict, level::Int, combine::Bool, cols::Integer, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-445"></a>445</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if level &gt; maxdepth
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-446"></a>446</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-447"></a>447</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-448"></a>448</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Organize backtraces into groups that are identical up to this level
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-449"></a>449</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if combine
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-450"></a>450</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # Combine based on the line information
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-451"></a>451</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        d = Dict{StackFrame,Vector{Int}}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-452"></a>452</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for i = 1:length(bt)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-453"></a>453</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            ip = bt[i][level+1]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-454"></a>454</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            key = lidict[ip]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-455"></a>455</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            indx = Base.ht_keyindex(d, key)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-456"></a>456</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if indx == -1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-457"></a>457</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                d[key] = [i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-458"></a>458</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-459"></a>459</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                push!(d.vals[indx], i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-460"></a>460</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-461"></a>461</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-462"></a>462</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # Generate counts
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-463"></a>463</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        dlen = length(d)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-464"></a>464</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lilist = Array{StackFrame}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-465"></a>465</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        group = Array{Vector{Int}}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-466"></a>466</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = Array{Int}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-467"></a>467</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-468"></a>468</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for (key, v) in d
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-469"></a>469</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lilist[i] = key
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-470"></a>470</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            group[i] = v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-471"></a>471</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            n[i] = sum(counts[v])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-472"></a>472</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-473"></a>473</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-474"></a>474</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-475"></a>475</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # Combine based on the instruction pointer
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-476"></a>476</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        d = Dict{T,Vector{Int}}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-477"></a>477</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for i = 1:length(bt)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-478"></a>478</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            key = bt[i][level+1]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-479"></a>479</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            indx = Base.ht_keyindex(d, key)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-480"></a>480</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if indx == -1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-481"></a>481</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                d[key] = [i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-482"></a>482</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-483"></a>483</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                push!(d.vals[indx], i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-484"></a>484</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-485"></a>485</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-486"></a>486</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # Generate counts, and do the code lookup
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-487"></a>487</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        dlen = length(d)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-488"></a>488</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lilist = Array{StackFrame}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-489"></a>489</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        group = Array{Vector{Int}}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-490"></a>490</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = Array{Int}(dlen)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-491"></a>491</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        i = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-492"></a>492</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for (key, v) in d
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-493"></a>493</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lilist[i] = lidict[key]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-494"></a>494</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            group[i] = v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-495"></a>495</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            n[i] = sum(counts[v])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-496"></a>496</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            i += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-497"></a>497</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-498"></a>498</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-499"></a>499</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Order the line information
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-500"></a>500</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if length(lilist) &gt; 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-501"></a>501</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        p = liperm(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-502"></a>502</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lilist = lilist[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-503"></a>503</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        group = group[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-504"></a>504</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        n = n[p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-505"></a>505</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-506"></a>506</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Generate the string for each line
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-507"></a>507</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    strs = tree_format(lilist, n, level, cols)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-508"></a>508</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # Recurse to the next level
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-509"></a>509</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    len = Int[length(x) for x in bt]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-510"></a>510</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i = 1:length(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-511"></a>511</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if !isempty(strs[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-512"></a>512</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            println(io, strs[i])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-513"></a>513</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-514"></a>514</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        idx = group[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-515"></a>515</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        keep = len[idx] .&gt; level+1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-516"></a>516</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if any(keep)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-517"></a>517</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            idx = idx[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-518"></a>518</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            tree(io, bt[idx], counts[idx], lidict, level+1, combine, cols, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-519"></a>519</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-520"></a>520</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-521"></a>521</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-522"></a>522</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-523"></a>523</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function tree{T&lt;:Unsigned}(io::IO, data::Vector{T}, lidict::Dict{T,StackFrame}, C::Bool, combine::Bool, cols::Integer, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-524"></a>524</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if !C
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-525"></a>525</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        data = purgeC(data, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-526"></a>526</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-527"></a>527</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    bt, counts = tree_aggregate(data)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-528"></a>528</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if isempty(counts)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-529"></a>529</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        warning_empty()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-530"></a>530</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-531"></a>531</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-532"></a>532</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    level = 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-533"></a>533</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    len = Int[length(x) for x in bt]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-534"></a>534</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    keep = len .&gt; 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-535"></a>535</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    tree(io, bt[keep], counts[keep], lidict, level, combine, cols, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-536"></a>536</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-537"></a>537</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-538"></a>538</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function tree{T&lt;:Unsigned}(io::IO, data::Vector{T}, lidict::Dict{T,Vector{StackFrame}}, C::Bool, combine::Bool, cols::Integer, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-539"></a>539</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    newdata, newdict = flatten(data, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-540"></a>540</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    tree(io, newdata, newdict, C, combine, cols, maxdepth)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-541"></a>541</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-542"></a>542</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-543"></a>543</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function callersf(matchfunc::Function, bt::Vector{UInt}, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-544"></a>544</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    counts = Dict{StackFrame, Int}()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-545"></a>545</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    lastmatched = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-546"></a>546</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for id in bt
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-547"></a>547</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if id == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-548"></a>548</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            lastmatched = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-549"></a>549</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            continue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-550"></a>550</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-551"></a>551</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        li = lidict[id]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-552"></a>552</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if lastmatched
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-553"></a>553</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if haskey(counts, li)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-554"></a>554</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                counts[li] += 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-555"></a>555</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-556"></a>556</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                counts[li] = 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-557"></a>557</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-558"></a>558</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-559"></a>559</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        lastmatched = matchfunc(li)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-560"></a>560</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-561"></a>561</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    k = collect(keys(counts))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-562"></a>562</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    v = collect(values(counts))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-563"></a>563</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    p = sortperm(v, rev=true)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-564"></a>564</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    [(v[i], k[i]) for i in p]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-565"></a>565</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-566"></a>566</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-567"></a>567</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Utilities
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-568"></a>568</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function rtruncto(str::String, w::Int)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-569"></a>569</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ret = str
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-570"></a>570</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if length(str) &gt; w
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-571"></a>571</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ret = string(&quot;...&quot;, str[end-w+4:end])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-572"></a>572</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-573"></a>573</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ret
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-574"></a>574</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-575"></a>575</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function ltruncto(str::String, w::Int)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-576"></a>576</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ret = str
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-577"></a>577</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if length(str) &gt; w
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-578"></a>578</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ret = string(str[1:w-4], &quot;...&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-579"></a>579</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-580"></a>580</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ret
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-581"></a>581</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-582"></a>582</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-583"></a>583</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-584"></a>584</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">truncto(str::Symbol, w::Int) = truncto(string(str), w)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-585"></a>585</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-586"></a>586</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># Order alphabetically (file, function) and then by line number
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-587"></a>587</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function liperm(lilist::Vector{StackFrame})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-588"></a>588</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    comb = Array{String}(length(lilist))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-589"></a>589</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    for i = 1:length(lilist)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-590"></a>590</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        li = lilist[i]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-591"></a>591</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if li != UNKNOWN
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-592"></a>592</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            comb[i] = @sprintf(&quot;%s:%s:%06d&quot;, li.file, li.func, li.line)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-593"></a>593</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-594"></a>594</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            comb[i] = &quot;zzz&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-595"></a>595</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-596"></a>596</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-597"></a>597</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sortperm(comb)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-598"></a>598</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-599"></a>599</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-600"></a>600</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">warning_empty() = warn(&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-601"></a>601</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            There were no samples collected. Run your program longer (perhaps by
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-602"></a>602</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            running it multiple times), or adjust the delay between samples with
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-603"></a>603</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            Profile.init().&quot;&quot;&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-604"></a>604</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-605"></a>605</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function purgeC(data, lidict)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-606"></a>606</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    keep = Bool[d == 0 || lidict[d].from_c == false for d in data]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-607"></a>607</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    data[keep]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-608"></a>608</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-609"></a>609</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Lprofile-jl-09745d080c1bd31bdd81-line.html-610"></a>610</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end # module
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

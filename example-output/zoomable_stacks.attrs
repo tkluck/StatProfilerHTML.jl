@@ -1,0 +1,13 @@
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./dSFMT.jl:dsfmt_fill_array_close_open!:81	function=dsfmt_fill_array_close_open!
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./REPL.jl:eval_user_input:53	function=eval_user_input
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./random.jl:rand:297	function=rand
+nothing:myfunc:1	function=myfunc
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./event.jl:#3:67	function=#3
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./random.jl:rand:300	function=rand
+nothing:anonymous	function=anonymous
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./profile.jl:macro expansion;:16	function=macro expansion;
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./random.jl:rand:229	function=rand
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./reduce.jl:mapreduce_impl:275	function=mapreduce_impl
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./random.jl:rand:230	function=rand
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./REPL.jl:macro expansion:95	function=macro expansion
+/home/tkluck/src/julia/usr/bin/../share/julia/base/./random.jl:rand!:347	function=rand!

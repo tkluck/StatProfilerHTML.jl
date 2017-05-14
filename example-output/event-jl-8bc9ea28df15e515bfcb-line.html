@@ -1,0 +1,3958 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="statprofiler.css">
+
+    <title>StatProfiler: /home/tkluck/src/julia/usr/bin/../share/julia/base/./event.jl</title>
+  </head>
+  <body>
+<div class="report-header">
+  <div class="backlink"><a href="index.html">Report index</a></div>
+  <div class="report-title">Devel::StatProfiler report</div>
+  <div class="generated-on">Generated on zo 14 mei 2017 23:17:53 BST</div>
+</div>
+
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</td>
+          <th>Exclusive</th>
+          <th>Inclusive</th>
+          <th>Code</th>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-1"></a>1</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># This file is a part of Julia. License is MIT: http://julialang.org/license
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-2"></a>2</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-3"></a>3</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## condition variables
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-4"></a>4</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-5"></a>5</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-6"></a>6</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Condition()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-7"></a>7</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-8"></a>8</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Create an edge-triggered event source that tasks can wait for. Tasks that call `wait` on a
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-9"></a>9</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">`Condition` are suspended and queued. Tasks are woken up when `notify` is later called on
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-10"></a>10</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">the `Condition`. Edge triggering means that only tasks waiting at the time `notify` is
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-11"></a>11</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">called can be woken up. For level-triggered notifications, you must keep extra state to keep
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-12"></a>12</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">track of whether a notification has happened. The [`Channel`](:class:`Channel`) type does
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-13"></a>13</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">this, and so can be used for level-triggered events.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-14"></a>14</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-15"></a>15</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type Condition
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-16"></a>16</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    waitq::Vector{Any}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-17"></a>17</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-18"></a>18</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Condition() = new([])
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-19"></a>19</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-20"></a>20</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-21"></a>21</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function wait(c::Condition)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-22"></a>22</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ct = current_task()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-23"></a>23</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-24"></a>24</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    push!(c.waitq, ct)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-25"></a>25</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-26"></a>26</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    try
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-27"></a>27</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return wait()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-28"></a>28</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    catch
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-29"></a>29</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        filter!(x-&gt;x!==ct, c.waitq)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-30"></a>30</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        rethrow()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-31"></a>31</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-32"></a>32</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-33"></a>33</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-34"></a>34</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-35"></a>35</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    notify(condition, val=nothing; all=true, error=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-36"></a>36</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-37"></a>37</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Wake up tasks waiting for a condition, passing them `val`. If `all` is `true` (the default),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-38"></a>38</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">all waiting tasks are woken, otherwise only one is. If `error` is `true`, the passed value
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-39"></a>39</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">is raised as an exception in the woken tasks.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-40"></a>40</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-41"></a>41</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">notify(c::Condition, arg::ANY=nothing; all=true, error=false) = notify(c, arg, all, error)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-42"></a>42</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function notify(c::Condition, arg, all, error)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-43"></a>43</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if all
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-44"></a>44</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        for t in c.waitq
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-45"></a>45</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            schedule(t, arg, error=error)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-46"></a>46</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-47"></a>47</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        empty!(c.waitq)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-48"></a>48</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    elseif !isempty(c.waitq)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-49"></a>49</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t = shift!(c.waitq)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-50"></a>50</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        schedule(t, arg, error=error)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-51"></a>51</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-52"></a>52</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-53"></a>53</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-54"></a>54</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-55"></a>55</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">notify1(c::Condition, arg=nothing) = notify(c, arg, all=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-56"></a>56</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-57"></a>57</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">notify_error(c::Condition, err) = notify(c, err, error=true)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-58"></a>58</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">notify1_error(c::Condition, err) = notify(c, err, error=true, all=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-59"></a>59</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-60"></a>60</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-61"></a>61</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># schedule an expression to run asynchronously, with minimal ceremony
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-62"></a>62</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-63"></a>63</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    @schedule
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-64"></a>64</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-65"></a>65</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Wrap an expression in a `Task` and add it to the local machine&#39;s scheduler queue.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-66"></a>66</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-67"></a>67</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="call-sites">
+              <a name="S-home-tkluck-src-julia-usr-bin-share-julia-base-event-jl-3-67"></a>
+              70 (100.00%) samples spent in #3<br />
+            </div>
+            <span class="code">macro schedule(expr)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-68"></a>68</td>
+          <td></td>
+          <td>70 (100.00%)</td>
+          <td>
+            <div class="callees">
+              70 (100.00%)
+              samples spent calling
+              <a href="REPL-jl-cd9ab12b103cbfe44444-line.html#S-home-tkluck-src-julia-usr-bin-share-julia-base-REPL-jl-macro-expansion-95">macro expansion</a><br />
+            </div>
+            <span class="code">    expr = :(()-&gt;($expr))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-69"></a>69</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    :(enq_work(Task($(esc(expr)))))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-70"></a>70</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-71"></a>71</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-72"></a>72</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## scheduler and work queue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-73"></a>73</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-74"></a>74</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">global const Workqueue = Any[]
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-75"></a>75</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-76"></a>76</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function enq_work(t::Task)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-77"></a>77</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.state == :runnable || error(&quot;schedule: Task not runnable&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-78"></a>78</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    ccall(:uv_stop, Void, (Ptr{Void},), eventloop())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-79"></a>79</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    push!(Workqueue, t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-80"></a>80</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.state = :queued
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-81"></a>81</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-82"></a>82</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-83"></a>83</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-84"></a>84</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">schedule(t::Task) = enq_work(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-85"></a>85</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-86"></a>86</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-87"></a>87</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    schedule(t::Task, [val]; error=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-88"></a>88</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-89"></a>89</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Add a task to the scheduler&#39;s queue. This causes the task to run constantly when the system
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-90"></a>90</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">is otherwise idle, unless the task performs a blocking operation such as `wait`.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-91"></a>91</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-92"></a>92</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">If a second argument `val` is provided, it will be passed to the task (via the return value of
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-93"></a>93</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">`yieldto`) when it runs again. If `error` is `true`, the value is raised as an exception in
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-94"></a>94</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">the woken task.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-95"></a>95</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-96"></a>96</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function schedule(t::Task, arg; error=false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-97"></a>97</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # schedule a task to be (re)started with the given value or exception
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-98"></a>98</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if error
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-99"></a>99</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t.exception = arg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-100"></a>100</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-101"></a>101</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t.result = arg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-102"></a>102</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-103"></a>103</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return enq_work(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-104"></a>104</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-105"></a>105</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-106"></a>106</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># fast version of schedule(t,v);wait()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-107"></a>107</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function schedule_and_wait(t::Task, v=nothing)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-108"></a>108</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.state == :runnable || error(&quot;schedule: Task not runnable&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-109"></a>109</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if isempty(Workqueue)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-110"></a>110</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return yieldto(t, v)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-111"></a>111</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-112"></a>112</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t.result = v
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-113"></a>113</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        push!(Workqueue, t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-114"></a>114</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t.state = :queued
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-115"></a>115</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-116"></a>116</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return wait()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-117"></a>117</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-118"></a>118</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-119"></a>119</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-120"></a>120</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    yield()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-121"></a>121</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-122"></a>122</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Switch to the scheduler to allow another scheduled task to run. A task that calls this
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-123"></a>123</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function is still runnable, and will be restarted immediately if there are no other runnable
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-124"></a>124</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">tasks.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-125"></a>125</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-126"></a>126</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">yield() = (enq_work(current_task()); wait())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-127"></a>127</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-128"></a>128</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-129"></a>129</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    yieldto(task, arg = nothing)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-130"></a>130</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-131"></a>131</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Switch to the given task. The first time a task is switched to, the task&#39;s function is
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-132"></a>132</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">called with no arguments. On subsequent switches, `arg` is returned from the task&#39;s last
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-133"></a>133</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">call to `yieldto`. This is a low-level call that only switches tasks, not considering states
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-134"></a>134</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">or scheduling in any way. Its use is discouraged.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-135"></a>135</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-136"></a>136</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">yieldto(t::Task, x::ANY = nothing) = ccall(:jl_switchto, Any, (Any, Any), t, x)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-137"></a>137</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-138"></a>138</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># yield to a task, throwing an exception in it
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-139"></a>139</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function throwto(t::Task, exc)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-140"></a>140</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.exception = exc
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-141"></a>141</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    yieldto(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-142"></a>142</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-143"></a>143</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-144"></a>144</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function wait()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-145"></a>145</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    while true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-146"></a>146</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if isempty(Workqueue)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-147"></a>147</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            c = process_events(true)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-148"></a>148</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if c==0 &amp;&amp; eventloop()!=C_NULL &amp;&amp; isempty(Workqueue)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-149"></a>149</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # if there are no active handles and no runnable tasks, just
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-150"></a>150</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # wait for signals.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-151"></a>151</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                pause()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-152"></a>152</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-153"></a>153</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-154"></a>154</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            t = shift!(Workqueue)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-155"></a>155</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            if t.state != :queued
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-156"></a>156</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # assume this somehow got queued twice,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-157"></a>157</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # probably broken now, but try discarding this switch and keep going
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-158"></a>158</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # can&#39;t throw here, because it&#39;s probably not the fault of the caller to wait
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-159"></a>159</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                # and don&#39;t want to use print() here, because that may try to incur a task switch
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-160"></a>160</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                ccall(:jl_safe_printf, Void, (Ptr{UInt8}, Vararg{Int32}),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-161"></a>161</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    &quot;\nWARNING: Workqueue inconsistency detected: shift!(Workqueue).state != :queued\n&quot;)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-162"></a>162</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                continue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-163"></a>163</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-164"></a>164</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            arg = t.result
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-165"></a>165</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            t.result = nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-166"></a>166</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            t.state = :runnable
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-167"></a>167</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            local result
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-168"></a>168</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            try
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-169"></a>169</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                result = yieldto(t, arg)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-170"></a>170</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                current_task().state == :runnable || throw(AssertionError(&quot;current_task().state == :runnable&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-171"></a>171</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            catch e
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-172"></a>172</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                ct = current_task()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-173"></a>173</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                if ct.state == :queued
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-174"></a>174</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    if t.state == :runnable
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-175"></a>175</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        # assume we failed to queue t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-176"></a>176</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        # return it to the queue to be scheduled later
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-177"></a>177</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        t.result = arg
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-178"></a>178</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        t.state = :queued
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-179"></a>179</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                        push!(Workqueue, t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-180"></a>180</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-181"></a>181</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    # return ourself to the runnable state
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-182"></a>182</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    i = findfirst(Workqueue, ct)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-183"></a>183</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    i == 0 || deleteat!(Workqueue, i)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-184"></a>184</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                    ct.state = :runnable
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-185"></a>185</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-186"></a>186</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                rethrow(e)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-187"></a>187</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-188"></a>188</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            process_events(false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-189"></a>189</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            # return when we come out of the queue
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-190"></a>190</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            return result
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-191"></a>191</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-192"></a>192</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-193"></a>193</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    assert(false)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-194"></a>194</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-195"></a>195</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-196"></a>196</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">if is_windows()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-197"></a>197</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    pause() = ccall(:Sleep, stdcall, Void, (UInt32,), 0xffffffff)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-198"></a>198</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">else
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-199"></a>199</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    pause() = ccall(:pause, Void, ())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-200"></a>200</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-201"></a>201</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-202"></a>202</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-203"></a>203</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## async event notifications
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-204"></a>204</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-205"></a>205</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-206"></a>206</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    AsyncCondition()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-207"></a>207</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-208"></a>208</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Create a async condition that wakes up tasks waiting for it (by calling `wait` on the object)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-209"></a>209</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">when notified from C by a call to uv_async_send.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-210"></a>210</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Waiting tasks are woken with an error when the object is closed (by `close`).
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-211"></a>211</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Use `isopen` to check whether it is still active.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-212"></a>212</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-213"></a>213</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type AsyncCondition
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-214"></a>214</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    handle::Ptr{Void}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-215"></a>215</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    cond::Condition
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-216"></a>216</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-217"></a>217</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    function AsyncCondition()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-218"></a>218</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        this = new(Libc.malloc(_sizeof_uv_async), Condition())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-219"></a>219</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        associate_julia_struct(this.handle, this)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-220"></a>220</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        preserve_handle(this)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-221"></a>221</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        err = ccall(:uv_async_init, Cint, (Ptr{Void}, Ptr{Void}, Ptr{Void}),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-222"></a>222</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            eventloop(), this, uv_jl_asynccb::Ptr{Void})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-223"></a>223</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        this
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-224"></a>224</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-225"></a>225</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-226"></a>226</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-227"></a>227</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">unsafe_convert(::Type{Ptr{Void}}, async::AsyncCondition) = async.handle
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-228"></a>228</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-229"></a>229</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function wait(async::AsyncCondition)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-230"></a>230</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    isopen(async) || throw(EOFError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-231"></a>231</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    wait(async.cond)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-232"></a>232</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-233"></a>233</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-234"></a>234</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isopen(t::AsyncCondition) = (t.handle != C_NULL)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-235"></a>235</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-236"></a>236</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">close(t::AsyncCondition) = ccall(:jl_close_uv, Void, (Ptr{Void},), t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-237"></a>237</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-238"></a>238</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function _uv_hook_close(async::AsyncCondition)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-239"></a>239</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    async.handle = C_NULL
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-240"></a>240</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    unpreserve_handle(async)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-241"></a>241</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    notify_error(async.cond, EOFError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-242"></a>242</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-243"></a>243</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-244"></a>244</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-245"></a>245</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function uv_asynccb(handle::Ptr{Void})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-246"></a>246</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    async = @handle_as handle AsyncCondition
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-247"></a>247</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    notify(async.cond)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-248"></a>248</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-249"></a>249</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-250"></a>250</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-251"></a>251</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-252"></a>252</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    AsyncCondition(callback::Function)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-253"></a>253</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-254"></a>254</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Create a async condition that calls the given `callback` function. The `callback` is passed one argument,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-255"></a>255</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">the async condition object itself.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-256"></a>256</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-257"></a>257</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function AsyncCondition(cb::Function)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-258"></a>258</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    async = AsyncCondition()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-259"></a>259</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    waiter = Task(function()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-260"></a>260</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while isopen(async)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-261"></a>261</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            success = try
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-262"></a>262</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                wait(async)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-263"></a>263</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-264"></a>264</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            catch # ignore possible exception on close()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-265"></a>265</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-266"></a>266</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-267"></a>267</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            success &amp;&amp; cb(async)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-268"></a>268</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-269"></a>269</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-270"></a>270</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # must start the task right away so that it can wait for the AsyncCondition before
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-271"></a>271</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # we re-enter the event loop. this avoids a race condition. see issue #12719
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-272"></a>272</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    enq_work(current_task())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-273"></a>273</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    yieldto(waiter)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-274"></a>274</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return async
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-275"></a>275</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-276"></a>276</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-277"></a>277</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">## timer-based notifications
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-278"></a>278</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-279"></a>279</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-280"></a>280</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Timer(delay, repeat=0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-281"></a>281</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-282"></a>282</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Create a timer that wakes up tasks waiting for it (by calling `wait` on the timer object) at
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-283"></a>283</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">a specified interval.  Times are in seconds.  Waiting tasks are woken with an error when the
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-284"></a>284</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">timer is closed (by `close`). Use `isopen` to check whether a timer is still active.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-285"></a>285</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-286"></a>286</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">type Timer
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-287"></a>287</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    handle::Ptr{Void}
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-288"></a>288</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    cond::Condition
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-289"></a>289</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    isopen::Bool
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-290"></a>290</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-291"></a>291</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    function Timer(timeout::Real, repeat::Real=0.0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-292"></a>292</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        timeout ≥ 0 || throw(ArgumentError(&quot;timer cannot have negative timeout of $timeout seconds&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-293"></a>293</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        repeat ≥ 0 || throw(ArgumentError(&quot;timer cannot have negative repeat interval of $repeat seconds&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-294"></a>294</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-295"></a>295</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        this = new(Libc.malloc(_sizeof_uv_timer), Condition(), true)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-296"></a>296</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        err = ccall(:uv_timer_init, Cint, (Ptr{Void}, Ptr{Void}), eventloop(), this)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-297"></a>297</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        if err != 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-298"></a>298</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            #TODO: this codepath is currently not tested
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-299"></a>299</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            Libc.free(this.handle)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-300"></a>300</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            this.handle = C_NULL
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-301"></a>301</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            throw(UVError(&quot;uv_make_timer&quot;,err))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-302"></a>302</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-303"></a>303</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-304"></a>304</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        associate_julia_struct(this.handle, this)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-305"></a>305</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        preserve_handle(this)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-306"></a>306</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-307"></a>307</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ccall(:uv_update_time, Void, (Ptr{Void},), eventloop())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-308"></a>308</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ccall(:uv_timer_start,  Cint,  (Ptr{Void}, Ptr{Void}, UInt64, UInt64),
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-309"></a>309</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              this, uv_jl_timercb::Ptr{Void},
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-310"></a>310</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">              UInt64(round(timeout * 1000)) + 1, UInt64(round(repeat * 1000)))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-311"></a>311</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        return this
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-312"></a>312</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-313"></a>313</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-314"></a>314</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-315"></a>315</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">unsafe_convert(::Type{Ptr{Void}}, t::Timer) = t.handle
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-316"></a>316</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-317"></a>317</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function wait(t::Timer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-318"></a>318</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    isopen(t) || throw(EOFError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-319"></a>319</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    wait(t.cond)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-320"></a>320</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-321"></a>321</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-322"></a>322</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">isopen(t::Timer) = t.isopen
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-323"></a>323</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-324"></a>324</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function close(t::Timer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-325"></a>325</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if t.handle != C_NULL
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-326"></a>326</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        t.isopen = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-327"></a>327</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ccall(:uv_timer_stop, Cint, (Ptr{Void},), t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-328"></a>328</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        ccall(:jl_close_uv, Void, (Ptr{Void},), t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-329"></a>329</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-330"></a>330</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-331"></a>331</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-332"></a>332</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-333"></a>333</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function _uv_hook_close(t::Timer)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-334"></a>334</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    unpreserve_handle(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-335"></a>335</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    disassociate_julia_struct(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-336"></a>336</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.handle = C_NULL
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-337"></a>337</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t.isopen = false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-338"></a>338</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    notify_error(t.cond, EOFError())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-339"></a>339</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-340"></a>340</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-341"></a>341</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-342"></a>342</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function uv_timercb(handle::Ptr{Void})
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-343"></a>343</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t = @handle_as handle Timer
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-344"></a>344</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    if ccall(:uv_timer_get_repeat, UInt64, (Ptr{Void},), t) == 0
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-345"></a>345</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        # timer is stopped now
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-346"></a>346</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        close(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-347"></a>347</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-348"></a>348</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    notify(t.cond)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-349"></a>349</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-350"></a>350</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-351"></a>351</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-352"></a>352</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-353"></a>353</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sleep(seconds)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-354"></a>354</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-355"></a>355</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Block the current task for a specified number of seconds. The minimum sleep time is 1
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-356"></a>356</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">millisecond or input of `0.001`.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-357"></a>357</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-358"></a>358</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function sleep(sec::Real)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-359"></a>359</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    sec ≥ 0 || throw(ArgumentError(&quot;cannot sleep for $sec seconds&quot;))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-360"></a>360</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    wait(Timer(sec))
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-361"></a>361</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    nothing
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-362"></a>362</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-363"></a>363</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-364"></a>364</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code"># timer with repeated callback
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-365"></a>365</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-366"></a>366</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    Timer(callback::Function, delay, repeat=0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-367"></a>367</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-368"></a>368</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">Create a timer to call the given `callback` function. The `callback` is passed one argument,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-369"></a>369</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">the timer object itself. The callback will be invoked after the specified initial `delay`,
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-370"></a>370</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">and then repeating with the given `repeat` interval. If `repeat` is `0`, the timer is only
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-371"></a>371</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">triggered once. Times are in seconds. A timer is stopped and has its resources freed by
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-372"></a>372</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">calling `close` on it.
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-373"></a>373</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">&quot;&quot;&quot;
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-374"></a>374</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">function Timer(cb::Function, timeout::Real, repeat::Real=0.0)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-375"></a>375</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    t = Timer(timeout, repeat)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-376"></a>376</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    waiter = Task(function()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-377"></a>377</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        while isopen(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-378"></a>378</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            success = try
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-379"></a>379</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                wait(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-380"></a>380</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                true
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-381"></a>381</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            catch # ignore possible exception on close()
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-382"></a>382</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">                false
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-383"></a>383</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-384"></a>384</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">            success &amp;&amp; cb(t)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-385"></a>385</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">        end
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-386"></a>386</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    end)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-387"></a>387</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # must start the task right away so that it can wait for the Timer before
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-388"></a>388</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    # we re-enter the event loop. this avoids a race condition. see issue #12719
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-389"></a>389</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    enq_work(current_task())
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-390"></a>390</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    yieldto(waiter)
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-391"></a>391</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">    return t
+</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td><a name="Levent-jl-8bc9ea28df15e515bfcb-line.html-392"></a>392</td>
+          <td></td>
+          <td></td>
+          <td>
+            <span class="code">end
+</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
