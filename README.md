@@ -18,7 +18,6 @@ Müller's excellent
 a statistical profiler for Perl. As such, it depends on a few CPAN modules:
 
     File::ShareDir
-    Sereal
     Text::MicroTemplate
 
 Future development intends to get rid of these dependencies.
