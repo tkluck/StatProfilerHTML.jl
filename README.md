@@ -17,7 +17,6 @@ Müller's excellent
 [Devel::StatProfiler](https://github.com/mbarbon/devel-statprofiler), which is
 a statistical profiler for Perl. As such, it depends on a few CPAN modules:
 
-    Archive::Zip
     File::ShareDir
     Sereal
     Text::MicroTemplate

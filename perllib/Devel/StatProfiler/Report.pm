@@ -6,7 +6,6 @@ use warnings;
 use autodie qw(open close chdir);
 
 use Devel::StatProfiler::Reader;
-use Devel::StatProfiler::EvalSource;
 use Devel::StatProfiler::SourceMap;
 use Devel::StatProfiler::Metadata;
 use Devel::StatProfiler::Utils qw(
@@ -55,19 +54,12 @@ sub new {
             files     => {},
         },
         $opts{sources} ? (
-            source    => Devel::StatProfiler::EvalSource->new(
-                serializer     => $opts{serializer},
-                genealogy      => {},
-                root_dir       => $opts{root_directory},
-                shard          => $opts{shard},
-            ),
             sourcemap => Devel::StatProfiler::SourceMap->new(
                 serializer     => $opts{serializer},
                 root_dir       => $opts{root_directory},
                 shard          => $opts{shard},
             ),
         ) : (
-            source    => undef,
             sourcemap => undef,
         ),
         metadata     => Devel::StatProfiler::Metadata->new(
@@ -225,8 +217,6 @@ sub add_trace_file {
         if $self->{genealogy};
     $eval_mapper->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
         if $eval_mapper;
-    $self->{source}->update_genealogy($process_id, $process_ordinal, $parent_id, $parent_ordinal)
-        if $self->{source};
 
     unless(ref $r eq 'Devel::StatProfiler::Reader::Text') {
         $self->_check_consistency(
@@ -307,12 +297,9 @@ sub add_trace_file {
             if @for_flamegraph;
     }
 
-    $self->{source}->add_sources_from_reader($r) if $self->{source};
     $self->{sourcemap}->add_sources_from_reader($r) if $self->{sourcemap};
 
     my $metadata = $r->get_custom_metadata;
-    $self->{metadata}->set_at_inc($metadata->{"\x00at_inc"})
-        if $self->{source} && $metadata->{"\x00at_inc"};
 }
 
 sub _map_hash_rx {
@@ -463,20 +450,6 @@ sub remap_names {
     _map_hash_rx($flames, $file_map_qr, $file_repl_sub, $exact, \&_merge_file_map_entry);
 }
 
-sub map_source {
-    my ($self) = @_;
-    my %eval_map;
-
-    for my $file (keys %{$self->{aggregate}{files}}) {
-        next unless $file =~ m{^qeval:([0-9a-f]+)/(.+)$};
-        my $hash = $self->{source}->get_hash_by_name($1, $2);
-
-        $eval_map{$file} = "eval:$hash" if $hash;
-    }
-
-    $self->remap_names(\%eval_map) if %eval_map;
-}
-
 sub merge {
     my ($self, $report) = @_;
 
@@ -620,7 +593,6 @@ sub _save {
         write_data_any($is_part, $self, $state_dir, 'genealogy', $self->{genealogy})
             if $self->{genealogy} && %{$self->{genealogy}};
         $self->{metadata}->save_report_part($report_dir);
-        $self->{source}->save_part if $self->{source};
     } else {
         $self->{metadata}->save_report_merged($report_dir);
     }
@@ -704,13 +676,6 @@ sub _fetch_source {
     # unmapped evals
     if ($path =~ /^qeval:/) {
         return [], $NO_SOURCE;
-    }
-
-    # eval source code
-    if ($self->{source} && $path =~ /^eval:([0-9a-fA-F]+)$/) {
-        if (my $source = $self->{source}->get_source_by_hash($1)) {
-            return [], ['Eval source code...', split /\n/, $source];
-        }
     }
 
     my ($input, $fh);
@@ -943,8 +908,8 @@ sub output {
     my ($self, $directory, $compress, $fetchers) = @_;
     my @diagnostics;
 
-    die "Unable to create report without a source map and an eval map"
-        unless $self->{source} and $self->{sourcemap};
+    die "Unable to create report without a source map"
+        unless $self->{sourcemap};
 
     File::Path::mkpath([$directory]);
 
