@@ -3,7 +3,6 @@ module StatProfilerHTML
 export statprofilehtml
 
 using Base.Profile
-using Iterators
 
 beacon() = "dummy function to use functionloc for finding the path"
 pkg_basepath() = dirname(dirname(functionloc(beacon)[1]))
