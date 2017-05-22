@@ -45,6 +45,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
             end
         end
         close(formatter)
+        wait(process)
     end
 end
 
