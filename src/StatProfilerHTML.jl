@@ -13,9 +13,10 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
     end
 
     basepath = pkg_basepath()
+    sharepath = joinpath(basepath, "share")
 
     withenv("PERL5LIB" => "$basepath/perllib") do
-        formatter, process =  open(`$basepath/bin/statprofilehtml`, "w", STDOUT)
+        formatter, process =  open(`$basepath/bin/statprofilehtml $sharepath`, "w", STDOUT)
 
         lastwaszero = false
         for d in data

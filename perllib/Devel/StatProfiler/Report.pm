@@ -16,7 +16,6 @@ use Devel::StatProfiler::Utils qw(
     write_data_any
 );
 use Devel::StatProfiler::FlameGraph;
-use File::ShareDir;
 use File::Basename ();
 use File::Spec::Functions ();
 use File::Copy ();
@@ -84,7 +83,7 @@ sub new {
     }, $class;
 
     if ($self->{flamegraph}) {
-        my $fg = File::ShareDir::dist_file('Devel-StatProfiler', 'flamegraph.pl');
+        my $fg = File::Spec::Functions::catfile($Devel::StatProfiler::SHARE_DIR, 'flamegraph.pl');
         $self->{fg_cmd} = "$^X $fg --nametype=sub --countname=samples";
     }
 
@@ -95,7 +94,7 @@ sub new {
 
 sub _get_template {
     my ($basename) = @_;
-    my $path = File::ShareDir::dist_file('Devel-StatProfiler', $basename);
+    my $path = File::Spec::Functions::catfile($Devel::StatProfiler::SHARE_DIR, $basename);
     my $tmpl = do {
         local $/;
         open my $fh, '<:utf8', $path or die "Unable to open '$path': $!";
@@ -1209,10 +1208,10 @@ sub output {
 
     # copy CSS/JS
     File::Copy::copy(
-        File::ShareDir::dist_file('Devel-StatProfiler', 'statprofiler.css'),
+        File::Spec::Functions::catfile($Devel::StatProfiler::SHARE_DIR, 'statprofiler.css'),
         File::Spec::Functions::catfile($directory, 'statprofiler.css'));
     File::Copy::copy(
-        File::ShareDir::dist_file('Devel-StatProfiler', 'sorttable.js'),
+        File::Spec::Functions::catfile($Devel::StatProfiler::SHARE_DIR, 'sorttable.css'),
         File::Spec::Functions::catfile($directory, 'sorttable.js'));
 
     $self->complete_flamegraphs($flamegraphs) if $flamegraphs;

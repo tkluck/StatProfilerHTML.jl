@@ -5,11 +5,14 @@
 use 5.12.0;
 use warnings;
 
+BEGIN {
+    die "Please pass the share directory as the first argument" unless @ARGV == 1;
+    $Devel::StatProfiler::SHARE_DIR = shift @ARGV;
+}
+
 use Devel::StatProfiler::Report;
 use Devel::StatProfiler::Reader;
 use Devel::StatProfiler::Reader::Text;
-
-my @files = @ARGV;
 
 my $outdir = 'statprof';
 
@@ -19,14 +22,7 @@ my $report = Devel::StatProfiler::Report->new(
     mixed_process   => 1,
 );
 
-@files = glob('statprof.out.*')
-    if not @files;
-@files = glob('statprof.out')
-    if not @files;
-die "Missing input files (via ARGV or 'statprof.out.*' or 'statprof.out'\n"
-    if not @files;
-
-my $r = Devel::StatProfiler::Reader::Text->new(\*ARGV);
+my $r = Devel::StatProfiler::Reader::Text->new(\*STDIN);
 $report->add_trace_file($r);
 
 my $diagnostics = $report->output($outdir);
@@ -34,3 +30,7 @@ my $diagnostics = $report->output($outdir);
 for my $diagnostic (@$diagnostics) {
     print STDERR $diagnostic, "\n";
 }
+
+package Devel::StatProfiler;
+
+our $SHARE_DIR;

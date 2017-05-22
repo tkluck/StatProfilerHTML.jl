@@ -17,7 +17,6 @@ Müller's excellent
 [Devel::StatProfiler](https://github.com/mbarbon/devel-statprofiler), which is
 a statistical profiler for Perl. As such, it depends on a few CPAN modules:
 
-    File::ShareDir
     Text::MicroTemplate
 
 Future development intends to get rid of these dependencies.

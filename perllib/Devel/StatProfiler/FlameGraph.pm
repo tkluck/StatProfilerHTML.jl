@@ -3,7 +3,6 @@ package Devel::StatProfiler::FlameGraph;
 use strict;
 use warnings;
 
-use File::ShareDir;
 use File::Spec::Functions;
 use IPC::Open3 ();
 use Cwd ();
@@ -11,7 +10,7 @@ use Symbol ();
 
 my @BASE_CMD = (
     $^X,
-    File::ShareDir::dist_file('Devel-StatProfiler', 'flamegraph.pl'),
+    File::Spec::Functions::catfile($Devel::StatProfiler::SHARE_DIR, 'flamegraph.pl'),
     '--nametype=sub',
     '--countname=samples',
 );
