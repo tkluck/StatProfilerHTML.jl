@@ -15,8 +15,5 @@ is the result of profiling
 This module contains a fork of the rendering part of Mattia Barbon and Steffen
 Müller's excellent
 [Devel::StatProfiler](https://github.com/mbarbon/devel-statprofiler), which is
-a statistical profiler for Perl. As such, it depends on a few CPAN modules:
-
-    Text::MicroTemplate
-
-Future development intends to get rid of these dependencies.
+a statistical profiler for Perl. It depends on Text::MicroTemplate, which for
+convenience, we ship as part of this bundle.
