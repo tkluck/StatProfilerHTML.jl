@@ -956,7 +956,7 @@ sub output {
 
     my $file_link = sub {
         my ($file, $line) = @_;
-        my $report = $self->{aggregate}{files}{$file}{report};
+        my $report = $self->_file($file)->{report};
 
         # twice, because we have physical files with source code for
         # multiple logical files (via #line directives)
