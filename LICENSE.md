@@ -1,6 +1,19 @@
-The StatProfilerHTML.jl package is licensed under the GNU Public License, Version 3.0+:
+Copyright (c) 2017 Timo Kluck.
 
-> Copyright (c) 2017: Timo Kluck.
+- This package is based on Devel::StatsProfiler, which is (c) 2013-2017 by
+    - Mattia Barbon
+    - Steffen Mueller
+- This package ships a copy of Text::Microtemplate, which is (c) 2008-2015 by
+    - Kazuho Oku
+    - Tokuhiro Matsuno
+    - Sebastian Riedel (through Mojo::Template)
+
+All has been made available to the public under GPL-compatible licenses by
+respective copyright holders.
+
+# LICENSE TEXT
+The StatProfilerHTML.jl package is licensed under the GNU Public License, Version 3.0+:
+>
 > This program is free software: you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
 > the Free Software Foundation, either version 3 of the License, or
