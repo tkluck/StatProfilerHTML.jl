@@ -4,15 +4,13 @@ export statprofilehtml
 
 using Base.Profile
 
-beacon() = "dummy function to use functionloc for finding the path"
-pkg_basepath() = dirname(dirname(functionloc(beacon)[1]))
+const basepath = dirname(@__DIR__)
 
 function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
     end
 
-    basepath = pkg_basepath()
     sharepath = joinpath(basepath, "share")
 
     withenv("PERL5LIB" => "$basepath/perllib") do
