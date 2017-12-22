@@ -4,17 +4,17 @@ export statprofilehtml
 
 using Base.Profile
 
-const basepath = dirname(@__DIR__)
-
 function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
     end
 
-    sharepath = joinpath(basepath, "share")
+    sharepath       = Pkg.dir("StatProfilerHTML", "share")
+    statprofilehtml = Pkg.dir("StatProfilerHTML", "bin", "statprofilehtml")
+    perllib         = Pkg.dir("StatProfilerHTML", "perllib")
 
-    withenv("PERL5LIB" => "$basepath/perllib") do
-        formatter, process =  open(`$basepath/bin/statprofilehtml $sharepath`, "w", STDOUT)
+    withenv("PERL5LIB" => perllib) do
+        formatter, process =  open(`$statprofilehtml $sharepath`, "w", STDOUT)
 
         lastwaszero = false
         for d in data
