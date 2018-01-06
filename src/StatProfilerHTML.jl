@@ -2,7 +2,13 @@ module StatProfilerHTML
 
 export statprofilehtml
 
-using Base.Profile
+if VERSION >= v"0.7-"
+    using Profile
+    with_value(f, x) = x !== nothing && f(x)
+else
+    using Base.Profile
+    with_value(f, x) = !isnull(x) && f(get(x))
+end
 
 function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
     if length(data) == 0
@@ -32,8 +38,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
                 if !frame.from_c
                     file = Base.find_source_file(string(frame.file))
                     func_line = frame.line
-                    if !isnull(frame.linfo)
-                        linfo = get(frame.linfo)
+                    with_value(frame.linfo) do linfo
                         func_line = linfo.def.line - 1  # off-by-one difference between how StatProfiler and julia seem to map this
                     end
 
