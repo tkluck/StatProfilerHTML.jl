@@ -2,7 +2,7 @@
 
 | **PackageEvaluator**                                            | **Build Status**                                                                                |
 |:---------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
-|[![][pkg-0.6-img]][pkg-0.6-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] [![][codecov-img]][codecov-url] |
+|[![][pkg-0.6-img]][pkg-0.6-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] |
 
 
 This module formats the output from Julia's Profile module into an html
@@ -28,9 +28,6 @@ convenience, we ship as part of this bundle.
 
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/mwnbnfp1gjm8ux3d?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/tkluck/statprofilerhtml-jl
-
-[codecov-img]: https://codecov.io/gh/tkluck/StatProfiler.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/tkluck/StatProfilerHTML.jl
 
 [pkg-0.6-img]: http://pkg.julialang.org/badges/StatProfilerHTML_0.6.svg
 [pkg-0.6-url]: http://pkg.julialang.org/?pkg=StatProfilerHTML
