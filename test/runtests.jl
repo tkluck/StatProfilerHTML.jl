@@ -11,12 +11,12 @@ fibonacci(n) = n <= 2 ? 1 : fibonacci(n-1) + fibonacci(n-2)
 
 @testset "StatPofilerHTML" begin
     mktempdir() do dir
-        cd(dir)
+        cd(dir) do
+            @profile fibonacci(43)
 
-        @profile fibonacci(43)
+            statprofilehtml()
 
-        statprofilehtml()
-
-        @test isdir("statprof")
+            @test isdir("statprof")
+        end
     end
 end
