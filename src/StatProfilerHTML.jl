@@ -16,7 +16,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
     end
 
     sharepath       = Pkg.dir("StatProfilerHTML", "share")
-    statprofilehtml = Pkg.dir("StatProfilerHTML", "bin", "statprofilehtml")
+    statprofilehtml = Pkg.dir("StatProfilerHTML", "bin", "statprofilehtml.pl")
     perllib         = Pkg.dir("StatProfilerHTML", "perllib")
 
     withenv("PERL5LIB" => perllib) do
