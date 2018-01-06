@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/bin/env perl
 # PODNAME: statprofilehtml
 # ABSTRACT: generate Devel::StatProfiler HTML report
 
