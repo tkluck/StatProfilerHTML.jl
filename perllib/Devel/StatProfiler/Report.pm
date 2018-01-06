@@ -1124,6 +1124,9 @@ sub output {
     # logical files (just copies the content of the report written by
     # the loop above
     for my $file (@second_pass) {
+        # In case julia doesn't know the source file, it will write 'nothing'.
+        # This often happens, so lets not write useless warnings.
+        $file eq "nothing" && next;
         # this can only be a mapped copy of an existing file
         my $reverse_file = $self->{sourcemap}->get_reverse_mapping($file);
 
