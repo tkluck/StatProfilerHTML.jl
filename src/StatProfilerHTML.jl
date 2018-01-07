@@ -21,7 +21,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
 
     withenv("PERL5LIB" => perllib) do
         open(`perl $statprofilehtml $sharepath`, "w", STDOUT) do formatter
-            lastwaszero = false
+            lastwaszero = true
             for d in data
                 if d == 0
                     if !lastwaszero
