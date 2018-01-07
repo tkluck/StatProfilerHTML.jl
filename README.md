@@ -1,8 +1,8 @@
 # StatProfilerHTML
 
-| **PackageEvaluator**                                            | **Build Status**                                                                                |
-|:---------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
-|[![][pkg-0.6-img]][pkg-0.6-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] |
+| **PackageEvaluator**           | **Build Status**                                                | **Test coverage**                                       |
+|:------------------------------:|:---------------------------------------------------------------:|:-------------------------------------------------------:|
+|[![][pkg-0.6-img]][pkg-0.6-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![Coverage Status][coveralls-img]][coveralls-url]      |
 
 
 This module formats the output from Julia's Profile module into an html
@@ -31,3 +31,6 @@ convenience, we ship as part of this bundle.
 
 [pkg-0.6-img]: http://pkg.julialang.org/badges/StatProfilerHTML_0.6.svg
 [pkg-0.6-url]: http://pkg.julialang.org/?pkg=StatProfilerHTML
+
+[coveralls-img]: https://coveralls.io/repos/github/tkluck/StatProfilerHTML.jl/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/github/tkluck/StatProfilerHTML.jl?branch=master
