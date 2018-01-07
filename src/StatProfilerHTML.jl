@@ -20,7 +20,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
     perllib         = Pkg.dir("StatProfilerHTML", "perllib")
 
     withenv("PERL5LIB" => perllib) do
-        formatter, process =  open(`$statprofilehtml $sharepath`, "w", STDOUT)
+        formatter, process =  open(`perl $statprofilehtml $sharepath`, "w", STDOUT)
 
         lastwaszero = false
         for d in data
