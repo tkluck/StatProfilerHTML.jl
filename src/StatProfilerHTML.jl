@@ -4,6 +4,7 @@ export statprofilehtml
 
 if VERSION >= v"0.7-"
     using Profile
+    using Base.StackTraces: StackFrame
     with_value(f, x) = x !== nothing && f(x)
 else
     using Base.Profile
