@@ -3,12 +3,14 @@ module StatProfilerHTML
 export statprofilehtml
 
 if VERSION >= v"0.7-"
+    using Pkg
     using Profile
     using Base.StackTraces: StackFrame
     with_value(f, x) = x !== nothing && f(x)
 else
     using Base.Profile
     with_value(f, x) = !isnull(x) && f(get(x))
+    stdout = STDOUT
 end
 
 function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
@@ -21,7 +23,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
     perllib         = Pkg.dir("StatProfilerHTML", "perllib")
 
     withenv("PERL5LIB" => perllib) do
-        open(`perl $statprofilehtml $sharepath`, "w", STDOUT) do formatter
+        open(`perl $statprofilehtml $sharepath`, "w", stdout) do formatter
             lastwaszero = true
             for d in data
                 if d == 0
