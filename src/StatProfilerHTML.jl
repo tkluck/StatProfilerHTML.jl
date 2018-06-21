@@ -13,17 +13,18 @@ else
     stdout = STDOUT
 end
 
+const basepath           = dirname(@__DIR__)
+const sharepath          = joinpath(basepath, "share")
+const statprofilehtml_pl = joinpath(basepath, "bin", "statprofilehtml.pl")
+const perllib            = joinpath(basepath, "perllib")
+
 function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
     end
 
-    sharepath       = Pkg.dir("StatProfilerHTML", "share")
-    statprofilehtml = Pkg.dir("StatProfilerHTML", "bin", "statprofilehtml.pl")
-    perllib         = Pkg.dir("StatProfilerHTML", "perllib")
-
     withenv("PERL5LIB" => perllib) do
-        open(`perl $statprofilehtml $sharepath`, "w", stdout) do formatter
+        open(`perl $statprofilehtml_pl $sharepath`, "w", stdout) do formatter
             lastwaszero = true
             for d in data
                 if d == 0
