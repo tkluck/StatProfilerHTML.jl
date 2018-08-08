@@ -44,7 +44,8 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
                             func_line = linfo.def.line - 1  # off-by-one difference between how StatProfiler and julia seem to map this
                         end
 
-                        write(formatter, "$(file)\t$(frame.line)\t$(frame.func)\t$(func_line)\n")
+                        file_repr = file == nothing ? "nothing" : file
+                        write(formatter, "$(file_repr)\t$(frame.line)\t$(frame.func)\t$(func_line)\n")
                         lastwaszero = false
                     end
                 end
