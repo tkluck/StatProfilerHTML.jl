@@ -3,7 +3,6 @@ module StatProfilerHTML
 export statprofilehtml
 
 if VERSION >= v"0.7-"
-    using Pkg
     using Profile
     using Base.StackTraces: StackFrame
     with_value(f, x) = x !== nothing && f(x)
