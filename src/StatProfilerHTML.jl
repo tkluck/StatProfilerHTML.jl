@@ -7,6 +7,7 @@ if VERSION >= v"0.7-"
     using Base.StackTraces: StackFrame
     with_value(f, x) = x !== nothing && f(x)
 else
+    using Compat: @info
     using Base.Profile
     with_value(f, x) = !isnull(x) && f(get(x))
     stdout = STDOUT
