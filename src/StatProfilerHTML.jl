@@ -18,7 +18,8 @@ const sharepath          = joinpath(basepath, "share")
 const statprofilehtml_pl = joinpath(basepath, "bin", "statprofilehtml.pl")
 const perllib            = joinpath(basepath, "perllib")
 
-function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}())
+function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}();
+                         from_c=false)
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
     end
@@ -38,7 +39,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
                 # all of them
                 frames= litrace[d]
                 for frame in frames
-                    if !frame.from_c
+                  if !frame.from_c || from_c
                         file = Base.find_source_file(string(frame.file))
                         func_line = frame.line
                         with_value(frame.linfo) do linfo
