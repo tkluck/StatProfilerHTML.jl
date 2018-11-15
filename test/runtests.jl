@@ -26,7 +26,7 @@ end
         cd(dir) do
             @profile fibonacci(43)
 
-            statprofilehtml(C=true)
+            statprofilehtml(from_c=true)
 
             @test isdir("statprof")
         end
