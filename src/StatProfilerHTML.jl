@@ -29,6 +29,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
     withenv("PERL5LIB" => perllib) do
         open(`perl $statprofilehtml_pl $sharepath`, "w", stdout) do formatter
             lastwaszero = true
+            last_was_invoke = false
             for d in data
                 if d == 0
                     if !lastwaszero
@@ -38,6 +39,9 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
                     continue
                 end
                 frame = litrace[d]
+                if frame.func == :jl_invoke || frame.func == :jl_apply_generic
+                    last_was_invoke = true
+                end
                 if !frame.from_c || from_c
                     file = Base.find_source_file(string(frame.file))
                     func_line = frame.line
@@ -45,8 +49,14 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
                         func_line = linfo.def.line - 1  # off-by-one difference between how StatProfiler and julia seem to map this
                     end
 
+                    func_name = frame.func
+                    if last_was_invoke
+                        func_name = "[invoked] $func_name"
+                        last_was_invoke = false
+                    end
+
                     file_repr = file == nothing ? "nothing" : file
-                    write(formatter, "$(file_repr)\t$(frame.line)\t$(frame.func)\t$(func_line)\n")
+                    write(formatter, "$(file_repr)\t$(frame.line)\t$(func_name)\t$(func_line)\n")
                     lastwaszero = false
                 end
             end

@@ -1045,6 +1045,8 @@ while (my ($id, $node) = each %Node) {
 	my $color;
 	if ($func eq "-") {
 		$color = $vdgrey;
+	} elsif ($displayfunc =~ /^\[invoked\] /) {
+		$color = $white;
 	} elsif (defined $delta) {
 		$color = color_scale($delta, $maxdelta);
 	} elsif ($palette) {
