@@ -3,6 +3,9 @@ uuid = "7957ca88-7554-11e8-9c82-b34c04f5d4e2"
 author = ["Timo Kluck <tkluck@infty.nl>"]
 version = "0.4.0"
 
+[compat]
+julia = "1.0"
+
 [deps]
 Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

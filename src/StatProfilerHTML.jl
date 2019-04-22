@@ -2,16 +2,9 @@ module StatProfilerHTML
 
 export statprofilehtml
 
-if VERSION >= v"0.7-"
-    using Profile
-    using Base.StackTraces: StackFrame
-    with_value(f, x) = x !== nothing && f(x)
-else
-    using Compat: @info
-    using Base.Profile
-    with_value(f, x) = !isnull(x) && f(get(x))
-    stdout = STDOUT
-end
+using Profile
+using Base.StackTraces: StackFrame
+with_value(f, x) = x !== nothing && f(x)
 
 const basepath           = dirname(@__DIR__)
 const sharepath          = joinpath(basepath, "share")
