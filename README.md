@@ -32,10 +32,6 @@ a statistical profiler for Perl. It depends on Text::MicroTemplate, which for
 convenience, we ship as part of this bundle.
 
 
-## Line number bug
-On the latest version of Julia, this package is severly affected by the
-issue with line numbers [as tracked in this bug report](https://github.com/JuliaLang/julia/issues/28618). Julia developers will hopefully fix this soon!
-
 [travis-img]: https://travis-ci.org/tkluck/StatProfilerHTML.jl.svg?branch=master
 [travis-url]: https://travis-ci.org/tkluck/StatProfilerHTML.jl
 
