@@ -9,17 +9,20 @@
 This module formats the output from Julia's Profile module into an html
 rendering of the source function lines and functions, allowing for interactive
 exploration of any bottlenecks that may exist in your code.
-To use this just call `statprofilehtml()` after running the julia Profiler
+
+There's two ways of using this:
+
+ - call `statprofilehtml()` after running the julia profiler in the normal way; or
+ - use the `@profilehtml` macro.
 
 
 Have a look [at this example output](http://www.infty.nl/StatProfilerHTML.jl/example-output/), which
 is the result of profiling
 
-    using Profile, StatProfilerHTML    
+    using StatProfilerHTML
     using MultivariatePolynomials
     @polyvar x y z
-    @profile (x + y + z)^120;
-    statprofilehtml()
+    @profilehtml (x + y + z)^120;
 
 
 This module contains a fork of the rendering part of Mattia Barbon and Steffen
