@@ -32,3 +32,13 @@ end
         end
     end
 end
+
+@testset "@profilehtml" begin
+    mktempdir() do dir
+        cd(dir) do
+            @profilehtml fibonacci(43)
+
+            @test isdir("statprof")
+        end
+    end
+end

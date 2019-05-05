@@ -52,8 +52,14 @@ end
 macro profilehtml(expr)
     quote
         Profile.clear()
-        @profile $(esc(expr))
+        res = try
+            @profile $(esc(expr))
+        catch ex
+            ex isa InterruptException || rethrow(ex)
+            @info "You interrupted the computation; generating profiling view for the computation so far."
+        end
         statprofilehtml()
+        res
     end
 end
 
