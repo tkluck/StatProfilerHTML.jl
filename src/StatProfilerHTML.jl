@@ -46,7 +46,7 @@ function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{S
         end
     end
 
-    @info "Wrote profiling output to file://$(pwd())/statprof/index.html"
+    @info "Wrote profiling output to file://$(pwd())/statprof/index.html ."
 end
 
 macro profilehtml(expr)
