@@ -1,7 +1,7 @@
 name = "StatProfilerHTML"
 uuid = "7957ca88-7554-11e8-9c82-b34c04f5d4e2"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "0.4.0"
+version = "0.5.0"
 
 [compat]
 julia = "1.0"
