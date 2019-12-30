@@ -857,23 +857,25 @@ sub start_flamegraphs {
     );
 
     my $clickable = Devel::StatProfiler::FlameGraph->new(
-        directory   => $directory,
-        traces      => 'all_stacks_by_time.calls',
-        output      => 'clickable_stacks_by_time.svg',
-        attributes  => 'clickable_stacks.attrs',
-        args        => {
-            total   => $self->{aggregate}{total},
-            title   => "Flame Graph",
+        directory    => $directory,
+        traces       => 'all_stacks_by_time.calls',
+        output       => 'clickable_stacks_by_time.svg',
+        attributes   => 'clickable_stacks.attrs',
+        extra_args   => {
+            total    => $self->{aggregate}{total},
+            title    => "Flame Graph",
+            encoding => "utf-8",
         },
     );
     my $zoomable = Devel::StatProfiler::FlameGraph->new(
-        directory   => $directory,
-        traces      => 'all_stacks_by_time.calls',
-        output      => 'zoomable_stacks_by_time.svg',
-        attributes  => 'zoomable_stacks.attrs',
-        args        => {
-            total   => $self->{aggregate}{total},
-            title   => "Zoomable Flame Graph",
+        directory    => $directory,
+        traces       => 'all_stacks_by_time.calls',
+        output       => 'zoomable_stacks_by_time.svg',
+        attributes   => 'zoomable_stacks.attrs',
+        extra_args   => {
+            total    => $self->{aggregate}{total},
+            title    => "Zoomable Flame Graph",
+            encoding => "utf-8",
         },
     );
 
