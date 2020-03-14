@@ -1,7 +1,7 @@
 name = "StatProfilerHTML"
 uuid = "a8a75453-ed82-57c9-9e16-4cd1196ecbf5"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "1.0.0"
+version = "1.1"
 
 [deps]
 Base64 = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -14,4 +14,4 @@ ProfileSVG = "132c30aa-f267-4189-9183-c8a63c7e05e6"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-julia = "1.0"
+julia = "1.3"
