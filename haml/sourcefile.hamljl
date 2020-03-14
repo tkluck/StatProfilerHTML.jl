@@ -1,0 +1,47 @@
+!!! 5
+%html
+  %head
+    %meta(http_equiv="Content-Type", content="text/html; charset=utf-8")
+    %link(rel="stylesheet", type="text/css", href="statprofiler.css")
+    %title StatProfilerHTML - $($filename)
+  %body
+    - @include("reportheader.hamljl", report=$report)
+    %table
+      %caption File source code
+      %thead
+        %tr
+          %th Line
+          %th Exclusive
+          %th Inclusive
+          %th Code
+      %tbody
+        - fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
+        - for (point, code) in $lines
+          %tr(id="L$(point.line)")
+            %td.lineno= point.line
+            %td.tracecount.excl= $report.traces_by_point[point].exclusive |> fmtcount($report.tracecount)
+            %td.tracecount.incl= $report.traces_by_point[point].inclusive |> fmtcount($report.tracecount)
+            %td
+              - if (callsites = get($report.callsites, point, nothing)) |> !isnothing
+                .call-sites
+                  - total = sum(c -> c.inclusive, values(callsites))
+                  = total |> fmtcount($report.tracecount)
+                  samples spent in $($report.functionnames[point])
+                  %br/
+                  - for (callsite, cnt) in pairs(callsites)
+                    = cnt.exclusive |> fmtcount(total, " (ex.),")
+                    = cnt.inclusive |> fmtcount(total, " (incl.)")
+                    when called from $(callsite.containing_function.name)
+                    %a(href=href(callsite)) line $(callsite.point.line)
+                    %br/
+              - if (callees = get($report.callees, point, nothing)) |> !isnothing
+                .callees
+                  - total = sum(values(callees))
+                  - for (callee, cnt) in pairs(callees)
+                    = cnt |> fmtcount(total)
+                    samples spent calling
+                    %a(href=href(callee))= callee.name
+                    %br/
+              %span.code= code
+
+-# vim: set filetype=haml:

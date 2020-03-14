@@ -1,0 +1,15 @@
+%table
+  %caption Methods sorted by exclusive sample count
+  %thead
+    %tr
+      %th Exclusive
+      %th Inclusive
+      %th Method
+  %tbody
+    - for fn in $methods
+      %tr
+        %td= $report.traces_by_function[fn].exclusive
+        %td= $report.traces_by_function[fn].inclusive
+        %td
+          %a(href=href(fn))= fn.name
+-# vim: set filetype=haml:

@@ -25,13 +25,6 @@ is the result of profiling
     @profilehtml (x + y + z)^120;
 
 
-This module contains a fork of the rendering part of Mattia Barbon and Steffen
-Müller's excellent
-[Devel::StatProfiler](https://github.com/mbarbon/devel-statprofiler), which is
-a statistical profiler for Perl. It depends on Text::MicroTemplate, which for
-convenience, we ship as part of this bundle.
-
-
 [travis-img]: https://travis-ci.org/tkluck/StatProfilerHTML.jl.svg?branch=master
 [travis-url]: https://travis-ci.org/tkluck/StatProfilerHTML.jl
 

@@ -1,11 +1,17 @@
 name = "StatProfilerHTML"
 uuid = "a8a75453-ed82-57c9-9e16-4cd1196ecbf5"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "1.0"
+version = "1.0.0"
+
+[deps]
+Base64 = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+FlameGraphs = "08572546-2f56-4bcf-ba4e-bab62c3a3f89"
+HAML = "0bc81568-2411-4001-9bf1-c899fa54f385"
+Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+ProfileSVG = "132c30aa-f267-4189-9183-c8a63c7e05e6"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 julia = "1.0"
-
-[deps]
-Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

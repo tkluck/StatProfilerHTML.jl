@@ -1,0 +1,8 @@
+.report-header
+  .backlink
+    %a(href="index.html") Report index
+  .report-title
+    StatProfilerHTML.jl report
+  .generated-on
+    Generated on $(format($report.generated_on, RFC1123Format))
+-# vim: set filetype=haml:

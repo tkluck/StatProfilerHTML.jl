@@ -1,0 +1,10 @@
+!!! 5
+%html
+  %head
+    %meta(http_equiv="Content-Type", content="text/html; charset=utf-8")
+    %link(rel="stylesheet", type="text/css", href="statprofiler.css")
+    %title StatProfilerHTML - file list
+  %body
+    - @include("reportheader.hamljl", report=$report)
+    - @include("filetable.hamljl", report=$report, files=$report.sorted_files)
+-# vim: set filetype=haml:

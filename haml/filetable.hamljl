@@ -1,0 +1,13 @@
+%table
+  %caption Files sorted by exclusive sample count
+  %thead
+    %tr
+      %th Exclusive
+      %th Report
+  %tbody
+    - for file in $files
+      %tr
+        %td= $report.traces_by_file[file].exclusive
+        %td
+          %a(href=outputfilename(file))= file
+-# vim: set filetype=haml:
