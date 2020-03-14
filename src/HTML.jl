@@ -51,6 +51,7 @@ output(r::Report, path) = begin
 
     for file in keys(r.traces_by_file)
         isnothing(file) && continue
+        isfile(string(file)) || continue
         lines = [
             (LineNumberNode(i, file), code)
             for (i, code) in enumerate(readlines(string(file)))
