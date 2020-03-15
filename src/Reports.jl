@@ -1,9 +1,11 @@
 module Reports
 
 import Base.StackTraces: StackFrame
-
 import Dates: now
+import Profile
+
 import DataStructures: DefaultDict
+import FlameGraphs: flamegraph
 
 struct FunctionPoint
     point :: LineNumberNode
@@ -46,6 +48,7 @@ mutable struct Report
     callees
     functionnames
     tracecount
+    flamegraph
     generated_on
 end
 
@@ -59,8 +62,38 @@ Report() = Report(
     DefaultDict{LineNumberNode, DefaultDict{FunctionPoint, Int}}(() -> DefaultDict{FunctionPoint, Int}(() -> 0)),
     DefaultDict{LineNumberNode, Symbol}(() -> Symbol("#error: no name#")),
     0,
+    nothing,
     now(),
 )
+
+
+Report(data::Vector{UInt}, litrace::Dict{UInt, Vector{StackFrame}}, from_c) = begin
+    report = Report()
+
+    report.flamegraph = flamegraph(data, lidict=litrace, C=from_c)
+
+    data, litrace = Profile.flatten(data, litrace)
+
+    lastwaszero = true
+    trace = StackFrame[]
+    for d in data
+        if d == 0
+            if !lastwaszero
+                push!(report, trace)
+                empty!(trace)
+            end
+            lastwaszero = true
+            continue
+        end
+        frame = litrace[d]
+        if !frame.from_c || from_c
+            push!(trace, frame)
+            lastwaszero = false
+        end
+    end
+
+    return report
+end
 
 Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     for frame in trace

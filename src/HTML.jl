@@ -4,6 +4,7 @@ import Base64: base64encode
 
 import Dates: format, RFC1123Format
 import HAML: includehaml, @include
+import ProfileSVG
 
 import ..Reports: Report, FunctionPoint, TracePoint
 
@@ -48,6 +49,8 @@ output(r::Report, path) = begin
     open(joinpath(path, "files.html"), "w") do io
         render_files(io; report=r)
     end
+
+    ProfileSVG.save("statprof/flamegraph.svg", r.flamegraph)
 
     for file in keys(r.traces_by_file)
         isnothing(file) && continue
