@@ -68,11 +68,15 @@ Report() = Report(
     now(),
 )
 
-
 Report(data::Vector{UInt}, litrace::Dict{UInt, Vector{StackFrame}}, from_c) = begin
     report = Report()
 
-    report.flamegraph = flamegraph(data, lidict=litrace, C=from_c)
+    seenfunctions = Dict{FunctionPoint, StackFrame}()
+    function_representative(sf) = get!(seenfunctions, TracePoint(sf).containing_function, sf)
+
+    merged_litrace = Dict(ix => map(function_representative, sfs) for (ix, sfs) in pairs(litrace))
+
+    report.flamegraph = flamegraph(data, lidict=merged_litrace, C=from_c)
 
     data, litrace = Profile.flatten(data, litrace)
 
