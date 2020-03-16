@@ -20,7 +20,7 @@ Have a look [at this example output](http://www.infty.nl/StatProfilerHTML.jl/exa
 is the result of profiling
 
     using StatProfilerHTML
-    using MultivariatePolynomials
+    using TypedPolynomials
     @polyvar x y z
     @profilehtml (x + y + z)^120;
 
