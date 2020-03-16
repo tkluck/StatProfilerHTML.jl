@@ -3,7 +3,7 @@ module HTML
 import Base64: base64encode
 
 import Dates: format, RFC1123Format
-import HAML: includehaml, @include, @surround, @output
+import HAML: includehaml, @include, @surround, @cdatafile
 
 import ..Reports: Report, FunctionPoint, TracePoint
 

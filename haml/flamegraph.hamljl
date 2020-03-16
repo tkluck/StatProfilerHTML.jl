@@ -10,8 +10,7 @@
   %style(type="text/css")
     \.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
   %script(type="text/ecmascript")
-    - for line in eachline(joinpath(@__DIR__, "flamegraph.js"))
-      - @output line
+    - @cdatafile("flamegraph.js")
   %rect(x=0.0, y=0, width=1200.0, height=height, fill="url(#background)")/
   %text(text_anchor="", x=10.0, y=height, font_size=12, font_family="Verdana",
         fill="rgb(0,0,0)", dominant_baseline="ideographic", id="details")= " "
