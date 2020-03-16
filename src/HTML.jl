@@ -9,11 +9,13 @@ import ..Reports: Report, FunctionPoint, TracePoint
 
 templatefile(name...) = joinpath(@__DIR__, "..", "haml", name...)
 
-includehaml(@__MODULE__, :render_sourcefile, templatefile("sourcefile.hamljl"))
-includehaml(@__MODULE__, :render_index, templatefile("index.hamljl"))
-includehaml(@__MODULE__, :render_files, templatefile("files.hamljl"))
-includehaml(@__MODULE__, :render_methods, templatefile("methods.hamljl"))
-includehaml(@__MODULE__, :render_flamegraph, templatefile("flamegraph.hamljl"))
+includehaml(@__MODULE__,
+    :render_sourcefile => templatefile("sourcefile.hamljl"),
+    :render_index      => templatefile("index.hamljl"),
+    :render_files      => templatefile("files.hamljl"),
+    :render_methods    => templatefile("methods.hamljl"),
+    :render_flamegraph => templatefile("flamegraph.hamljl"),
+)
 
 outputfilename(::Nothing) = ""
 outputfilename(sourcefile::Symbol) = begin
