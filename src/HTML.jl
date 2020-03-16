@@ -3,8 +3,7 @@ module HTML
 import Base64: base64encode
 
 import Dates: format, RFC1123Format
-import HAML: includehaml, @include
-import ProfileSVG
+import HAML: includehaml, @include, @surround, @output
 
 import ..Reports: Report, FunctionPoint, TracePoint
 
@@ -14,6 +13,7 @@ includehaml(@__MODULE__, :render_sourcefile, templatefile("sourcefile.hamljl"))
 includehaml(@__MODULE__, :render_index, templatefile("index.hamljl"))
 includehaml(@__MODULE__, :render_files, templatefile("files.hamljl"))
 includehaml(@__MODULE__, :render_methods, templatefile("methods.hamljl"))
+includehaml(@__MODULE__, :render_flamegraph, templatefile("flamegraph.hamljl"))
 
 outputfilename(::Nothing) = ""
 outputfilename(sourcefile::Symbol) = begin
@@ -34,6 +34,8 @@ href(pt::TracePoint) = begin
     return "$fn#$anchor"
 end
 
+fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
+
 output(r::Report, path) = begin
     mkpath(path)
     cp(templatefile("statprofiler.css"), joinpath(path, "statprofiler.css"), force=true)
@@ -50,7 +52,9 @@ output(r::Report, path) = begin
         render_files(io; report=r)
     end
 
-    ProfileSVG.save("statprof/flamegraph.svg", r.flamegraph)
+    open(joinpath(path, "flamegraph.svg"), "w") do io
+        render_flamegraph(io; report=r)
+    end
 
     for file in keys(r.traces_by_file)
         isnothing(file) && continue

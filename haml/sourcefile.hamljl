@@ -15,7 +15,6 @@
           %th Inclusive
           %th Code
       %tbody
-        - fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
         - for (point, code) in $lines
           %tr(id="L$(point.line)")
             %td.lineno= point.line

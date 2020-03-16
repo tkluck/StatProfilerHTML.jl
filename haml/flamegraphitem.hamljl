@@ -1,0 +1,24 @@
+- pt = TracePoint($node.data.sf)
+- span = $node.data.span
+- cnt = length(span)
+- width = $scale * cnt
+- label = pt.containing_function.name
+-# heuristic from Brendan Gregg's flamegraph.pl
+- show_label = (12 * 0.59) * length(string(label)) < width
+-# 'hot' color scheme from Brendan Gregg's flamegraph.pl
+- r, g, b = rand(205:254), rand(0:229), rand(0:54)
+- fillcolor = "rgb($r, $g, $b)"
+%g(class="func_g", onmouseover="s(this)", onmouseout="c()")
+  %title<
+    = pt.containing_function.name
+    - @surround("(", ")") do
+      = cnt |> fmtcount($report.tracecount)
+  %a(target="_top", Symbol("xlink:href") => href(pt.containing_function))
+    %rect(x=$x[], y=$y, width=width, height=15.0, fill=fillcolor, rx=2, ry=2)/
+    %text(text_anchor="", x=$x[] + 3, y=$y + 10.5, font_size=12, font_family="Verdana", fill="rgb(0,0,0)")= show_label ? label : " "
+- curx = Ref($x[])
+- for child in $node
+  - @include("flamegraphitem.hamljl", report=$report, node=child,
+        x=curx, y=$y - 16, scale=$scale)
+- $x[] += width
+-# vim: set filetype=haml:

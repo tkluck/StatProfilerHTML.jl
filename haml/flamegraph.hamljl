@@ -1,0 +1,20 @@
+- height = 16 * $report.maxdepth + 20
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+%svg(version="1.1", width=1200, height=height,
+     viewBox="0 0 1200 $height", xmlns="http://www.w3.org/2000/svg", Symbol("xmlns:xlink") => "http://www.w3.org/1999/xlink")
+  %defs
+    %linearGradient(id="background", y1=0, y2=1, x1=0, x2=0)
+      %stop(stop_color="#eeeeee", offset="5%")/
+      %stop(stop_color="#eeeeb0", offset="95%")/
+  %style(type="text/css")
+    \.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+  %script(type="text/ecmascript")
+    - for line in eachline(joinpath(@__DIR__, "flamegraph.js"))
+      - @output line
+  %rect(x=0.0, y=0, width=1200.0, height=height, fill="url(#background)")/
+  %text(text_anchor="", x=10.0, y=height, font_size=12, font_family="Verdana",
+        fill="rgb(0,0,0)", dominant_baseline="ideographic", id="details")= " "
+  - @include("flamegraphitem.hamljl", report=$report, node=$report.flamegraph,
+        x=Ref(0.0), y=height-20-16, scale = 1200.0 / $report.tracecount)
+-# vim: set filetype=haml:

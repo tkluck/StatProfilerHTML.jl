@@ -49,6 +49,7 @@ mutable struct Report
     functionnames
     tracecount
     flamegraph
+    maxdepth
     generated_on
 end
 
@@ -63,6 +64,7 @@ Report() = Report(
     DefaultDict{LineNumberNode, Symbol}(() -> Symbol("#error: no name#")),
     0,
     nothing,
+    0,
     now(),
 )
 
@@ -128,6 +130,7 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     end
 
     r.tracecount += 1
+    r.maxdepth = max(r.maxdepth, length(trace))
 
     return r
 end
