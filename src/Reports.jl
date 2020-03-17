@@ -68,7 +68,7 @@ Report() = Report(
     now(),
 )
 
-Report(data::Vector{UInt}, litrace::Dict{UInt, Vector{StackFrame}}, from_c) = begin
+Report(data::Vector{UInt}, litrace::Dict{UInt64, Vector{StackFrame}}, from_c) = begin
     report = Report()
 
     seenfunctions = Dict{FunctionPoint, StackFrame}()

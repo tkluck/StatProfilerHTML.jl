@@ -11,7 +11,7 @@ import .HTML: output
 using Profile
 using Base.StackTraces: StackFrame
 
-function statprofilehtml(data::Array{UInt,1} = UInt[],litrace::Dict{UInt,Array{StackFrame,1}} = Dict{UInt,Array{StackFrame,1}}();
+function statprofilehtml(data::Vector{UInt} = UInt[],litrace::Dict{UInt64, Vector{StackFrame}} = Dict{UInt64, Vector{StackFrame}}();
                          from_c=false)
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
