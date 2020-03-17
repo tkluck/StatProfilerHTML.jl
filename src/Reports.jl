@@ -68,15 +68,19 @@ Report() = Report(
     now(),
 )
 
-Report(data::Vector{UInt}, litrace::LineInfoDict, from_c) = begin
+Report(data::Vector{<:Unsigned}, litrace::LineInfoDict, from_c) = begin
     report = Report()
 
+    # point different lines of the same function to the same stack frame --
+    # we show line-by-line info in the source files, not in the flame graph.
     seenfunctions = Dict{FunctionPoint, StackFrame}()
     function_representative(sf) = get!(seenfunctions, TracePoint(sf).containing_function, sf)
-
     merged_litrace = Dict(ix => map(function_representative, sfs) for (ix, sfs) in pairs(litrace))
 
-    report.flamegraph = flamegraph(data, lidict=merged_litrace, C=from_c)
+    # 32-bit support: it seems Profile is a bit undecided about whether `data`
+    # is a Vector{UInt} or a Vector{UInt64}. flamegraph calls methods where
+    # it _has_ to be UInt64 even on 32 bits platforms
+    report.flamegraph = flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c)
 
     data, litrace = flatten(data, litrace)
 

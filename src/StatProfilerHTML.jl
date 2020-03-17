@@ -12,7 +12,7 @@ import Profile: LineInfoDict
 import .Reports: Report
 import .HTML: output
 
-function statprofilehtml(data::Vector{UInt} = UInt[], litrace::LineInfoDict = LineInfoDict();
+function statprofilehtml(data::Vector{<:Unsigned} = UInt[], litrace::LineInfoDict = LineInfoDict();
                          from_c=false)
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
