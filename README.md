@@ -2,7 +2,7 @@
 
 | **Build Status**                                                | **Test coverage**                                       |
 |:---------------------------------------------------------------:|:-------------------------------------------------------:|
-| [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![Coverage Status][coveralls-img]][coveralls-url]      |
+| [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![Coverage Status][codecov-img]][codecov-url]      |
 |                                                                 |                                                         |
 
 
@@ -31,5 +31,5 @@ is the result of profiling
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/mwnbnfp1gjm8ux3d?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/tkluck/statprofilerhtml-jl
 
-[coveralls-img]: https://coveralls.io/repos/github/tkluck/StatProfilerHTML.jl/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/github/tkluck/StatProfilerHTML.jl?branch=master
+[codecov-img]: https://codecov.io/gh/tkluck/StatProfilerHTML.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/tkluck/StatProfilerHTML.jl
