@@ -2,7 +2,7 @@ module Reports
 
 import Base.StackTraces: StackFrame
 import Dates: now
-import Profile
+import Profile: flatten, LineInfoDict
 
 import DataStructures: DefaultDict
 import FlameGraphs: flamegraph
@@ -68,7 +68,7 @@ Report() = Report(
     now(),
 )
 
-Report(data::Vector{UInt}, litrace::Dict{UInt64, Vector{StackFrame}}, from_c) = begin
+Report(data::Vector{UInt}, litrace::LineInfoDict, from_c) = begin
     report = Report()
 
     seenfunctions = Dict{FunctionPoint, StackFrame}()
@@ -78,7 +78,7 @@ Report(data::Vector{UInt}, litrace::Dict{UInt64, Vector{StackFrame}}, from_c) = 
 
     report.flamegraph = flamegraph(data, lidict=merged_litrace, C=from_c)
 
-    data, litrace = Profile.flatten(data, litrace)
+    data, litrace = flatten(data, litrace)
 
     lastwaszero = true
     trace = StackFrame[]

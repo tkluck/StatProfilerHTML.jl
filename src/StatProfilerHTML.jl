@@ -5,13 +5,14 @@ export statprofilehtml, @profilehtml
 include("Reports.jl")
 include("HTML.jl")
 
+import Base.StackTraces: StackFrame
+import Profile
+import Profile: LineInfoDict
+
 import .Reports: Report
 import .HTML: output
 
-using Profile
-using Base.StackTraces: StackFrame
-
-function statprofilehtml(data::Vector{UInt} = UInt[],litrace::Dict{UInt64, Vector{StackFrame}} = Dict{UInt64, Vector{StackFrame}}();
+function statprofilehtml(data::Vector{UInt} = UInt[], litrace::LineInfoDict = LineInfoDict();
                          from_c=false)
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
@@ -28,7 +29,7 @@ macro profilehtml(expr)
     quote
         Profile.clear()
         res = try
-            @profile $(esc(expr))
+            Profile.@profile $(esc(expr))
         catch ex
             ex isa InterruptException || rethrow(ex)
             @info "You interrupted the computation; generating profiling view for the computation so far."
