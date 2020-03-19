@@ -2,7 +2,7 @@ module Reports
 
 import Base.StackTraces: StackFrame
 import Dates: now
-import Profile: flatten, LineInfoDict
+import Profile: flatten
 
 import DataStructures: DefaultDict
 import FlameGraphs: flamegraph
@@ -68,7 +68,7 @@ Report() = Report(
     now(),
 )
 
-Report(data::Vector{<:Unsigned}, litrace::LineInfoDict, from_c) = begin
+Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c) = begin
     report = Report()
 
     # point different lines of the same function to the same stack frame --
