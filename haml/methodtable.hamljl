@@ -8,8 +8,8 @@
   %tbody
     - for fn in $methods
       %tr
-        %td= $report.traces_by_function[fn].exclusive
-        %td= $report.traces_by_function[fn].inclusive
+        %td= $report.traces_by_function[fn].exclusive |> fmtcount($report.tracecount)
+        %td= $report.traces_by_function[fn].inclusive |> fmtcount($report.tracecount)
         %td
           %a(href=href(fn))= fn.name
 -# vim: set filetype=haml:

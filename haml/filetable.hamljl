@@ -7,7 +7,7 @@
   %tbody
     - for file in $files
       %tr
-        %td= $report.traces_by_file[file].exclusive
+        %td= $report.traces_by_file[file].exclusive |> fmtcount($report.tracecount)
         %td
           %a(href=outputfilename(file))= file
 -# vim: set filetype=haml:
