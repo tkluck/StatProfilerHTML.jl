@@ -3,7 +3,7 @@ module HTML
 import Base64: base64encode
 
 import Dates: format, RFC1123Format
-import HAML: includehaml, @include, @surround, @cdatafile
+import HAML: includehaml, @include, @surround, @cdatafile, @output
 
 import ..Reports: Report, FunctionPoint, TracePoint
 
@@ -15,6 +15,7 @@ includehaml(@__MODULE__,
     :render_files      => templatefile("files.hamljl"),
     :render_methods    => templatefile("methods.hamljl"),
     :render_flamegraph => templatefile("flamegraph.hamljl"),
+    :render_flamegraphitem => templatefile("flamegraphitem.hamljl"),
 )
 
 outputfilename(::Nothing) = ""

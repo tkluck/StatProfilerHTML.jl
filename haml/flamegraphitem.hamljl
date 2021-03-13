@@ -1,5 +1,5 @@
-- pt = TracePoint($node.data.sf)
-- span = $node.data.span
+- pt = TracePoint($node[].data.sf)
+- span = $node[].data.span
 - cnt = length(span)
 - width = $scale * cnt
 - label = pt.containing_function.name
@@ -17,8 +17,8 @@
     %rect(x=$x[], y=$y, width=width, height=15.0, fill=fillcolor, rx=2, ry=2)/
     %text(text_anchor="", x=$x[] + 3, y=$y + 10.5, font_size=12, font_family="Verdana", fill="rgb(0,0,0)")= show_label ? label : " "
 - curx = Ref($x[])
-- for child in $node
-  - @include("flamegraphitem.hamljl", report=$report, node=child,
+- for child in $node[]
+  - @output render_flamegraphitem(report=$report, node=Ref{Any}(child),
         x=curx, y=$y - 16, scale=$scale)
 - $x[] += width
 -# vim: set filetype=haml:
