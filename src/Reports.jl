@@ -18,9 +18,13 @@ struct TracePoint
     from_c              :: Bool
 end
 
+const found_source_files = Dict{Symbol, Union{Nothing, Symbol}}()
+
 TracePoint(frame::StackFrame) = begin
-    file = Base.find_source_file(string(frame.file))
-    file = isnothing(file) ? nothing : Symbol(file)
+    file = get!(found_source_files, frame.file) do
+        res = Base.find_source_file(string(frame.file))
+        isnothing(res) ? nothing : Symbol(res)
+    end
 
     func_line = isnothing(frame.linfo) ? frame.line : frame.linfo.def.line - 1
 
