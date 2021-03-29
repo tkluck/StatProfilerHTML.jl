@@ -1,7 +1,7 @@
 module Reports
 
 import Base.StackTraces: StackFrame
-import Dates: now
+import Dates: DateTime, now
 import Profile: flatten
 
 import DataStructures: DefaultDict
@@ -42,39 +42,43 @@ end
 
 TraceCounts() = TraceCounts(0, 0)
 
-mutable struct Report
-    traces_by_point
-    traces_by_function
-    traces_by_file
-    sorted_functions
-    sorted_files
-    callsites
-    callees
-    functionnames
-    tracecount
-    flamegraph
-    maxdepth
-    generated_on
+mutable struct Report{Dict1, Dict2, Dict3, Dict4, Dict5, Dict6, FlameGraph}
+    traces_by_point    :: Dict1
+    traces_by_function :: Dict2
+    traces_by_file     :: Dict3
+    sorted_functions   :: Vector{FunctionPoint}
+    sorted_files       :: Vector{Union{Nothing, Symbol}}
+    callsites          :: Dict4
+    callees            :: Dict5
+    functionnames      :: Dict6
+    tracecount         :: Int
+    flamegraph         :: FlameGraph
+    maxdepth           :: Int
+    generated_on       :: DateTime
 end
 
-Report() = Report(
+default4() = TraceCounts()
+default0() = 0
+default1() = DefaultDict{TracePoint, TraceCounts}(default4)
+default2() = DefaultDict{FunctionPoint, Int}(default0)
+default3() = Symbol("#error: no name#")
+
+Report(flamegraph, generated_on=now()) = Report(
     DefaultDict{LineNumberNode, TraceCounts}(TraceCounts),
     DefaultDict{FunctionPoint, TraceCounts}(TraceCounts),
     DefaultDict{Union{Nothing, Symbol}, TraceCounts}(TraceCounts),
-    FunctionPoint[],
-    Symbol[],
-    DefaultDict{LineNumberNode, DefaultDict{TracePoint, TraceCounts}}(() -> DefaultDict{TracePoint, TraceCounts}(TraceCounts)),
-    DefaultDict{LineNumberNode, DefaultDict{FunctionPoint, Int}}(() -> DefaultDict{FunctionPoint, Int}(() -> 0)),
-    DefaultDict{LineNumberNode, Symbol}(() -> Symbol("#error: no name#")),
+    Vector{FunctionPoint}(),
+    Vector{Union{Nothing, Symbol}}(),
+    DefaultDict{LineNumberNode, DefaultDict{TracePoint, TraceCounts, typeof(default4)}}(default1),
+    DefaultDict{LineNumberNode, DefaultDict{FunctionPoint, Int, typeof(default0)}}(default2),
+    DefaultDict{LineNumberNode, Symbol}(default3),
     0,
-    nothing,
+    flamegraph,
     0,
-    now(),
+    generated_on,
 )
 
 Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c) = begin
-    report = Report()
-
     # point different lines of the same function to the same stack frame --
     # we show line-by-line info in the source files, not in the flame graph.
     seenfunctions = Dict{FunctionPoint, StackFrame}()
@@ -84,7 +88,7 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
     # 32-bit support: it seems Profile is a bit undecided about whether `data`
     # is a Vector{UInt} or a Vector{UInt64}. flamegraph calls methods where
     # it _has_ to be UInt64 even on 32 bits platforms
-    report.flamegraph = flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c)
+    report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c))
 
     data, litrace = flatten(data, litrace)
 
