@@ -110,8 +110,8 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
 end
 
 Base.push!(r::Report, trace::Vector{StackFrame}) = begin
-    for frame in trace
-        pt = TracePoint(frame)
+    trace = TracePoint.(trace)
+    for pt in trace
         r.traces_by_point[pt.point].inclusive += 1
         r.traces_by_function[pt.containing_function].inclusive += 1
         r.traces_by_file[pt.point.file].inclusive += 1
@@ -119,24 +119,21 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
         r.functionnames[pt.containing_function.point] = pt.containing_function.name
     end
 
-    length(trace) > 0 && let frame = trace[1]
-        pt = TracePoint(frame)
+    length(trace) > 0 && let pt = trace[1]
         r.traces_by_point[pt.point].exclusive += 1
         r.traces_by_function[pt.containing_function].exclusive += 1
         r.traces_by_file[pt.point.file].exclusive += 1
     end
 
     for (callee, caller) in @views zip(trace[1:end-1], trace[2:end])
-        caller = TracePoint(caller)
-        callee = TracePoint(callee).containing_function
+        callee = callee.containing_function
 
         r.callsites[callee.point][caller].inclusive += 1
         r.callees[caller.point][callee] += 1
     end
 
     length(trace) > 1 && let (callee, caller) = (trace[1], trace[2])
-        caller = TracePoint(caller)
-        callee = TracePoint(callee).containing_function
+        callee = callee.containing_function
 
         r.callsites[callee.point][caller].exclusive += 1
     end
