@@ -39,23 +39,29 @@ end
 
 fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
 
+if VERSION >= v"1.5"
+    lockfreeopenwrite(f, filename) = open(f, filename, write=true, lock=false)
+else
+    lockfreeopenwrite(f, filename) = open(f, filename, write=true)
+end
+
 output(r::Report, path) = begin
     mkpath(path)
     cp(templatefile("statprofiler.css"), joinpath(path, "statprofiler.css"), force=true)
 
-    open(joinpath(path, "index.html"), "w") do io
+    lockfreeopenwrite(joinpath(path, "index.html")) do io
         render_index(io; report=r)
     end
 
-    open(joinpath(path, "methods.html"), "w") do io
+    lockfreeopenwrite(joinpath(path, "methods.html")) do io
         render_methods(io; report=r)
     end
 
-    open(joinpath(path, "files.html"), "w") do io
+    lockfreeopenwrite(joinpath(path, "files.html")) do io
         render_files(io; report=r)
     end
 
-    open(joinpath(path, "flamegraph.svg"), "w") do io
+    lockfreeopenwrite(joinpath(path, "flamegraph.svg")) do io
         render_flamegraph(io; report=r)
     end
 
@@ -66,7 +72,7 @@ output(r::Report, path) = begin
             (LineNumberNode(i, file), code)
             for (i, code) in enumerate(readlines(string(file)))
         ]
-        open(joinpath(path, outputfilename(file)), "w") do io
+        lockfreeopenwrite(joinpath(path, outputfilename(file))) do io
             render_sourcefile(io; filename=file, lines=lines, report=r)
         end
     end
