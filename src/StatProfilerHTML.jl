@@ -39,4 +39,6 @@ macro profilehtml(expr)
     end
 end
 
+precompile(Tuple{typeof(statprofilehtml)})
+
 end
