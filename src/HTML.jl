@@ -76,7 +76,7 @@ output(r::Report, path) = begin
         isfile(string(file)) || continue
         lines = [
             (LineNumberNode(i, file), code)
-            for (i, code) in enumerate(readlines(string(file)))
+            for (i, code) in enumerate(eachline(string(file)))
         ]
         lockfreeopenwrite(joinpath(path, outputfilename(file))) do io
             render_sourcefile(io; filename=file, lines=lines, report=r)
