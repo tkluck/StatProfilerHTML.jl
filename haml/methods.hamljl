@@ -1,8 +1,8 @@
 !!! 5
 %html
   %head
-    %meta(http_equiv="Content-Type", content="text/html; charset=utf-8")
-    %link(rel="stylesheet", type="text/css", href="statprofiler.css")
+    %meta(http_equiv="Content-Type", content="text/html; charset=utf-8")/
+    %link(rel="stylesheet", type="text/css", href="statprofiler.css")/
     %title StatProfilerHTML - method list
   %body
     - @include("reportheader.hamljl", report=$report)
