@@ -1,7 +1,7 @@
 name = "StatProfilerHTML"
 uuid = "a8a75453-ed82-57c9-9e16-4cd1196ecbf5"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "1.2.1"
+version = "1.2.2"
 
 [deps]
 Base64 = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
