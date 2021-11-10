@@ -33,6 +33,19 @@ end
     end
 end
 
+@testset "non-standard path" begin
+    mktempdir() do dir
+        cd(dir) do
+            @profile fibonacci(43)
+
+            statprofilehtml(path="foobar")
+
+            @test isdir("foobar")
+            @test !isdir("statprof")
+        end
+    end
+end
+
 @testset "@profilehtml" begin
     mktempdir() do dir
         cd(dir) do

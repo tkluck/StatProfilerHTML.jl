@@ -13,16 +13,18 @@ import .Reports: Report
 import .HTML: output
 
 function statprofilehtml(data::Vector{<:Unsigned} = UInt[], litrace::LineInfoDict = LineInfoDict();
-                         from_c=false)
+                         from_c=false, path="statprof")
     if length(data) == 0
         (data, litrace) = Profile.retrieve()
     end
 
+    fullpath = abspath(path)
+
     report = Report(data, litrace, from_c)
     sort!(report)
-    HTML.output(report, "statprof")
+    HTML.output(report, fullpath)
 
-    @info "Wrote profiling output to file://$(pwd())/statprof/index.html ."
+    @info "Wrote profiling output to file://$fullpath/index.html ."
 end
 
 macro profilehtml(expr)
