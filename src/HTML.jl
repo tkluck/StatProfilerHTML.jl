@@ -1,11 +1,16 @@
 module HTML
 
-import Base64: base64encode
+import SHA: sha1
 
 import Dates: format, RFC1123Format
 import HAML: includehaml, @include, @surround, @cdatafile, @output
 
 import ..Reports: Report, FunctionPoint, TracePoint
+
+# needs to be smaller than 250 on MacOS, and anecdotally, the length of a full
+# path needs to be at most 260 on Windows. This should give some spare room
+# in either case.
+const MAX_OUTPUT_FILE_NAME_LENGTH = 150
 
 templatefile(name...) = joinpath(@__DIR__, "..", "haml", name...)
 
@@ -21,7 +26,8 @@ includehaml(@__MODULE__,
 outputfilename(::Nothing) = ""
 outputfilename(sourcefile::Symbol) = begin
     b = basename(string(sourcefile))
-    x = base64encode(string(sourcefile))
+    x = bytes2hex(sha1(String(sourcefile)))
+    b = first(b, MAX_OUTPUT_FILE_NAME_LENGTH - length(x) - length("-.html"))
     return "$b-$x.html"
 end
 

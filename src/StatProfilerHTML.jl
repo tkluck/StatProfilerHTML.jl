@@ -22,7 +22,7 @@ function statprofilehtml(data::Vector{<:Unsigned} = UInt[], litrace::LineInfoDic
 
     report = Report(data, litrace, from_c)
     sort!(report)
-    HTML.output(report, fullpath)
+    HTML.output(report, path)
 
     @info "Wrote profiling output to file://$fullpath/index.html ."
 end
