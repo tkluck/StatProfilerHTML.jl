@@ -18,6 +18,11 @@ function statprofilehtml(data::Vector{<:Unsigned} = UInt[], litrace::LineInfoDic
         (data, litrace) = Profile.retrieve()
     end
 
+    # TODO: Handle and use metadata (threadid, taskid etc.) rather than always remove it
+    if isdefined(Profile, :has_meta) && Profile.has_meta(data)
+        data = Profile.strip_meta(data)
+    end
+
     fullpath = abspath(path)
 
     report = Report(data, litrace, from_c)
