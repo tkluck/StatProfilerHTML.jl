@@ -1,9 +1,9 @@
 # StatProfilerHTML
 
-| **Build Status**                                                | **Test coverage**                                       |
-|:---------------------------------------------------------------:|:-------------------------------------------------------:|
-| [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![Coverage Status][codecov-img]][codecov-url]      |
-|                                                                 |                                                         |
+| **Build Status**         | **Test coverage**                                 |
+|:------------------------:|:-------------------------------------------------:|
+| [![][c-i-img]][c-i-url]  | [![Coverage Status][codecov-img]][codecov-url]    |
+|                          |                                                   |
 
 
 This module formats the output from Julia's Profile module into an html
@@ -25,11 +25,8 @@ is the result of profiling
     @profilehtml (x + y + z)^120;
 
 
-[travis-img]: https://travis-ci.org/tkluck/StatProfilerHTML.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/tkluck/StatProfilerHTML.jl
-
-[appveyor-img]: https://ci.appveyor.com/api/projects/status/mwnbnfp1gjm8ux3d?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/tkluck/statprofilerhtml-jl
+[c-i-img]: https://github.com/tkluck/StatProfilerHTML.jl/workflows/CI/badge.svg
+[c-i-url]: https://github.com/tkluck/StatProfilerHTML.jl/actions?query=workflow%3ACI
 
 [codecov-img]: https://codecov.io/gh/tkluck/StatProfilerHTML.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/tkluck/StatProfilerHTML.jl
