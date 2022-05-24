@@ -2,7 +2,8 @@ module Reports
 
 import Base.StackTraces: StackFrame
 import Dates: DateTime, now
-import Profile: flatten
+import Base.StackTraces: StackFrame
+import Profile
 
 import DataStructures: DefaultDict
 import FlameGraphs: flamegraph
@@ -78,6 +79,13 @@ Report(flamegraph, generated_on=now()) = Report(
     generated_on,
 )
 
+# TODO: Handle and use metadata (threadid, taskid etc.) rather than always remove it
+@static if isdefined(Profile, :has_meta)
+    _strip_data(data) = Profile.has_meta(data) ? Profile.strip_meta(data) : copy(data)
+else
+    _strip_data(data) = copy(data)
+end
+
 Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c) = begin
     # point different lines of the same function to the same stack frame --
     # we show line-by-line info in the source files, not in the flame graph.
@@ -90,7 +98,8 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
     # it _has_ to be UInt64 even on 32 bits platforms
     report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c))
 
-    data, litrace = flatten(data, litrace)
+    data = _strip_data(data)
+    data, litrace = Profile.flatten(data, litrace)
 
     lastwaszero = true
     trace = StackFrame[]
