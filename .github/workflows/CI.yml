@@ -38,6 +38,8 @@ jobs:
           - os: windows-latest
             arch: x86
     steps:
+      - name: Avoid line ending issues on Windows
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
