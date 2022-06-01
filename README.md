@@ -3,7 +3,6 @@
 | **Build Status**         | **Test coverage**                                 |
 |:------------------------:|:-------------------------------------------------:|
 | [![][c-i-img]][c-i-url]  | [![Coverage Status][codecov-img]][codecov-url]    |
-|                          |                                                   |
 
 
 This module formats the output from Julia's Profile module into an html
