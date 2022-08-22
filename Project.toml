@@ -14,6 +14,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 DataStructures = "0.17, 0.18"
-FlameGraphs = "0.1, 0.2"
+FlameGraphs = "0.1, 0.2, 1"
 HAML = "0.3.1"
 julia = "1.3"
