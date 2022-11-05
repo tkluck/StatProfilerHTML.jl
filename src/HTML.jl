@@ -45,11 +45,7 @@ end
 
 fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
 
-if VERSION >= v"1.5"
-    lockfreeopenwrite(f, filename) = open(f, filename, write=true, lock=false)
-else
-    lockfreeopenwrite(f, filename) = open(f, filename, write=true)
-end
+lockfreeopenwrite(f, filename) = open(f, filename, write=true, lock=false)
 
 output(r::Report, path) = begin
     mkpath(path)

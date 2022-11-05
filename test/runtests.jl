@@ -1,11 +1,7 @@
 using StatProfilerHTML
 
-if VERSION >= v"0.7-"
-    using Test
-    using Profile
-else
-    using Base.Test
-end
+using Test
+using Profile
 
 fibonacci(n) = n <= 2 ? 1 : fibonacci(n-1) + fibonacci(n-2)
 
