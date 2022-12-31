@@ -42,6 +42,13 @@ end
 
 TraceCounts() = TraceCounts(0, 0)
 
+Base.:(==)(a::TraceCounts, b::TraceCounts) = begin
+    a.inclusive == b.inclusive || return false
+    a.exclusive == b.exclusive || return false
+    return true
+end
+Base.hash(a::TraceCounts, h::UInt) = hash(a.inclusive, hash(a.exclusive, h))
+
 mutable struct Report{Dict1, Dict2, Dict3, Dict4, Dict5, Dict6, FlameGraph}
     traces_by_point    :: Dict1
     traces_by_function :: Dict2
