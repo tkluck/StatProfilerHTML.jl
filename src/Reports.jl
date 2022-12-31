@@ -2,7 +2,6 @@ module Reports
 
 import Base.StackTraces: StackFrame
 import Dates: DateTime, now
-import Base.StackTraces: StackFrame
 import Profile
 
 import DataStructures: DefaultDict
