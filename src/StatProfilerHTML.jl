@@ -8,6 +8,7 @@ include("HTML.jl")
 import Base.StackTraces: StackFrame
 import Profile
 import Profile: LineInfoDict
+import Dates: now
 
 import .Reports: Report
 import .HTML: output
@@ -20,7 +21,7 @@ function statprofilehtml(data::Vector{<:Unsigned} = UInt[], litrace::LineInfoDic
 
     fullpath = abspath(path)
 
-    report = Report(data, litrace, from_c)
+    report = Report(data, litrace, from_c, now())
     sort!(report)
     HTML.output(report, path)
 

@@ -1,9 +1,7 @@
-import Base.StackTraces: StackFrame
-import StatProfilerHTML.Reports: Report, TracePoint, TraceCounts
 
 @testset "Reports" begin
     @testset "Empty report" begin
-        r = Report(UInt[], Dict{UInt, Vector{StackFrame}}(), false)
+        r = Report(UInt[], Dict{UInt, Vector{StackFrame}}(), false, NOW)
         @test r isa Report
         @test isempty(r.traces_by_point)
         @test isempty(r.traces_by_function)
@@ -12,17 +10,7 @@ import StatProfilerHTML.Reports: Report, TracePoint, TraceCounts
     end
 
     @testset "Short report" begin
-        filename = :var"/home/my/file"
-        sf1 = StackFrame(:helper_function, filename, 22)
-        sf2 = StackFrame(:main_function, filename, 42)
-        tp1 = TracePoint(sf1)
-        tp2 = TracePoint(sf2)
-        fp1 = tp1.containing_function
-        fp2 = tp2.containing_function
-        ip1 = UInt64(0x22)
-        ip2 = UInt64(0x42)
-        sep = UInt64[1, 1, 1, 1, 0, 0]
-        r = Report(UInt64[ip1, ip2, sep..., ip2, sep...], Dict(ip1 => [sf1], ip2 => [sf2]), false)
+        r = TEST_REPORT
         @test r isa Report
         @testset "Traces by point" begin
             @test r.traces_by_point[tp1.point] == TraceCounts(1, 1)
@@ -39,7 +27,8 @@ import StatProfilerHTML.Reports: Report, TracePoint, TraceCounts
             @test r.callsites[fp1.point][tp2] == TraceCounts(1, 1)
             @test r.callees[tp2.point][fp1] == 1
         end
+        @test r.sorted_files == [filename]
         @test r.tracecount == 2
-        @test r.maxdepth == 2
+        @test r.maxdepth == 3
     end
 end

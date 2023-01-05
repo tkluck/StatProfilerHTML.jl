@@ -1,7 +1,7 @@
 name = "StatProfilerHTML"
 uuid = "a8a75453-ed82-57c9-9e16-4cd1196ecbf5"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "1.5"
+version = "1.5.0"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -9,6 +9,7 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 FlameGraphs = "08572546-2f56-4bcf-ba4e-bab62c3a3f89"
 HAML = "0bc81568-2411-4001-9bf1-c899fa54f385"
 Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 

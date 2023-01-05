@@ -70,7 +70,7 @@ default1() = DefaultDict{TracePoint, TraceCounts}(default4)
 default2() = DefaultDict{FunctionPoint, Int}(default0)
 default3() = Symbol("#error: no name#")
 
-Report(flamegraph, generated_on=now()) = Report(
+Report(flamegraph, generated_on) = Report(
     DefaultDict{LineNumberNode, TraceCounts}(TraceCounts),
     DefaultDict{FunctionPoint, TraceCounts}(TraceCounts),
     DefaultDict{Union{Nothing, Symbol}, TraceCounts}(TraceCounts),
@@ -88,11 +88,13 @@ Report(flamegraph, generated_on=now()) = Report(
 # TODO: Handle and use metadata (threadid, taskid etc.) rather than always remove it
 @static if isdefined(Profile, :has_meta)
     _strip_data(data) = Profile.has_meta(data) ? Profile.strip_meta(data) : copy(data)
+    const DUMMY_SEPARATOR = UInt64[1, 1, 1, 1, 0, 0]
 else
     _strip_data(data) = copy(data)
+    const DUMMY_SEPARATOR = UInt64[0, 0]
 end
 
-Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c) = begin
+Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c, generated_on) = begin
     # point different lines of the same function to the same stack frame --
     # we show line-by-line info in the source files, not in the flame graph.
     seenfunctions = Dict{FunctionPoint, StackFrame}()
@@ -102,7 +104,7 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
     # 32-bit support: it seems Profile is a bit undecided about whether `data`
     # is a Vector{UInt} or a Vector{UInt64}. flamegraph calls methods where
     # it _has_ to be UInt64 even on 32 bits platforms
-    report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c))
+    report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c), generated_on)
 
     data = _strip_data(data)
     data, litrace = Profile.flatten(data, litrace)
@@ -158,17 +160,18 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     end
 
     r.tracecount += 1
-    r.maxdepth = max(r.maxdepth, length(trace))
+    # add 1 to the trace length because flamegraph() adds a dummy node
+    r.maxdepth = max(r.maxdepth, length(trace) + 1)
 
     return r
 end
 
 Base.sort!(r::Report) = begin
     r.sorted_functions = collect(keys(r.traces_by_function))
-    sort!(r.sorted_functions, by=fn -> r.traces_by_function[fn].exclusive, rev=true)
+    sort!(r.sorted_functions, by=fn -> (r.traces_by_function[fn].exclusive, fn.name), rev=true)
 
     r.sorted_files = collect(keys(r.traces_by_file))
-    sort!(r.sorted_files, by=file -> r.traces_by_file[file].exclusive, rev=true)
+    sort!(r.sorted_files, by=file -> (r.traces_by_file[file].exclusive, something(file, :var"")), rev=true)
 
     return r
 end
