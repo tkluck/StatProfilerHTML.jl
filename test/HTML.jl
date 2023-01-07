@@ -1,6 +1,5 @@
 import Dates: DateTime, @dateformat_str
 import StatProfilerHTML.HTML: output
-import Random: seed!
 
 const GOLDENDIR = joinpath(@__DIR__, "golden")
 
@@ -9,16 +8,12 @@ const GOLDENDIR = joinpath(@__DIR__, "golden")
         if isfile(GOLDENDIR)
             mv(GOLDENDIR, "$GOLDENDIR.bak", force=true)
         end
-        # seed the random number generators for the random colours in the flame graph
-        seed!(1234)
         output(TEST_REPORT, GOLDENDIR)
     else
         @info "For updating the golden output, pass --update-golden to the test script"
     end
 
     mktempdir() do resultdir
-        # seed the random number generators for the random colours in the flame graph
-        seed!(1234)
         output(TEST_REPORT, resultdir)
 
         for (root, dirs, files) in walkdir(resultdir)

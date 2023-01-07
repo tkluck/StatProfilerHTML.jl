@@ -6,7 +6,7 @@
 -# heuristic from Brendan Gregg's flamegraph.pl
 - show_label = (12 * 0.59) * length(string(label)) < width
 -# 'hot' color scheme from Brendan Gregg's flamegraph.pl
-- r, g, b = rand(205:254), rand(0:229), rand(0:54)
+- r, g, b = rand($rng, 205:254), rand($rng, 0:229), rand($rng, 0:54)
 - fillcolor = "rgb($r, $g, $b)"
 %g(class="func_g", onmouseover="s(this)", onmouseout="c()")
   %title<
@@ -30,6 +30,6 @@
 - curx = Ref($x[])
 - for child in $node[]
   - @output render_flamegraphitem(report=$report, node=Ref{Any}(child),
-        x=curx, y=$y - 16, scale=$scale)
+        x=curx, y=$y - 16, scale=$scale, rng=$rng)
 - $x[] += width
 -# vim: set filetype=haml:

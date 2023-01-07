@@ -1,8 +1,9 @@
 module HTML
 
+import Random: MersenneTwister
 import SHA: sha1
-
 import Dates: format, RFC1123Format
+
 import HAML: includehaml, @include, @surround, @cdatafile, @output
 
 import ..Reports: Report, FunctionPoint, TracePoint
@@ -64,7 +65,8 @@ output(r::Report, path) = begin
     end
 
     lockfreeopenwrite(joinpath(path, "flamegraph.svg")) do io
-        render_flamegraph(io; report=r)
+        rng = MersenneTwister(1234)
+        render_flamegraph(io; report=r, rng=rng)
     end
 
     for file in keys(r.traces_by_file)
