@@ -1,7 +1,7 @@
 
 @testset "Reports" begin
     @testset "Empty report" begin
-        r = Report(UInt[], Dict{UInt, Vector{StackFrame}}(), false, NOW)
+        r = Report(UInt64[], Dict{UInt64, Vector{StackFrame}}(), false, NOW)
         @test r isa Report
         @test isempty(r.traces_by_point)
         @test isempty(r.traces_by_function)
