@@ -30,7 +30,7 @@
     <title>
     (2 &#40;100 &#37;&#41;)</title>
     <a target='_top' xlink:href='#L-1'>
-      <rect x='0.0' y='32' width='1200.0' height='15.0' fill='rgb&#40;228, 138, 51&#41;' rx='2' ry='2' />
+      <rect x='0.0' y='32' width='1200.0' height='15.0' fill='rgb&#40;209, 214, 23&#41;' rx='2' ry='2' />
       <text text-anchor='' x='3.0' y='42.5' font-size='12' font-family='Verdana' fill='rgb&#40;0,0,0&#41;'></text>
     </a>
   </g>
@@ -38,7 +38,7 @@
   <title>main_function
   (2 &#40;100 &#37;&#41;)</title>
   <a target='_top' xlink:href='file-d2083278300f24cbd21c9523bfdb63e64ff2a97d.html#L42'>
-    <rect x='0.0' y='16' width='1200.0' height='15.0' fill='rgb&#40;235, 27, 23&#41;' rx='2' ry='2' />
+    <rect x='0.0' y='16' width='1200.0' height='15.0' fill='rgb&#40;224, 83, 0&#41;' rx='2' ry='2' />
     <text text-anchor='' x='3.0' y='26.5' font-size='12' font-family='Verdana' fill='rgb&#40;0,0,0&#41;'>main_function</text>
   </a>
 </g>
@@ -46,7 +46,7 @@
   <title>helper_function
   (1 &#40;50 &#37;&#41;)</title>
   <a target='_top' xlink:href='file-d2083278300f24cbd21c9523bfdb63e64ff2a97d.html#L22'>
-    <rect x='0.0' y='0' width='600.0' height='15.0' fill='rgb&#40;250, 33, 8&#41;' rx='2' ry='2' />
+    <rect x='0.0' y='0' width='600.0' height='15.0' fill='rgb&#40;220, 161, 47&#41;' rx='2' ry='2' />
     <text text-anchor='' x='3.0' y='10.5' font-size='12' font-family='Verdana' fill='rgb&#40;0,0,0&#41;'>helper_function</text>
   </a>
 </g>
