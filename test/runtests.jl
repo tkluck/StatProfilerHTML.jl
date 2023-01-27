@@ -1,4 +1,5 @@
 using StatProfilerHTML
+using Random
 
 using Test
 using Profile

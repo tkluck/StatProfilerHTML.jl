@@ -20,9 +20,17 @@ end
 
 const found_source_files = Dict{Symbol, Union{Nothing, Symbol}}()
 
+function find_source_file(file)
+    res = Base.find_source_file(file)
+    !isnothing(res) && isfile(res) && return res
+    # try to translate build bot directory to local source
+    res = replace(file, r".*?[\\/]usr[\\/]share[\\/]julia[\\/]stdlib" => joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "stdlib"))
+    isfile(res) ? normpath(res) : nothing
+end
+
 TracePoint(frame::StackFrame) = begin
     file = get!(found_source_files, frame.file) do
-        res = Base.find_source_file(string(frame.file))
+        res = find_source_file(string(frame.file))
         isnothing(res) ? nothing : Symbol(res)
     end
 
