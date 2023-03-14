@@ -31,7 +31,7 @@
                     = cnt.exclusive |> fmtcount(total, " (ex.),")
                     = cnt.inclusive |> fmtcount(total, " (incl.)")
                     when called from $(callsite.containing_function.name)
-                    %a(href=href(callsite)) line $(callsite.point.line)
+                    %a(href=href($report, callsite)) line $(callsite.point.line)
                     %br/
               - if (callees = get($report.callees, point, nothing)) |> !isnothing
                 .callees
@@ -39,7 +39,7 @@
                   - for (callee, cnt) in pairs(callees)
                     = cnt |> fmtcount(total)
                     samples spent calling
-                    %a(href=href(callee))= callee.name
+                    %a(href=href($report, callee))= callee.name
                     %br/
               %span.code= code
 

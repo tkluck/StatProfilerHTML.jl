@@ -9,5 +9,5 @@
       %tr
         %td= $report.traces_by_file[file].exclusive |> fmtcount($report.tracecount)
         %td
-          %a(href=outputfilename(file))= file
+          %a(href=outputfilename($report, file))= relpath($report, file)
 -# vim: set filetype=haml:

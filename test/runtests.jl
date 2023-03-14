@@ -9,11 +9,12 @@ using Dates: DateTime, @dateformat_str
 using StatProfilerHTML.Reports: DUMMY_SEPARATOR, Report, TracePoint, TraceCounts
 
 const NOW = DateTime("2022-12-31", dateformat"y-m-d")
+const STARTPATH = @__DIR__
 
 const TEST_REPORT = begin
-    filename = :var"/home/my/file"
-    sf1 = StackFrame(:helper_function, filename, 22)
-    sf2 = StackFrame(:main_function, filename, 42)
+    filename = Symbol(joinpath(STARTPATH, "fake-source.jl"))
+    sf1 = StackFrame(:helper_function, filename, 8)
+    sf2 = StackFrame(:main_function, filename, 15)
     tp1 = TracePoint(sf1)
     tp2 = TracePoint(sf2)
     fp1 = tp1.containing_function
@@ -21,7 +22,7 @@ const TEST_REPORT = begin
     ip1 = UInt64(0x22)
     ip2 = UInt64(0x42)
     sep = DUMMY_SEPARATOR
-    r = Report(UInt64[ip1, ip2, sep..., ip2, sep...], Dict(ip1 => [sf1], ip2 => [sf2]), false, NOW)
+    r = Report(UInt64[ip1, ip2, sep..., ip2, sep...], Dict(ip1 => [sf1], ip2 => [sf2]), false, NOW, STARTPATH)
     sort!(r)
 end
 

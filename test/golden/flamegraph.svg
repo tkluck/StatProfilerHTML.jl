@@ -37,7 +37,7 @@
   <g class='func_g' onmouseover='s&#40;this&#41;' onmouseout='c&#40;&#41;'>
   <title>main_function
   (2 &#40;100 &#37;&#41;)</title>
-  <a target='_top' xlink:href='file-d2083278300f24cbd21c9523bfdb63e64ff2a97d.html#L42'>
+  <a target='_top' xlink:href='fake-source.jl-4c8b0079d11b2925585882f699dd2fdccff100a6.html#L15'>
     <rect x='0.0' y='16' width='1200.0' height='15.0' fill='rgb&#40;224, 83, 0&#41;' rx='2' ry='2' />
     <text text-anchor='' x='3.0' y='26.5' font-size='12' font-family='Verdana' fill='rgb&#40;0,0,0&#41;'>main_function</text>
   </a>
@@ -45,7 +45,7 @@
 <g class='func_g' onmouseover='s&#40;this&#41;' onmouseout='c&#40;&#41;'>
   <title>helper_function
   (1 &#40;50 &#37;&#41;)</title>
-  <a target='_top' xlink:href='file-d2083278300f24cbd21c9523bfdb63e64ff2a97d.html#L22'>
+  <a target='_top' xlink:href='fake-source.jl-4c8b0079d11b2925585882f699dd2fdccff100a6.html#L8'>
     <rect x='0.0' y='0' width='600.0' height='15.0' fill='rgb&#40;220, 161, 47&#41;' rx='2' ry='2' />
     <text text-anchor='' x='3.0' y='10.5' font-size='12' font-family='Verdana' fill='rgb&#40;0,0,0&#41;'>helper_function</text>
   </a>

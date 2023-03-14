@@ -1,5 +1,6 @@
 module HTML
 
+
 import SHA: sha1
 import Dates: format, RFC1123Format
 import StableRNGs: StableRNG
@@ -24,22 +25,24 @@ includehaml(@__MODULE__,
     :render_flamegraphitem => templatefile("flamegraphitem.hamljl"),
 )
 
-outputfilename(::Nothing) = ""
-outputfilename(sourcefile::Symbol) = begin
-    b = basename(string(sourcefile))
-    x = bytes2hex(sha1(String(sourcefile)))
+outputfilename(::Report, ::Nothing) = ""
+outputfilename(r::Report, sourcefile::Symbol) = begin
+    s = string(sourcefile)
+    b = basename(s)
+    r = relpath(s, r.startpath)
+    x = bytes2hex(sha1(r))
     b = first(b, MAX_OUTPUT_FILE_NAME_LENGTH - length(x) - length("-.html"))
     return "$b-$x.html"
 end
 
-href(pt::FunctionPoint) = begin
-    fn = outputfilename(pt.point.file)
+href(r::Report, pt::FunctionPoint) = begin
+    fn = outputfilename(r, pt.point.file)
     anchor = "L$(pt.point.line)"
     return "$fn#$anchor"
 end
 
-href(pt::TracePoint) = begin
-    fn = outputfilename(pt.point.file)
+href(r::Report, pt::TracePoint) = begin
+    fn = outputfilename(r, pt.point.file)
     anchor = "L$(pt.point.line)"
     return "$fn#$anchor"
 end
@@ -76,8 +79,8 @@ output(r::Report, path) = begin
             (LineNumberNode(i, file), code)
             for (i, code) in enumerate(eachline(string(file)))
         ]
-        lockfreeopenwrite(joinpath(path, outputfilename(file))) do io
-            render_sourcefile(io; filename=file, lines=lines, report=r)
+        lockfreeopenwrite(joinpath(path, outputfilename(r, file))) do io
+            render_sourcefile(io; filename=relpath(r, file), lines=lines, report=r)
         end
     end
 end

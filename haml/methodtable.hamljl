@@ -11,5 +11,5 @@
         %td= $report.traces_by_function[fn].exclusive |> fmtcount($report.tracecount)
         %td= $report.traces_by_function[fn].inclusive |> fmtcount($report.tracecount)
         %td
-          %a(href=href(fn))= fn.name
+          %a(href=href($report, fn))= fn.name
 -# vim: set filetype=haml:

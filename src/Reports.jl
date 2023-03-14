@@ -25,7 +25,7 @@ function find_source_file(file)
     !isnothing(res) && isfile(res) && return res
     # try to translate build bot directory to local source
     res = replace(file, r".*?[\\/]usr[\\/]share[\\/]julia[\\/]stdlib" => joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "stdlib"))
-    isfile(res) ? normpath(res) : nothing
+    isfile(res) ? res : nothing
 end
 
 TracePoint(frame::StackFrame) = begin
@@ -70,6 +70,7 @@ mutable struct Report{Dict1, Dict2, Dict3, Dict4, Dict5, Dict6, FlameGraph}
     flamegraph         :: FlameGraph
     maxdepth           :: Int
     generated_on       :: DateTime
+    startpath          :: String
 end
 
 default4() = TraceCounts()
@@ -78,7 +79,7 @@ default1() = DefaultDict{TracePoint, TraceCounts}(default4)
 default2() = DefaultDict{FunctionPoint, Int}(default0)
 default3() = Symbol("#error: no name#")
 
-Report(flamegraph, generated_on) = Report(
+Report(flamegraph, generated_on, startpath) = Report(
     DefaultDict{LineNumberNode, TraceCounts}(TraceCounts),
     DefaultDict{FunctionPoint, TraceCounts}(TraceCounts),
     DefaultDict{Union{Nothing, Symbol}, TraceCounts}(TraceCounts),
@@ -91,6 +92,7 @@ Report(flamegraph, generated_on) = Report(
     flamegraph,
     0,
     generated_on,
+    startpath,
 )
 
 # TODO: Handle and use metadata (threadid, taskid etc.) rather than always remove it
@@ -102,7 +104,7 @@ else
     const DUMMY_SEPARATOR = UInt64[0, 0]
 end
 
-Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c, generated_on) = begin
+Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, from_c, generated_on, startpath=".") = begin
     # point different lines of the same function to the same stack frame --
     # we show line-by-line info in the source files, not in the flame graph.
     seenfunctions = Dict{FunctionPoint, StackFrame}()
@@ -112,7 +114,7 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
     # 32-bit support: it seems Profile is a bit undecided about whether `data`
     # is a Vector{UInt} or a Vector{UInt64}. flamegraph calls methods where
     # it _has_ to be UInt64 even on 32 bits platforms
-    report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c), generated_on)
+    report = Report(flamegraph(UInt64.(data), lidict=merged_litrace, C=from_c), generated_on, startpath)
 
     data = _strip_data(data)
     data, litrace = Profile.flatten(data, litrace)
@@ -184,5 +186,6 @@ Base.sort!(r::Report) = begin
     return r
 end
 
+Base.relpath(r::Report, file) = relpath(string(file), r.startpath)
 
 end # module

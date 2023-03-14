@@ -13,7 +13,7 @@
     = pt.containing_function.name
     - @surround("(", ")") do
       = cnt |> fmtcount($report.tracecount)
-  %a(target="_top", var"xlink:href"=href(pt.containing_function))
+  %a(target="_top", var"xlink:href"=href($report, pt.containing_function))
     %rect(x=$x[],
           y=$y,
           width=width,
