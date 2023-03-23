@@ -38,4 +38,12 @@ const GOLDENDIR = joinpath(@__DIR__, "golden")
             end
         end
     end
+
+    @testset "Empty report" begin
+        mktempdir() do resultdir
+            r = Report(UInt64[], Dict{UInt64, Vector{StackFrame}}(), false, NOW)
+            output(r, resultdir)
+            @test isfile(joinpath(resultdir, "index.html"))
+       end
+   end
 end

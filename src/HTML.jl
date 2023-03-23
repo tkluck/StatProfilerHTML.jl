@@ -47,7 +47,11 @@ href(r::Report, pt::TracePoint) = begin
     return "$fn#$anchor"
 end
 
-fmtcount(total, suffix="") = x -> iszero(x) ? "" : "$x ($(round(Int, 100x/total)) %)$suffix"
+fmtcount(total, suffix="") = function(x)
+    iszero(total) && return "0 (out of 0)$suffix"
+    iszero(x) && return ""
+    return "$x ($(round(Int, 100x/total)) %)$suffix"
+end
 
 lockfreeopenwrite(f, filename) = open(f, filename, write=true, lock=false)
 

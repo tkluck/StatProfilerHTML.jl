@@ -14,6 +14,7 @@
   %rect(x=0.0, y=0, width=1200.0, height=height, fill="url(#background)")/
   %text(text_anchor="", x=10.0, y=height, font_size=12, font_family="Verdana",
         fill="rgb(0,0,0)", dominant_baseline="ideographic", id="details")= " "
-  - @include("flamegraphitem.hamljl", report=$report, node=Ref{Any}($report.flamegraph),
-        x=Ref(0.0), y=height-20-16, scale = 1200.0 / $report.tracecount, rng=$rng)
+  - if !isnothing($report.flamegraph)
+    - @include("flamegraphitem.hamljl", report=$report, node=Ref{Any}($report.flamegraph),
+          x=Ref(0.0), y=height-20-16, scale = 1200.0 / $report.tracecount, rng=$rng)
 -# vim: set filetype=haml:
