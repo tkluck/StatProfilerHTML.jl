@@ -21,11 +21,12 @@ includehaml(@__MODULE__,
     :render_index      => templatefile("index.hamljl"),
     :render_files      => templatefile("files.hamljl"),
     :render_methods    => templatefile("methods.hamljl"),
+    :render_notfound   => templatefile("notfound.hamljl"),
     :render_flamegraph => templatefile("flamegraph.hamljl"),
     :render_flamegraphitem => templatefile("flamegraphitem.hamljl"),
 )
 
-outputfilename(::Report, ::Nothing) = ""
+outputfilename(::Report, ::Nothing) = "notfound.html"
 outputfilename(r::Report, sourcefile::Symbol) = begin
     s = string(sourcefile)
     b = basename(s)
@@ -69,6 +70,10 @@ output(r::Report, path) = begin
 
     lockfreeopenwrite(joinpath(path, "files.html")) do io
         render_files(io; report=r)
+    end
+
+    lockfreeopenwrite(joinpath(path, "notfound.html")) do io
+        render_notfound(io; report=r)
     end
 
     lockfreeopenwrite(joinpath(path, "flamegraph.svg")) do io

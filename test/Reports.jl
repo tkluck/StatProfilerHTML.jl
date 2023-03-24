@@ -14,11 +14,11 @@
         @test r isa Report
         @testset "Traces by point" begin
             @test r.traces_by_point[tp1.point] == TraceCounts(1, 1)
-            @test r.traces_by_point[tp2.point] == TraceCounts(2, 1)
+            @test r.traces_by_point[tp2.point] == TraceCounts(3, 1)
         end
         @testset "Traces by function" begin
             @test r.traces_by_function[fp1] == TraceCounts(1, 1)
-            @test r.traces_by_function[fp2] == TraceCounts(2, 1)
+            @test r.traces_by_function[fp2] == TraceCounts(3, 1)
         end
         @testset "Traces by file" begin
             @test_broken r.traces_by_file[filename] == TraceCounts(2, 2)
@@ -28,7 +28,7 @@
             @test r.callees[tp2.point][fp1] == 1
         end
         @test r.sorted_files == [filename]
-        @test r.tracecount == 2
+        @test r.tracecount == 3
         @test r.maxdepth == 3
     end
 end

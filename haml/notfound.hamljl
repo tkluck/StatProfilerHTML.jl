@@ -1,0 +1,13 @@
+!!! 5
+%html
+  %head
+    %meta(http_equiv="Content-Type", content="text/html; charset=utf-8")/
+    %link(rel="stylesheet", type="text/css", href="statprofiler.css")/
+    %title StatProfilerHTML - source file not available
+  %body
+    - @include("reportheader.hamljl", report=$report)
+    %h1 Source file not found
+    %p
+      This source file was not available when this report was generated.
+
+-# vim: set filetype=haml:

@@ -62,7 +62,7 @@ mutable struct Report{Dict1, Dict2, Dict3, Dict4, Dict5, Dict6, FlameGraph}
     traces_by_function :: Dict2
     traces_by_file     :: Dict3
     sorted_functions   :: Vector{FunctionPoint}
-    sorted_files       :: Vector{Union{Nothing, Symbol}}
+    sorted_files       :: Vector{Symbol}
     callsites          :: Dict4
     callees            :: Dict5
     functionnames      :: Dict6
@@ -82,9 +82,9 @@ default3() = Symbol("#error: no name#")
 Report(flamegraph, generated_on, startpath) = Report(
     DefaultDict{LineNumberNode, TraceCounts}(TraceCounts),
     DefaultDict{FunctionPoint, TraceCounts}(TraceCounts),
-    DefaultDict{Union{Nothing, Symbol}, TraceCounts}(TraceCounts),
+    DefaultDict{Symbol, TraceCounts}(TraceCounts),
     Vector{FunctionPoint}(),
-    Vector{Union{Nothing, Symbol}}(),
+    Vector{Symbol}(),
     DefaultDict{LineNumberNode, DefaultDict{TracePoint, TraceCounts, typeof(default4)}}(default1),
     DefaultDict{LineNumberNode, DefaultDict{FunctionPoint, Int, typeof(default0)}}(default2),
     DefaultDict{LineNumberNode, Symbol}(default3),
@@ -145,7 +145,9 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     for pt in trace
         r.traces_by_point[pt.point].inclusive += 1
         r.traces_by_function[pt.containing_function].inclusive += 1
-        r.traces_by_file[pt.point.file].inclusive += 1
+        if !isnothing(pt.point.file)
+            r.traces_by_file[pt.point.file].inclusive += 1
+        end
 
         r.functionnames[pt.containing_function.point] = pt.containing_function.name
     end
@@ -153,7 +155,9 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     length(trace) > 0 && let pt = trace[1]
         r.traces_by_point[pt.point].exclusive += 1
         r.traces_by_function[pt.containing_function].exclusive += 1
-        r.traces_by_file[pt.point.file].exclusive += 1
+        if !isnothing(pt.point.file)
+            r.traces_by_file[pt.point.file].exclusive += 1
+        end
     end
 
     for (callee, caller) in @views zip(trace[1:end-1], trace[2:end])
