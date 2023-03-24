@@ -6,6 +6,7 @@ import Profile
 
 import DataStructures: DefaultDict
 import FlameGraphs: flamegraph
+import OrderedCollections: OrderedDict
 
 struct FunctionPoint
     point :: LineNumberNode
@@ -137,7 +138,7 @@ Report(data::Vector{<:Unsigned}, litrace::Dict{<:Unsigned, Vector{StackFrame}}, 
         end
     end
 
-    return report
+    return sort(report)
 end
 
 Base.push!(r::Report, trace::Vector{StackFrame}) = begin
@@ -180,14 +181,43 @@ Base.push!(r::Report, trace::Vector{StackFrame}) = begin
     return r
 end
 
-Base.sort!(r::Report) = begin
-    r.sorted_functions = collect(keys(r.traces_by_function))
-    sort!(r.sorted_functions, by=fn -> (r.traces_by_function[fn].exclusive, fn.name), rev=true)
+Base.sort(r::Report) = begin
 
-    r.sorted_files = collect(keys(r.traces_by_file))
-    sort!(r.sorted_files, by=file -> (r.traces_by_file[file].exclusive, something(file, :var"")), rev=true)
+    traces_by_function = OrderedDict(r.traces_by_function)
+    sort!(traces_by_function, by=fn -> (traces_by_function[fn].exclusive, fn.name), rev=true)
 
-    return r
+    traces_by_file = OrderedDict(r.traces_by_file)
+    sort!(traces_by_file, by=file -> (traces_by_file[file].exclusive, something(file, :var"")), rev=true)
+
+    callsites = Dict{LineNumberNode, OrderedDict{TracePoint, TraceCounts}}()
+    for (point, callers) in pairs(r.callsites)
+        c = OrderedDict(callers)
+        sort!(c, by = caller -> (c[caller].inclusive, something(caller.point.file, :var""), caller.point.line), rev=true)
+        callsites[point] = c
+    end
+
+    callees = Dict{LineNumberNode, OrderedDict{FunctionPoint, Int}}()
+    for (point, fns) in pairs(r.callees)
+        c = OrderedDict(fns)
+        sort!(c, by = fn -> (c[fn], fn.name), rev=true)
+        callees[point] = c
+    end
+
+    return Report(
+        r.traces_by_point,
+        traces_by_function,
+        traces_by_file,
+        collect(keys(traces_by_function)),
+        collect(keys(traces_by_file)),
+        callsites,
+        callees,
+        r.functionnames,
+        r.tracecount,
+        r.flamegraph,
+        r.maxdepth,
+        r.generated_on,
+        r.startpath,
+    )
 end
 
 Base.relpath(r::Report, file) = relpath(string(file), r.startpath)
