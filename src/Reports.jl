@@ -29,13 +29,17 @@ function find_source_file(file)
     isfile(res) ? res : nothing
 end
 
+_linenumber(frame::StackFrame) = _linenumber(frame, frame.linfo)
+_linenumber(frame::StackFrame, linfo::Any) = frame.line
+_linenumber(frame::StackFrame, linfo::Core.MethodInstance) = linfo.def.line
+
 TracePoint(frame::StackFrame) = begin
     file = get!(found_source_files, frame.file) do
         res = find_source_file(string(frame.file))
         isnothing(res) ? nothing : Symbol(res)
     end
 
-    func_line = isnothing(frame.linfo) ? frame.line : frame.linfo.def.line - 1
+    func_line = _linenumber(frame)
 
     return TracePoint(
         FunctionPoint(LineNumberNode(Int(func_line), file), frame.func),
