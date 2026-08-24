@@ -1,7 +1,7 @@
 name = "StatProfilerHTML"
 uuid = "a8a75453-ed82-57c9-9e16-4cd1196ecbf5"
 author = ["Timo Kluck <tkluck@infty.nl>"]
-version = "1.6.1"
+version = "1.6.2"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -19,7 +19,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 DataStructures = "0.17, 0.18, 0.19"
 FlameGraphs = "0.1, 0.2, 1"
 HAML = "0.3.1"
-OrderedCollections = "1"
+OrderedCollections = "1, 2"
 StableRNGs = "1"
 julia = "1.6"
 
